@@ -1,0 +1,662 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		230F91FE2FFE0A3B006BAF97 /* FinoWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 23ED9E5B2FFDF69F00839B54 /* FinoWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		23BEC9702FFE0065005DE436 /* WidgetModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23BEC96F2FFE005C005DE436 /* WidgetModels.swift */; };
+		23BEC9712FFE0065005DE436 /* WidgetModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23BEC96F2FFE005C005DE436 /* WidgetModels.swift */; };
+		23BEC9AB2FFE100000000001 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 23BEC9AA2FFE100000000001 /* Localizable.xcstrings */; };
+		23ED9E5E2FFDF6A000839B54 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 23ED9E5D2FFDF69F00839B54 /* WidgetKit.framework */; };
+		23ED9E602FFDF6A000839B54 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 23ED9E5F2FFDF6A000839B54 /* SwiftUI.framework */; };
+		23ED9E902FFDF82B00839B54 /* FinoWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23ED9E892FFDF82B00839B54 /* FinoWidget.swift */; };
+		23ED9E912FFDF82B00839B54 /* FinoWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 23ED9E8A2FFDF82B00839B54 /* FinoWidgetBundle.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		23AB000B2FFE30000000000B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A10000060000000000000006 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A10000050000000000000005;
+			remoteInfo = Fino;
+		};
+		23ED9E692FFDF6A100839B54 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A10000060000000000000006 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 23ED9E5A2FFDF69F00839B54;
+			remoteInfo = FinoWidgetExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		B20000070000000000000007 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				230F91FE2FFE0A3B006BAF97 /* FinoWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		23AB00032FFE300000000003 /* FinoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FinoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		23BEC96F2FFE005C005DE436 /* WidgetModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetModels.swift; sourceTree = "<group>"; };
+		23BEC9752FFE03F0005DE436 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		23BEC9AA2FFE100000000001 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		23ED9E5B2FFDF69F00839B54 /* FinoWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = FinoWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		23ED9E5D2FFDF69F00839B54 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		23ED9E5F2FFDF6A000839B54 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		23ED9E882FFDF82B00839B54 /* FinoWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FinoWidget.entitlements; sourceTree = "<group>"; };
+		23ED9E892FFDF82B00839B54 /* FinoWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinoWidget.swift; sourceTree = "<group>"; };
+		23ED9E8A2FFDF82B00839B54 /* FinoWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinoWidgetBundle.swift; sourceTree = "<group>"; };
+		A10000040000000000000004 /* Fino.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Fino.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		23AB00012FFE300000000001 /* FinoTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = FinoTests;
+			sourceTree = "<group>";
+		};
+		A10000010000000000000001 /* FinoApp */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = FinoApp;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		23AB00052FFE300000000005 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		23ED9E582FFDF69F00839B54 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				23ED9E602FFDF6A000839B54 /* SwiftUI.framework in Frameworks */,
+				23ED9E5E2FFDF6A000839B54 /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A10000080000000000000008 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		23ED9E5C2FFDF69F00839B54 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				23ED9E5D2FFDF69F00839B54 /* WidgetKit.framework */,
+				23ED9E5F2FFDF6A000839B54 /* SwiftUI.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		23ED9E8C2FFDF82B00839B54 /* FinoWidget */ = {
+			isa = PBXGroup;
+			children = (
+				23BEC9752FFE03F0005DE436 /* Info.plist */,
+				23BEC9AA2FFE100000000001 /* Localizable.xcstrings */,
+				23BEC96F2FFE005C005DE436 /* WidgetModels.swift */,
+				23ED9E882FFDF82B00839B54 /* FinoWidget.entitlements */,
+				23ED9E892FFDF82B00839B54 /* FinoWidget.swift */,
+				23ED9E8A2FFDF82B00839B54 /* FinoWidgetBundle.swift */,
+			);
+			path = FinoWidget;
+			sourceTree = "<group>";
+		};
+		A10000020000000000000002 = {
+			isa = PBXGroup;
+			children = (
+				A10000010000000000000001 /* FinoApp */,
+				23AB00012FFE300000000001 /* FinoTests */,
+				23ED9E8C2FFDF82B00839B54 /* FinoWidget */,
+				23ED9E5C2FFDF69F00839B54 /* Frameworks */,
+				A10000030000000000000003 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A10000030000000000000003 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				23AB00032FFE300000000003 /* FinoTests.xctest */,
+				A10000040000000000000004 /* Fino.app */,
+				23ED9E5B2FFDF69F00839B54 /* FinoWidgetExtension.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		23AB00022FFE300000000002 /* FinoTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 23AB00072FFE300000000007 /* Build configuration list for PBXNativeTarget "FinoTests" */;
+			buildPhases = (
+				23AB00042FFE300000000004 /* Sources */,
+				23AB00052FFE300000000005 /* Frameworks */,
+				23AB00062FFE300000000006 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				23AB000A2FFE30000000000A /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				23AB00012FFE300000000001 /* FinoTests */,
+			);
+			name = FinoTests;
+			packageProductDependencies = (
+			);
+			productName = FinoTests;
+			productReference = 23AB00032FFE300000000003 /* FinoTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		23ED9E5A2FFDF69F00839B54 /* FinoWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 23ED9E6D2FFDF6A100839B54 /* Build configuration list for PBXNativeTarget "FinoWidgetExtension" */;
+			buildPhases = (
+				23ED9E572FFDF69F00839B54 /* Sources */,
+				23ED9E582FFDF69F00839B54 /* Frameworks */,
+				23ED9E592FFDF69F00839B54 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = FinoWidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = FinoWidgetExtension;
+			productReference = 23ED9E5B2FFDF69F00839B54 /* FinoWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		A10000050000000000000005 /* Fino */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A100000A000000000000000A /* Build configuration list for PBXNativeTarget "Fino" */;
+			buildPhases = (
+				A10000070000000000000007 /* Sources */,
+				A10000080000000000000008 /* Frameworks */,
+				A10000090000000000000009 /* Resources */,
+				B20000070000000000000007 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				23ED9E6A2FFDF6A100839B54 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				A10000010000000000000001 /* FinoApp */,
+			);
+			name = Fino;
+			packageProductDependencies = (
+			);
+			productName = FinanzasApp;
+			productReference = A10000040000000000000004 /* Fino.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A10000060000000000000006 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2660;
+				LastUpgradeCheck = 2660;
+				TargetAttributes = {
+					23AB00022FFE300000000002 = {
+						CreatedOnToolsVersion = 26.6;
+						TestTargetID = A10000050000000000000005;
+					};
+					23ED9E5A2FFDF69F00839B54 = {
+						CreatedOnToolsVersion = 26.6;
+					};
+					A10000050000000000000005 = {
+						CreatedOnToolsVersion = 16.0;
+					};
+				};
+			};
+			buildConfigurationList = A100000B000000000000000B /* Build configuration list for PBXProject "Fino" */;
+			developmentRegion = es;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				es,
+				en,
+				Base,
+			);
+			mainGroup = A10000020000000000000002;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = A10000030000000000000003 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				23AB00022FFE300000000002 /* FinoTests */,
+				A10000050000000000000005 /* Fino */,
+				23ED9E5A2FFDF69F00839B54 /* FinoWidgetExtension */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		23AB00062FFE300000000006 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		23ED9E592FFDF69F00839B54 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				23BEC9AB2FFE100000000001 /* Localizable.xcstrings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A10000090000000000000009 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		23AB00042FFE300000000004 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		23ED9E572FFDF69F00839B54 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				23ED9E902FFDF82B00839B54 /* FinoWidget.swift in Sources */,
+				23BEC9712FFE0065005DE436 /* WidgetModels.swift in Sources */,
+				23ED9E912FFDF82B00839B54 /* FinoWidgetBundle.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A10000070000000000000007 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				23BEC9702FFE0065005DE436 /* WidgetModels.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		23AB000A2FFE30000000000A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A10000050000000000000005 /* Fino */;
+			targetProxy = 23AB000B2FFE30000000000B /* PBXContainerItemProxy */;
+		};
+		23ED9E6A2FFDF6A100839B54 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 23ED9E5A2FFDF69F00839B54 /* FinoWidgetExtension */;
+			targetProxy = 23ED9E692FFDF6A100839B54 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		23AB00082FFE300000000008 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.axelmorano.FinoApp.FinoTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Fino.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Fino";
+			};
+			name = Debug;
+		};
+		23AB00092FFE300000000009 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.axelmorano.FinoApp.FinoTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Fino.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Fino";
+			};
+			name = Release;
+		};
+		23ED9E6E2FFDF6A100839B54 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = FinoWidget/FinoWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = PRS2QB447G;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FinoWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = FinoWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.axelmorano.FinoApp.FinoWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		23ED9E6F2FFDF6A100839B54 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = FinoWidget/FinoWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = PRS2QB447G;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FinoWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = FinoWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.axelmorano.FinoApp.FinoWidget;
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=*]" = com.axelmorano.FinoApp.FinoWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		A100000C000000000000000C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Fino.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = PRS2QB447G;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Fino-Info.plist";
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "Se usa para desbloquear tus finanzas.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.axelmorano.FinoApp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A100000D000000000000000D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Fino.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = PRS2QB447G;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Fino-Info.plist";
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "Se usa para desbloquear tus finanzas.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.axelmorano.FinoApp;
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=*]" = com.axelmorano.FinoApp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		A100000E000000000000000E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		A100000F000000000000000F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		23AB00072FFE300000000007 /* Build configuration list for PBXNativeTarget "FinoTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				23AB00082FFE300000000008 /* Debug */,
+				23AB00092FFE300000000009 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		23ED9E6D2FFDF6A100839B54 /* Build configuration list for PBXNativeTarget "FinoWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				23ED9E6E2FFDF6A100839B54 /* Debug */,
+				23ED9E6F2FFDF6A100839B54 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A100000A000000000000000A /* Build configuration list for PBXNativeTarget "Fino" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A100000C000000000000000C /* Debug */,
+				A100000D000000000000000D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A100000B000000000000000B /* Build configuration list for PBXProject "Fino" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A100000E000000000000000E /* Debug */,
+				A100000F000000000000000F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A10000060000000000000006 /* Project object */;
+}
