@@ -351,6 +351,7 @@ struct AgregarGastoRapidoIntent: AppIntent {
         ))
         try? contexto.save()
 
+        RedondeoService.aplicar(aGastoDe: borrador.monto, en: contexto)
         NotificacionesService.verificarPresupuestos(en: contexto)
         let movimientos = (try? contexto.fetch(FetchDescriptor<Movimiento>())) ?? []
         WidgetDataService.publicar(movimientos: movimientos)

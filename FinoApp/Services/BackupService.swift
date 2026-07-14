@@ -13,6 +13,17 @@ struct BackupFino: Codable {
     let objetivos: [ObjetivoBackup]
     let categoriasPersonalizadas: [CategoriaPersonalizada]
     let preferencias: PreferenciasBackup?
+    /// Deudas de gastos compartidos (desde la versión 2.1).
+    let deudas: [DeudaBackup]?
+}
+
+struct DeudaBackup: Codable {
+    let id: UUID
+    let persona: String
+    let detalle: String
+    let monto: Double
+    let fecha: Date
+    let saldada: Bool
 }
 
 /// Personalización que vive fuera de la base: preferencias del usuario,
@@ -84,7 +95,8 @@ enum BackupService {
         cuentas: [Cuenta],
         movimientos: [Movimiento],
         presupuestos: [Presupuesto],
-        objetivos: [ObjetivoAhorro]
+        objetivos: [ObjetivoAhorro],
+        deudas: [Deuda] = []
     ) throws -> URL {
         let backup = BackupFino(
             fecha: .now,
@@ -125,7 +137,13 @@ enum BackupService {
                 }),
                 ajustesFabrica: CustomCategoryStore.todosLosAjustes(),
                 categoriasOcultas: CustomCategoryStore.todasLasOcultas()
-            )
+            ),
+            deudas: deudas.map {
+                DeudaBackup(
+                    id: $0.id, persona: $0.persona, detalle: $0.detalle,
+                    monto: $0.monto, fecha: $0.fecha, saldada: $0.saldada
+                )
+            }
         )
 
         let encoder = JSONEncoder()
@@ -158,6 +176,7 @@ enum BackupService {
         try? contexto.delete(model: Cuenta.self)
         try? contexto.delete(model: Presupuesto.self)
         try? contexto.delete(model: ObjetivoAhorro.self)
+        try? contexto.delete(model: Deuda.self)
 
         var cuentasPorID: [UUID: Cuenta] = [:]
         for dto in backup.cuentas {
@@ -216,6 +235,18 @@ enum BackupService {
             objetivo.id = dto.id
             objetivo.creado = dto.creado
             contexto.insert(objetivo)
+        }
+
+        for dto in backup.deudas ?? [] {
+            let deuda = Deuda(
+                persona: dto.persona,
+                detalle: dto.detalle,
+                monto: dto.monto,
+                fecha: dto.fecha,
+                saldada: dto.saldada
+            )
+            deuda.id = dto.id
+            contexto.insert(deuda)
         }
 
         CustomCategoryStore.reemplazarTodas(backup.categoriasPersonalizadas)

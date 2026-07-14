@@ -8,6 +8,7 @@ struct DashboardView: View {
     @Query(sort: [SortDescriptor(\Cuenta.orden), SortDescriptor(\Cuenta.nombre)]) private var cuentas: [Cuenta]
     @Query private var presupuestos: [Presupuesto]
     @Query(sort: \ObjetivoAhorro.creado) private var objetivos: [ObjetivoAhorro]
+    @Query(filter: #Predicate<Deuda> { !$0.saldada }) private var deudasPendientes: [Deuda]
 
     @State private var categoriaSeleccionada: String?
     @State private var mostrandoAlta = false
@@ -36,6 +37,7 @@ struct DashboardView: View {
                     VStack(spacing: 25) {
                         DashboardHeader()
                         carruselPrincipal
+                        bannerDeudas
                         seccionTarjetas
                     }
                     .padding(.horizontal)
@@ -65,6 +67,44 @@ struct DashboardView: View {
                 //.padding(.bottom, 4)
                 .background(Color.verdeOscuro.ignoresSafeArea(edges: .top))
         }
+
+    /// Acceso rápido a "Me deben" cuando hay deudas pendientes.
+    @ViewBuilder
+    private var bannerDeudas: some View {
+        if !deudasPendientes.isEmpty {
+            NavigationLink {
+                DeudasView()
+            } label: {
+                HStack(spacing: 12) {
+                    Image(systemName: "person.2.fill")
+                        .font(.subheadline)
+                        .foregroundStyle(.green)
+                        .frame(width: 34, height: 34)
+                        .background(Circle().fill(.green.opacity(0.15)))
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Te deben")
+                            .font(.subheadline.weight(.semibold))
+                        Text("^[\(deudasPendientes.count) deuda](inflect: true) pendiente")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+
+                    Spacer()
+
+                    Text(deudasPendientes.reduce(0) { $0 + $1.monto }.enMonedaCompacta)
+                        .font(.callout.bold())
+                        .monospacedDigit()
+                        .foregroundStyle(.green)
+                    Image(systemName: "chevron.right")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.tertiary)
+                }
+                .estiloTarjeta(padding: 14)
+            }
+            .buttonStyle(.plain)
+        }
+    }
 
     // MARK: - Carrusel principal
 

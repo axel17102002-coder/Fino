@@ -122,6 +122,7 @@ struct RegistrarPagoWalletIntent: AppIntent {
         ))
         try? contexto.save()
 
+        RedondeoService.aplicar(aGastoDe: monto, en: contexto)
         NotificacionesService.verificarPresupuestos(en: contexto)
         let movimientos = (try? contexto.fetch(FetchDescriptor<Movimiento>())) ?? []
         WidgetDataService.publicar(movimientos: movimientos)

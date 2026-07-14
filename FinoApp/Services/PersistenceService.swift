@@ -16,7 +16,8 @@ final class PersistenceService {
             Cuenta.self,
             Presupuesto.self,
             ObjetivoAhorro.self,
-            MovimientoRecurrente.self
+            MovimientoRecurrente.self,
+            Deuda.self
         ])
         let configuracion = ModelConfiguration(schema: esquema)
         do {
@@ -52,6 +53,7 @@ final class PersistenceService {
         try? contexto.delete(model: Presupuesto.self)
         try? contexto.delete(model: ObjetivoAhorro.self)
         try? contexto.delete(model: MovimientoRecurrente.self)
+        try? contexto.delete(model: Deuda.self)
         try? contexto.save()
     }
 }

@@ -19,6 +19,10 @@ struct AddTransactionSheet: View {
     @State private var analizandoTicket = false
     @State private var falloTicket = false
 
+    // Gasto compartido.
+    @State private var esCompartido = false
+    @State private var conQuienes = ""
+
     private let esEdicion: Bool
 
     init(movimiento: Movimiento? = nil) {
@@ -121,6 +125,32 @@ struct AddTransactionSheet: View {
                     }
                 }
 
+                if !esEdicion && viewModel.tipo == .gasto {
+                    Section {
+                        Toggle(isOn: $esCompartido.animation()) {
+                            Label("Gasto compartido", systemImage: "person.2.fill")
+                        }
+                        if esCompartido {
+                            TextField("¿Con quiénes? (separá con comas)", text: $conQuienes)
+                                .autocorrectionDisabled()
+                            if let monto = viewModel.monto {
+                                let nombres = DeudasService.nombres(desde: conQuienes)
+                                if !nombres.isEmpty {
+                                    LabeledContent(
+                                        "Cada uno (entre \(nombres.count + 1))",
+                                        value: DeudasService.parteDeCadaUno(total: monto, nombres: nombres).enMoneda
+                                    )
+                                    .font(.subheadline)
+                                }
+                            }
+                        }
+                    } footer: {
+                        if esCompartido {
+                            Text("Pagaste vos: el gasto queda completo y Fino anota lo que te debe cada uno en \"Me deben\".")
+                        }
+                    }
+                }
+
                 Section("Notas") {
                     TextField("Notas (opcional)", text: $viewModel.notas, axis: .vertical)
                         .lineLimit(2...4)
@@ -136,6 +166,18 @@ struct AddTransactionSheet: View {
                     Button("Guardar") {
                         if viewModel.guardar(en: contexto) {
                             NotificacionesService.verificarPresupuestos(en: contexto)
+                            if !esEdicion, viewModel.tipo == .gasto, let monto = viewModel.monto {
+                                if esCompartido {
+                                    DeudasService.crear(
+                                        conNombres: conQuienes,
+                                        total: monto,
+                                        detalle: viewModel.nombre,
+                                        movimientoID: nil,
+                                        en: contexto
+                                    )
+                                }
+                                RedondeoService.aplicar(aGastoDe: monto, en: contexto)
+                            }
                             Haptics.exito()
                             dismiss()
                         }

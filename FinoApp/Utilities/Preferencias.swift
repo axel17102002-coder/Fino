@@ -10,6 +10,10 @@ enum Preferencias {
     static let claveBloqueoBiometrico = "bloqueoBiometrico"
     static let claveRecordatorioBackup = "recordatorioBackup"
     static let claveDiaInicioMes = "diaInicioMes"
+    static let claveRedondeoActivado = "redondeoActivado"
+    static let claveRedondeoObjetivoID = "redondeoObjetivoID"
+    static let claveRedondeoPaso = "redondeoPaso"
+    static let claveTotalRedondeado = "totalRedondeado"
 }
 
 // MARK: - Moneda

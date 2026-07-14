@@ -3,6 +3,16 @@
   "strings": {
     "": {},
     "%@": {},
+    "%@ te devuelve %@. Si lo sumás como ingreso, tu balance del mes lo refleja.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ pays you back %@. Adding it as income keeps your monthly balance honest."
+          }
+        }
+      }
+    },
     "%@ · %@": {
       "localizations": {
         "en": {
@@ -301,6 +311,16 @@
         }
       }
     },
+    "Ahorro invisible": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Invisible savings"
+          }
+        }
+      }
+    },
     "Al volver a abrir la app te va a pedir Face ID (o el código del teléfono).": {
       "localizations": {
         "en": {
@@ -498,6 +518,36 @@
           "stringUnit": {
             "state": "translated",
             "value": "Search by name, category or account"
+          }
+        }
+      }
+    },
+    "Cada gasto se redondea al valor elegido y la diferencia se aporta sola a tu meta. Gastás $4.320 → $680 van a la meta.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Every expense rounds up to the chosen step and the difference goes to your goal automatically."
+          }
+        }
+      }
+    },
+    "Cada gasto se redondea y el vuelto va a tu meta. Ya juntaste %@ sin darte cuenta.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Every expense gets rounded up and the change goes to your goal. You have already saved %@ without noticing."
+          }
+        }
+      }
+    },
+    "Cada uno (entre %lld)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Each (split by %lld)"
           }
         }
       }
@@ -792,6 +842,16 @@
         }
       }
     },
+    "Cuando cargues un gasto, marcalo como compartido y Fino divide la cuenta y se acuerda por vos.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "When adding an expense, mark it as shared and Fino splits the bill and remembers for you."
+          }
+        }
+      }
+    },
     "Cuando registres movimientos vas a ver acá tus gráficos e insights.": {
       "localizations": {
         "en": {
@@ -905,6 +965,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Unlock your finances"
+          }
+        }
+      }
+    },
+    "Devolución de %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Repayment from %@"
           }
         }
       }
@@ -1199,6 +1269,16 @@
         }
       }
     },
+    "Elegí una": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pick one"
+          }
+        }
+      }
+    },
     "Eliminar": {
       "localizations": {
         "en": {
@@ -1416,6 +1496,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Expense"
+          }
+        }
+      }
+    },
+    "Gasto compartido": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shared expense"
           }
         }
       }
@@ -1807,6 +1897,16 @@
         }
       }
     },
+    "Me deben": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Owed to me"
+          }
+        }
+      }
+    },
     "Mes": {
       "localizations": {
         "en": {
@@ -1923,6 +2023,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Recurring transactions"
+          }
+        }
+      }
+    },
+    "Nadie te debe nada": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nobody owes you anything"
           }
         }
       }
@@ -2197,6 +2307,16 @@
         }
       }
     },
+    "Pagaste vos: el gasto queda completo y Fino anota lo que te debe cada uno en \"Me deben\".": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You paid: the expense stays whole and Fino tracks what each person owes you in \"Owed to me\"."
+          }
+        }
+      }
+    },
     "Pago con tarjeta": {
       "localizations": {
         "en": {
@@ -2327,6 +2447,26 @@
         }
       }
     },
+    "Redondear a": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Round up to"
+          }
+        }
+      }
+    },
+    "Redondear gastos a una meta": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Round up expenses to a goal"
+          }
+        }
+      }
+    },
     "Regalo": {
       "localizations": {
         "en": {
@@ -2415,6 +2555,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "Clothing"
+          }
+        }
+      }
+    },
+    "Saldadas": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Settled"
+          }
+        }
+      }
+    },
+    "Saldar": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Settle"
           }
         }
       }
@@ -2649,6 +2809,16 @@
         }
       }
     },
+    "Solo marcar como saldada": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Just mark as settled"
+          }
+        }
+      }
+    },
     "Sueldo": {
       "localizations": {
         "en": {
@@ -2675,6 +2845,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Subscriptions"
+          }
+        }
+      }
+    },
+    "Sí, sumar el ingreso": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yes, add the income"
           }
         }
       }
@@ -2715,6 +2895,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "Credit cards"
+          }
+        }
+      }
+    },
+    "Te deben": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Owed to you"
+          }
+        }
+      }
+    },
+    "Te deben en total": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Total owed to you"
           }
         }
       }
@@ -2930,6 +3130,16 @@
         }
       }
     },
+    "^[%lld deuda](inflect: true) pendiente": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "^[%lld debt](inflect: true) pending"
+          }
+        }
+      }
+    },
     "de %@": {
       "localizations": {
         "en": {
@@ -3012,6 +3222,16 @@
       }
     },
     "·": {},
+    "¿Con quiénes? (separá con comas)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "With whom? (comma-separated)"
+          }
+        }
+      }
+    },
     "¿Cuánto gastaste?": {
       "localizations": {
         "en": {
@@ -3058,6 +3278,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "What would you like to do?"
+          }
+        }
+      }
+    },
+    "¿Registrar la devolución como ingreso?": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Log the repayment as income?"
           }
         }
       }

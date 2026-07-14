@@ -10,8 +10,13 @@ struct ConfiguracionView: View {
     @AppStorage(Preferencias.claveNombre) private var nombre: String = ""
     @AppStorage(Preferencias.claveBloqueoBiometrico) private var bloqueoActivado = false
     @AppStorage(Preferencias.claveDiaInicioMes) private var diaInicioMes = 1
+    @AppStorage(Preferencias.claveRedondeoActivado) private var redondeoActivado = false
+    @AppStorage(Preferencias.claveRedondeoObjetivoID) private var redondeoObjetivoID = ""
+    @AppStorage(Preferencias.claveRedondeoPaso) private var redondeoPaso = 1000.0
+    @AppStorage(Preferencias.claveTotalRedondeado) private var totalRedondeado = 0.0
 
     @Query private var movimientos: [Movimiento]
+    @Query(sort: \ObjetivoAhorro.creado) private var objetivos: [ObjetivoAhorro]
 
     var body: some View {
         NavigationStack {
@@ -28,6 +33,7 @@ struct ConfiguracionView: View {
                 Form {
                     seccionGeneral
                     seccionFinanzas
+                    seccionRedondeo
                     seccionDatos
                     seccionSeguridad
                     seccionAcercaDe
@@ -80,6 +86,11 @@ struct ConfiguracionView: View {
             } label: {
                 Label("Movimientos recurrentes", systemImage: "arrow.triangle.2.circlepath")
             }
+            NavigationLink {
+                DeudasView()
+            } label: {
+                Label("Me deben", systemImage: "person.2.fill")
+            }
             Picker("El mes empieza el día", selection: $diaInicioMes) {
                 ForEach(1...31, id: \.self) { Text("\($0)").tag($0) }
             }
@@ -87,6 +98,40 @@ struct ConfiguracionView: View {
             textoSobreFondo("Finanzas")
         } footer: {
             textoSobreFondo("Los recurrentes se cargan solos cada mes. Y si cobrás el 5, poné 5: el resumen, los presupuestos y los promedios van del 5 al 4 del mes siguiente.", esFooter: true)
+        }
+    }
+
+    /// Redondeo automático de gastos hacia un objetivo de ahorro.
+    @ViewBuilder
+    private var seccionRedondeo: some View {
+        if !objetivos.isEmpty {
+            Section {
+                Toggle(isOn: $redondeoActivado.animation()) {
+                    Label("Redondear gastos a una meta", systemImage: "arrow.up.circle.fill")
+                }
+                if redondeoActivado {
+                    Picker("Meta", selection: $redondeoObjetivoID) {
+                        Text("Elegí una").tag("")
+                        ForEach(objetivos) { objetivo in
+                            Label(objetivo.nombre, systemImage: objetivo.icono)
+                                .tag(objetivo.id.uuidString)
+                        }
+                    }
+                    Picker("Redondear a", selection: $redondeoPaso) {
+                        ForEach([100.0, 500.0, 1000.0], id: \.self) { paso in
+                            Text(paso.enMonedaCompacta).tag(paso)
+                        }
+                    }
+                }
+            } header: {
+                textoSobreFondo("Ahorro invisible")
+            } footer: {
+                if totalRedondeado > 0 {
+                    textoSobreFondo("Cada gasto se redondea y el vuelto va a tu meta. Ya juntaste \(totalRedondeado.enMoneda) sin darte cuenta.", esFooter: true)
+                } else {
+                    textoSobreFondo("Cada gasto se redondea al valor elegido y la diferencia se aporta sola a tu meta. Gastás $4.320 → $680 van a la meta.", esFooter: true)
+                }
+            }
         }
     }
     /// Acceso a la pantalla de backup y gestión de datos.
