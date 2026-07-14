@@ -1731,6 +1731,16 @@
         }
       }
     },
+    "Las partes suman más que el gasto.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The shares add up to more than the expense."
+          }
+        }
+      }
+    },
     "Lee el total, el comercio y la fecha directo del ticket. Todo pasa en tu teléfono.": {
       "localizations": {
         "en": {
@@ -2333,6 +2343,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "One-time payment"
+          }
+        }
+      }
+    },
+    "Partes iguales": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Equal parts"
           }
         }
       }
@@ -3046,6 +3066,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Your name"
+          }
+        }
+      }
+    },
+    "Tu parte": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your share"
           }
         }
       }

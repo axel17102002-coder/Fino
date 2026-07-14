@@ -59,6 +59,48 @@ struct CompartidosYRedondeoTests {
         #expect(movimientos.first?.monto == 1000)
     }
 
+    @Test func partesDesigualesCreanDeudasConSuMonto() throws {
+        let config = ModelConfiguration(isStoredInMemoryOnly: true)
+        let contenedor = try ModelContainer(for: Deuda.self, Movimiento.self, configurations: config)
+        let contexto = contenedor.mainContext
+
+        DeudasService.crear(
+            partes: [("Juan", 2000), ("Ana", 500), ("Pedro", 0)],
+            detalle: "Asado",
+            movimientoID: nil,
+            en: contexto
+        )
+
+        let deudas = try contexto.fetch(FetchDescriptor<Deuda>())
+        #expect(deudas.count == 2)
+        #expect(deudas.first { $0.persona == "Juan" }?.monto == 2000)
+        #expect(deudas.first { $0.persona == "Ana" }?.monto == 500)
+    }
+
+    @Test func borrarElGastoBorraSusDeudas() throws {
+        let config = ModelConfiguration(isStoredInMemoryOnly: true)
+        let contenedor = try ModelContainer(for: Deuda.self, Movimiento.self, configurations: config)
+        let contexto = contenedor.mainContext
+
+        let gasto = Movimiento(
+            tipo: .gasto, nombre: "Cena",
+            categoriaRaw: CategoriaGasto.comida.rawValue, monto: 3000
+        )
+        contexto.insert(gasto)
+        DeudasService.crear(
+            conNombres: "Juan, Ana", total: 3000, detalle: "Cena",
+            movimientoID: gasto.id, en: contexto
+        )
+        // Una deuda de otro gasto no se debe tocar.
+        contexto.insert(Deuda(persona: "Pedro", detalle: "Otra cosa", monto: 500))
+
+        DeudasService.eliminarVinculadas(a: gasto.id, en: contexto)
+
+        let restantes = try contexto.fetch(FetchDescriptor<Deuda>())
+        #expect(restantes.count == 1)
+        #expect(restantes.first?.persona == "Pedro")
+    }
+
     // MARK: - Redondeo a metas
 
     @Test func vueltoDelRedondeo() {

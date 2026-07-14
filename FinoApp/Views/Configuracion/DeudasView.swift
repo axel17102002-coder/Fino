@@ -62,7 +62,7 @@ struct DeudasView: View {
                             HStack {
                                 Text(grupo.persona)
                                 Spacer()
-                                Text(grupo.total.enMonedaCompacta)
+                                Text(grupo.total.enMoneda)
                                     .monospacedDigit()
                             }
                         }
@@ -135,7 +135,7 @@ struct DeudasView: View {
                     .foregroundStyle(.secondary)
             }
             Spacer()
-            Text(deuda.monto.enMonedaCompacta)
+            Text(deuda.monto.enMoneda)
                 .font(.callout.bold())
                 .monospacedDigit()
         }

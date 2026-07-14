@@ -22,6 +22,9 @@ struct AddTransactionSheet: View {
     // Gasto compartido.
     @State private var esCompartido = false
     @State private var conQuienes = ""
+    @State private var partesIguales = true
+    /// Monto que debe cada persona cuando las partes no son iguales.
+    @State private var montosPorPersona: [String: String] = [:]
 
     private let esEdicion: Bool
 
@@ -133,14 +136,43 @@ struct AddTransactionSheet: View {
                         if esCompartido {
                             TextField("¿Con quiénes? (separá con comas)", text: $conQuienes)
                                 .autocorrectionDisabled()
-                            if let monto = viewModel.monto {
-                                let nombres = DeudasService.nombres(desde: conQuienes)
-                                if !nombres.isEmpty {
-                                    LabeledContent(
-                                        "Cada uno (entre \(nombres.count + 1))",
-                                        value: DeudasService.parteDeCadaUno(total: monto, nombres: nombres).enMoneda
-                                    )
-                                    .font(.subheadline)
+
+                            let nombres = DeudasService.nombres(desde: conQuienes)
+                            if !nombres.isEmpty {
+                                Toggle("Partes iguales", isOn: $partesIguales.animation())
+
+                                if partesIguales {
+                                    if let monto = viewModel.monto {
+                                        LabeledContent(
+                                            "Cada uno (entre \(nombres.count + 1))",
+                                            value: DeudasService.parteDeCadaUno(total: monto, nombres: nombres).enMoneda
+                                        )
+                                        .font(.subheadline)
+                                    }
+                                } else {
+                                    ForEach(nombres, id: \.self) { nombre in
+                                        HStack {
+                                            Text(nombre)
+                                            Spacer()
+                                            Text(Formatters.monedaActual.simbolo)
+                                                .foregroundStyle(.secondary)
+                                            TextField("0", text: montoBinding(para: nombre))
+                                                .keyboardType(.decimalPad)
+                                                .monospacedDigit()
+                                                .multilineTextAlignment(.trailing)
+                                                .frame(width: 110)
+                                        }
+                                    }
+                                    if let monto = viewModel.monto {
+                                        let ajeno = totalAjeno(de: nombres)
+                                        LabeledContent("Tu parte", value: max(monto - ajeno, 0).enMoneda)
+                                            .font(.subheadline)
+                                        if ajeno > monto {
+                                            Label("Las partes suman más que el gasto.", systemImage: "exclamationmark.triangle.fill")
+                                                .font(.caption)
+                                                .foregroundStyle(.orange)
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -164,17 +196,11 @@ struct AddTransactionSheet: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Guardar") {
-                        if viewModel.guardar(en: contexto) {
+                        if let movimiento = viewModel.guardar(en: contexto) {
                             NotificacionesService.verificarPresupuestos(en: contexto)
                             if !esEdicion, viewModel.tipo == .gasto, let monto = viewModel.monto {
                                 if esCompartido {
-                                    DeudasService.crear(
-                                        conNombres: conQuienes,
-                                        total: monto,
-                                        detalle: viewModel.nombre,
-                                        movimientoID: nil,
-                                        en: contexto
-                                    )
+                                    crearDeudas(total: monto, movimientoID: movimiento.id)
                                 }
                                 RedondeoService.aplicar(aGastoDe: monto, en: contexto)
                             }
@@ -240,6 +266,54 @@ struct AddTransactionSheet: View {
             } message: {
                 Text("Probá de nuevo con más luz o con el ticket más plano. También podés cargar el gasto a mano.")
             }
+        }
+    }
+
+    // MARK: - Gasto compartido
+
+    /// Campo de monto de una persona; al aparecer se precarga con la
+    /// parte igualitaria para que solo haya que ajustar.
+    private func montoBinding(para nombre: String) -> Binding<String> {
+        Binding(
+            get: {
+                if let guardado = montosPorPersona[nombre] { return guardado }
+                let nombres = DeudasService.nombres(desde: conQuienes)
+                guard let monto = viewModel.monto else { return "" }
+                let parte = DeudasService.parteDeCadaUno(total: monto, nombres: nombres)
+                return parte > 0 ? String(Int(parte)) : ""
+            },
+            set: { montosPorPersona[nombre] = $0 }
+        )
+    }
+
+    private func totalAjeno(de nombres: [String]) -> Double {
+        nombres.reduce(0) { acumulado, nombre in
+            acumulado + (Formatters.parsearMonto(montoBinding(para: nombre).wrappedValue) ?? 0)
+        }
+    }
+
+    private func crearDeudas(total: Double, movimientoID: UUID) {
+        if partesIguales {
+            DeudasService.crear(
+                conNombres: conQuienes,
+                total: total,
+                detalle: viewModel.nombre,
+                movimientoID: movimientoID,
+                en: contexto
+            )
+        } else {
+            let nombres = DeudasService.nombres(desde: conQuienes)
+            let partes = nombres.compactMap { nombre -> (persona: String, monto: Double)? in
+                guard let monto = Formatters.parsearMonto(montoBinding(para: nombre).wrappedValue),
+                      monto > 0 else { return nil }
+                return (nombre, monto)
+            }
+            DeudasService.crear(
+                partes: partes,
+                detalle: viewModel.nombre,
+                movimientoID: movimientoID,
+                en: contexto
+            )
         }
     }
 

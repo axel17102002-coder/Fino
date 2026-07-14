@@ -20,7 +20,8 @@ enum DeudasService {
         return total / Double(nombres.count + 1)
     }
 
-    /// Crea una deuda por persona a partir de un gasto compartido.
+    /// Crea una deuda por persona a partir de un gasto compartido en
+    /// partes iguales.
     static func crear(
         conNombres texto: String,
         total: Double,
@@ -31,14 +32,38 @@ enum DeudasService {
         let personas = nombres(desde: texto)
         let parte = parteDeCadaUno(total: total, nombres: personas)
         guard parte > 0 else { return }
+        crear(
+            partes: personas.map { ($0, parte) },
+            detalle: detalle,
+            movimientoID: movimientoID,
+            en: contexto
+        )
+    }
 
-        for persona in personas {
+    /// Crea deudas con un monto distinto por persona.
+    static func crear(
+        partes: [(persona: String, monto: Double)],
+        detalle: String,
+        movimientoID: UUID?,
+        en contexto: ModelContext
+    ) {
+        for (persona, monto) in partes where monto > 0 {
             contexto.insert(Deuda(
                 persona: persona,
                 detalle: detalle,
-                monto: parte,
+                monto: monto,
                 movimientoID: movimientoID
             ))
+        }
+        try? contexto.save()
+    }
+
+    /// Borra las deudas que nacieron de un gasto que se está eliminando:
+    /// si el gasto no existió, tampoco lo que te debían por él.
+    static func eliminarVinculadas(a movimientoID: UUID, en contexto: ModelContext) {
+        let deudas = (try? contexto.fetch(FetchDescriptor<Deuda>())) ?? []
+        for deuda in deudas where deuda.movimientoID == movimientoID {
+            contexto.delete(deuda)
         }
         try? contexto.save()
     }

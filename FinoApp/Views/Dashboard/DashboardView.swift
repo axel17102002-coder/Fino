@@ -92,7 +92,7 @@ struct DashboardView: View {
 
                     Spacer()
 
-                    Text(deudasPendientes.reduce(0) { $0 + $1.monto }.enMonedaCompacta)
+                    Text(deudasPendientes.reduce(0) { $0 + $1.monto }.enMoneda)
                         .font(.callout.bold())
                         .monospacedDigit()
                         .foregroundStyle(.green)

@@ -72,13 +72,15 @@ final class MovimientoFormViewModel {
         }
     }
 
-    /// Crea o actualiza el movimiento. Devuelve `true` si se guardó.
+    /// Crea o actualiza el movimiento y lo devuelve (`nil` si el
+    /// formulario no es válido), para poder vincularle deudas.
     @discardableResult
-    func guardar(en contexto: ModelContext) -> Bool {
-        guard esValido, let monto else { return false }
+    func guardar(en contexto: ModelContext) -> Movimiento? {
+        guard esValido, let monto else { return nil }
         let nombreLimpio = nombre.trimmingCharacters(in: .whitespacesAndNewlines)
         let cuotasFinales = permiteCuotas ? max(1, cuotas) : 1
 
+        let guardado: Movimiento
         if let movimiento = movimientoEditado {
             movimiento.tipo = tipo
             movimiento.nombre = nombreLimpio
@@ -88,8 +90,9 @@ final class MovimientoFormViewModel {
             movimiento.notas = notas
             movimiento.cuotas = cuotasFinales
             movimiento.cuenta = cuenta
+            guardado = movimiento
         } else {
-            contexto.insert(Movimiento(
+            let nuevo = Movimiento(
                 tipo: tipo,
                 nombre: nombreLimpio,
                 categoriaRaw: categoriaRaw,
@@ -98,9 +101,11 @@ final class MovimientoFormViewModel {
                 notas: notas,
                 cuotas: cuotasFinales,
                 cuenta: cuenta
-            ))
+            )
+            contexto.insert(nuevo)
+            guardado = nuevo
         }
         try? contexto.save()
-        return true
+        return guardado
     }
 }

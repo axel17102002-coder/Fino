@@ -148,6 +148,8 @@ struct MovimientosView: View {
     // MARK: - Acciones
 
     private func eliminar(_ movimiento: Movimiento) {
+        // Si era un gasto compartido, sus deudas se van con él.
+        DeudasService.eliminarVinculadas(a: movimiento.id, en: contexto)
         contexto.delete(movimiento)
         try? contexto.save()
         Haptics.advertencia()
