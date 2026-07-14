@@ -54,6 +54,31 @@ enum CalculosService {
         return inicioAnterior
     }
 
+    /// Próxima ocurrencia de un día del mes (hoy cuenta). Si el mes no
+    /// llega a ese día (31 en febrero), usa el último día del mes.
+    static func proximaFecha(dia: Int, desde referencia: Date = .now) -> Date? {
+        guard (1...31).contains(dia) else { return nil }
+        let calendario = Calendar.current
+        let hoy = calendario.startOfDay(for: referencia)
+
+        func fecha(enMesDe base: Date) -> Date? {
+            var componentes = calendario.dateComponents([.year, .month], from: base)
+            guard let mes = calendario.date(from: componentes),
+                  let diasDelMes = calendario.range(of: .day, in: .month, for: mes)?.count
+            else { return nil }
+            componentes.day = min(dia, diasDelMes)
+            return calendario.date(from: componentes)
+        }
+
+        if let esteMes = fecha(enMesDe: hoy), esteMes >= hoy {
+            return esteMes
+        }
+        guard let mesQueViene = calendario.date(byAdding: .month, value: 1, to: hoy) else {
+            return nil
+        }
+        return fecha(enMesDe: mesQueViene)
+    }
+
     // MARK: - Filtros y totales
 
     /// Movimientos del período financiero que contiene a `mes`.

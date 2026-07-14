@@ -2,6 +2,7 @@
   "sourceLanguage": "es",
   "strings": {
     "": {},
+    "%@": {},
     "%@ · %@": {
       "localizations": {
         "en": {
@@ -360,6 +361,7 @@
         }
       }
     },
+    "Automatización": {},
     "Automático": {
       "localizations": {
         "en": {
@@ -570,6 +572,16 @@
         }
       }
     },
+    "Cierra el %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Closes %@"
+          }
+        }
+      }
+    },
     "Cierre": {
       "localizations": {
         "en": {
@@ -596,6 +608,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Color"
+          }
+        }
+      }
+    },
+    "Comercio": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Merchant"
           }
         }
       }
@@ -656,6 +678,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Spent"
+          }
+        }
+      }
+    },
+    "Consumo actual: %@. No te olvides de pagarla.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Current balance: %@. Don't forget to pay it."
           }
         }
       }
@@ -1218,12 +1250,32 @@
         }
       }
     },
+    "En %lld días": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In %lld days"
+          }
+        }
+      }
+    },
     "Es solo para saludarte. Podés cambiarlo cuando quieras en Configuración.": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Just so we can greet you. You can change it anytime in Settings."
+          }
+        }
+      }
+    },
+    "Escanear ticket": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scan receipt"
           }
         }
       }
@@ -1438,6 +1490,7 @@
         }
       }
     },
+    "Guarda un gasto al instante, sin abrir la app ni confirmar. Usalo en una automatización de Atajos con el disparador \"Transacción\" para registrar solos los pagos con Apple Pay.": {},
     "Guardar": {
       "localizations": {
         "en": {
@@ -1474,6 +1527,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Home"
+          }
+        }
+      }
+    },
+    "Hoy": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Today"
           }
         }
       }
@@ -1574,6 +1637,36 @@
           "stringUnit": {
             "state": "translated",
             "value": "Investments"
+          }
+        }
+      }
+    },
+    "Lee el total, el comercio y la fecha directo del ticket. Todo pasa en tu teléfono.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reads the total, merchant and date straight from the receipt. Everything stays on your phone."
+          }
+        }
+      }
+    },
+    "Leer ticket de una foto": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Read receipt from a photo"
+          }
+        }
+      }
+    },
+    "Leyendo ticket…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reading receipt…"
           }
         }
       }
@@ -1690,6 +1783,26 @@
           "stringUnit": {
             "state": "translated",
             "value": "Biggest expense in"
+          }
+        }
+      }
+    },
+    "Mañana": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tomorrow"
+          }
+        }
+      }
+    },
+    "Mañana vence la %@ 💳": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ payment due tomorrow 💳"
           }
         }
       }
@@ -1814,12 +1927,32 @@
         }
       }
     },
+    "No pude leer el ticket": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn't read the receipt"
+          }
+        }
+      }
+    },
     "No se pudo restaurar": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Restore failed"
+          }
+        }
+      }
+    },
+    "No te olvides de revisarla.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Don't forget to check it."
           }
         }
       }
@@ -2064,6 +2197,16 @@
         }
       }
     },
+    "Pago con tarjeta": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Card payment"
+          }
+        }
+      }
+    },
     "Pago único": {
       "localizations": {
         "en": {
@@ -2144,6 +2287,16 @@
         }
       }
     },
+    "Probá de nuevo con más luz o con el ticket más plano. También podés cargar el gasto a mano.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Try again with more light or a flatter receipt. You can also enter the expense manually."
+          }
+        }
+      }
+    },
     "Recordarme cada 15 días": {
       "localizations": {
         "en": {
@@ -2190,6 +2343,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Gifts"
+          }
+        }
+      }
+    },
+    "Registrar gasto de ${monto} en ${comercio}": {},
+    "Registrar pago con tarjeta": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Log card payment"
           }
         }
       }
@@ -2706,6 +2870,16 @@
         }
       }
     },
+    "Vence el %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Due %@"
+          }
+        }
+      }
+    },
     "Vencimiento": {
       "localizations": {
         "en": {
@@ -2948,7 +3122,17 @@
         }
       }
     },
-    "•••• %@": {}
+    "•••• %@": {},
+    "💳 %@ en %@ registrado en Fino": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "💳 %@ at %@ logged in Fino"
+          }
+        }
+      }
+    }
   },
   "version": "1.0"
 }

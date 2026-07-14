@@ -77,6 +77,7 @@ struct RootTabView: View {
         .task {
             RecurrentesService.generarPendientes(en: contexto)
             WidgetDataService.publicar(movimientos: movimientos)
+            NotificacionesService.programarVencimientosTarjetas(en: contexto)
         }
         // El intent "Agregar gasto" (Atajos / botón de acción) pide abrir
         // el formulario apenas la app está en pantalla.
@@ -102,6 +103,7 @@ struct RootTabView: View {
             // Esto también cubre ediciones de montos, que no cambian la Query.
             if fase == .background {
                 WidgetDataService.publicar(movimientos: movimientos)
+                NotificacionesService.programarVencimientosTarjetas(en: contexto)
             }
         }
     }

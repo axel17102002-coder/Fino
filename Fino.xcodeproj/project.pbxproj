@@ -440,6 +440,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Fino-Info.plist";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Se usa para escanear tickets y cargar gastos.";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "Se usa para desbloquear tus finanzas.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -472,6 +473,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Fino-Info.plist";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Se usa para escanear tickets y cargar gastos.";
 				INFOPLIST_KEY_NSFaceIDUsageDescription = "Se usa para desbloquear tus finanzas.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;

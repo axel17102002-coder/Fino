@@ -72,6 +72,47 @@ enum NotificacionesService {
         }
     }
 
+    // MARK: - Vencimientos de tarjetas
+
+    /// Programa (o reprograma) el aviso del día anterior a cada
+    /// vencimiento de tarjeta, con el consumo actual. Se llama al abrir
+    /// la app y al mandarla a background, así el monto queda fresco.
+    static func programarVencimientosTarjetas(en contexto: ModelContext) {
+        let cuentas = (try? contexto.fetch(FetchDescriptor<Cuenta>())) ?? []
+        let tarjetas = cuentas.filter { $0.esTarjetaCredito && $0.diaVencimiento > 0 }
+        guard !tarjetas.isEmpty else { return }
+
+        let centro = UNUserNotificationCenter.current()
+        let calendario = Calendar.current
+
+        for tarjeta in tarjetas {
+            let id = "vencimiento-\(tarjeta.id.uuidString)"
+            centro.removePendingNotificationRequests(withIdentifiers: [id])
+
+            guard let vencimiento = CalculosService.proximaFecha(dia: tarjeta.diaVencimiento),
+                  let aviso = calendario.date(byAdding: .day, value: -1, to: vencimiento),
+                  aviso >= calendario.startOfDay(for: .now)
+            else { continue }
+
+            let consumo = CalculosService.consumoActual(de: tarjeta)
+            let contenido = UNMutableNotificationContent()
+            contenido.title = String(localized: "Mañana vence la \(tarjeta.nombre) 💳")
+            contenido.body = consumo > 0
+                ? String(localized: "Consumo actual: \(consumo.enMoneda). No te olvides de pagarla.")
+                : String(localized: "No te olvides de revisarla.")
+            contenido.sound = .default
+
+            var componentes = calendario.dateComponents([.year, .month, .day], from: aviso)
+            componentes.hour = 10
+            let pedido = UNNotificationRequest(
+                identifier: id,
+                content: contenido,
+                trigger: UNCalendarNotificationTrigger(dateMatching: componentes, repeats: false)
+            )
+            centro.add(pedido)
+        }
+    }
+
     private static func avisarPresupuesto(categoria: String, umbral: Int, gastado: Double, limite: Double) {
         Task { await pedirPermiso() }
 

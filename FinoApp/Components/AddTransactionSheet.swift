@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import PhotosUI
 
 /// Formulario de alta y edición de movimientos.
 struct AddTransactionSheet: View {
@@ -12,8 +13,17 @@ struct AddTransactionSheet: View {
     @State private var categoriasPersonalizadas: [CategoriaPersonalizada] = []
     @State private var mostrandoNuevaCategoria = false
 
+    // Escaneo de tickets.
+    @State private var mostrandoEscaner = false
+    @State private var fotoTicket: PhotosPickerItem?
+    @State private var analizandoTicket = false
+    @State private var falloTicket = false
+
+    private let esEdicion: Bool
+
     init(movimiento: Movimiento? = nil) {
         _viewModel = State(initialValue: MovimientoFormViewModel(movimiento: movimiento))
+        esEdicion = movimiento != nil
     }
 
     private var categoriasDisponibles: [any CategoriaInfo] {
@@ -32,6 +42,23 @@ struct AddTransactionSheet: View {
                         }
                     }
                     .pickerStyle(.segmented)
+                }
+
+                if !esEdicion {
+                    Section {
+                        if EscanerTicketView.disponible {
+                            Button {
+                                mostrandoEscaner = true
+                            } label: {
+                                Label("Escanear ticket", systemImage: "doc.text.viewfinder")
+                            }
+                        }
+                        PhotosPicker(selection: $fotoTicket, matching: .images) {
+                            Label("Leer ticket de una foto", systemImage: "photo.on.rectangle")
+                        }
+                    } footer: {
+                        Text("Lee el total, el comercio y la fecha directo del ticket. Todo pasa en tu teléfono.")
+                    }
                 }
 
                 Section("Datos") {
@@ -133,7 +160,69 @@ struct AddTransactionSheet: View {
                     }
                 }
             }
+            .fullScreenCover(isPresented: $mostrandoEscaner) {
+                EscanerTicketView { imagen in
+                    mostrandoEscaner = false
+                    if let imagen {
+                        Task { await analizarTicket(imagen) }
+                    }
+                }
+                .ignoresSafeArea()
+            }
+            .onChange(of: fotoTicket) { _, item in
+                guard let item else { return }
+                analizandoTicket = true
+                Task {
+                    if let data = try? await item.loadTransferable(type: Data.self),
+                       let imagen = UIImage(data: data) {
+                        await analizarTicket(imagen)
+                    } else {
+                        analizandoTicket = false
+                        falloTicket = true
+                    }
+                    fotoTicket = nil
+                }
+            }
+            .overlay {
+                if analizandoTicket {
+                    ZStack {
+                        Color.black.opacity(0.25).ignoresSafeArea()
+                        ProgressView("Leyendo ticket…")
+                            .padding(20)
+                            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 14))
+                    }
+                }
+            }
+            .alert("No pude leer el ticket", isPresented: $falloTicket) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text("Probá de nuevo con más luz o con el ticket más plano. También podés cargar el gasto a mano.")
+            }
         }
+    }
+
+    /// Corre el OCR y precarga el formulario con lo que se pudo leer.
+    private func analizarTicket(_ imagen: UIImage) async {
+        analizandoTicket = true
+        let datos = await TicketScannerService.analizar(imagen)
+        analizandoTicket = false
+
+        guard !datos.estaVacio else {
+            falloTicket = true
+            return
+        }
+        if let monto = datos.monto {
+            viewModel.montoTexto = monto.truncatingRemainder(dividingBy: 1) == 0
+                ? String(Int(monto))
+                : String(monto)
+        }
+        if let nombre = datos.nombre {
+            viewModel.nombre = nombre
+        }
+        if let fecha = datos.fecha {
+            viewModel.fecha = fecha
+        }
+        Haptics.exito()
     }
 
     private func recargarCategoriasPersonalizadas() {

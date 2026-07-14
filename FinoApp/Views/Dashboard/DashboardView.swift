@@ -258,6 +258,9 @@ struct DashboardView: View {
                         }
                     }
                 }
+                // Próximos cierres y vencimientos (solo tarjetas que los
+                // tengan configurados).
+                VencimientosCard(tarjetas: tarjetas)
             }
         }
     }
