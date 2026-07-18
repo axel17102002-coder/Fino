@@ -334,6 +334,10 @@ struct AddTransactionSheet: View {
         }
         if let nombre = datos.nombre {
             viewModel.nombre = nombre
+            // El historial sugiere la categoría para este comercio.
+            if let sugerida = CategoriaPredictorService.categoria(paraGasto: nombre, en: contexto) {
+                viewModel.categoriaRaw = sugerida
+            }
         }
         if let fecha = datos.fecha {
             viewModel.fecha = fecha

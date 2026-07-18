@@ -113,10 +113,15 @@ struct RegistrarPagoWalletIntent: AppIntent {
         }
 
         let nombre = NombreComercio.limpiar(comercio)
+        // Prioridad: categoría elegida en el atajo → la que el historial
+        // sugiere para este comercio → "Otros".
+        let categoriaRaw = categoria?.id
+            ?? CategoriaPredictorService.categoria(paraGasto: nombre, en: contexto)
+            ?? CategoriaGasto.otros.rawValue
         contexto.insert(Movimiento(
             tipo: .gasto,
             nombre: nombre.isEmpty ? String(localized: "Pago con tarjeta") : nombre,
-            categoriaRaw: categoria?.id ?? CategoriaGasto.otros.rawValue,
+            categoriaRaw: categoriaRaw,
             monto: monto,
             cuenta: cuentaModelo
         ))

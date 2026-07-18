@@ -60,6 +60,12 @@ final class BorradorGastoRapido {
         categorias = CustomCategoryStore.categoriasOrdenadas(para: .gasto)
             .map { ($0.rawValue, $0.nombre) }
         indiceCategoria = 0
+        // El historial preselecciona la categoría de este comercio.
+        let contextoPrediccion = PersistenceService.shared.container.mainContext
+        if let sugerida = CategoriaPredictorService.categoria(paraGasto: nombre, en: contextoPrediccion),
+           let indice = categorias.firstIndex(where: { $0.raw == sugerida }) {
+            indiceCategoria = indice
+        }
         let contexto = PersistenceService.shared.container.mainContext
         let todas = (try? contexto.fetch(FetchDescriptor<Cuenta>())) ?? []
         cuentas = todas.sorted { $0.nombre < $1.nombre }.map { ($0.id, $0.nombre) }
