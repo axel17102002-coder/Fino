@@ -13,6 +13,7 @@ struct RootTabView: View {
     @Query private var movimientos: [Movimiento]
 
     @AppStorage(Preferencias.claveOnboardingCompletado) private var onboardingCompletado = false
+    @AppStorage(Preferencias.claveMontosOcultos) private var montosOcultos = false
 
     @State private var pestaniaActiva: Pestania = .inicio
     @State private var mostrandoMenuAlta = false
@@ -49,6 +50,9 @@ struct RootTabView: View {
                 }
             }
             .sensoryFeedback(.selection, trigger: pestaniaActiva)
+            // El ojito de privacidad redibuja todas las pestañas: los
+            // montos se formatean al construir cada vista.
+            .id(montosOcultos)
             // Reserva el alto de la barra propia para que el contenido
             // de las pestañas no quede tapado detrás de ella.
             .safeAreaInset(edge: .bottom) {

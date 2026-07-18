@@ -10,8 +10,15 @@ enum Formatters {
     }
 
     /// Formatea un monto en la moneda indicada (o la global si no se pasa).
+    /// Modo privacidad (el ojito del Dashboard): todos los montos de la
+    /// app se muestran tapados.
+    static var montosOcultos: Bool {
+        UserDefaults.standard.bool(forKey: Preferencias.claveMontosOcultos)
+    }
+
     static func moneda(_ valor: Double, moneda: Moneda? = nil) -> String {
         let monedaSeleccionada = moneda ?? monedaActual
+        if montosOcultos { return "\(monedaSeleccionada.simbolo) ••••" }
 
         let formatter = NumberFormatter()
         formatter.numberStyle = .currency
@@ -28,6 +35,7 @@ enum Formatters {
     /// Versión compacta para ejes de gráficos, ej: `1,9 M` o `250 k`.
     static func monedaCompacta(_ valor: Double, moneda: Moneda? = nil) -> String {
         let moneda = moneda ?? monedaActual
+        if montosOcultos { return "\(moneda.simbolo) ••••" }
         let absoluto = abs(valor)
         let signo = valor < 0 ? "-" : ""
         let simbolo = moneda.simbolo

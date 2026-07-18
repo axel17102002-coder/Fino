@@ -10,11 +10,10 @@ struct DashboardView: View {
     @Query(sort: \ObjetivoAhorro.creado) private var objetivos: [ObjetivoAhorro]
     @Query(filter: #Predicate<Deuda> { !$0.saldada }) private var deudasPendientes: [Deuda]
 
-    @AppStorage(Preferencias.claveNombre) private var nombreUsuario = ""
+    @AppStorage(Preferencias.claveMontosOcultos) private var montosOcultos = false
 
     @State private var categoriaSeleccionada: String?
     @State private var mostrandoAlta = false
-    @State private var mostrandoConfig = false
     @State private var paginaCarrusel: Int? = 0
 
     private var viewModel: DashboardViewModel {
@@ -54,14 +53,11 @@ struct DashboardView: View {
             .sheet(isPresented: $mostrandoAlta) {
                 AddTransactionSheet()
             }
-            .sheet(isPresented: $mostrandoConfig) {
-                ConfiguracionView()
-            }
         }
     }
 
     /// Franja verdeOscuro fija en el borde superior: cubre el área del
-    /// reloj/notch, sostiene el logo y el acceso a Configuración.
+    /// reloj/notch, sostiene el logo y el ojito de privacidad.
     private var franjaLogo: some View {
         HStack(alignment: .center) {
             Image("Logo")
@@ -71,36 +67,29 @@ struct DashboardView: View {
 
             Spacer()
 
+            // Modo privacidad: tapa todos los montos de la app.
             Button {
-                mostrandoConfig = true
+                withAnimation(.easeOut(duration: 0.15)) {
+                    montosOcultos.toggle()
+                }
+                Haptics.seleccion()
             } label: {
-                avatarUsuario
+                Image(systemName: montosOcultos ? "eye.slash.fill" : "eye.fill")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(Color.verdeOscuro)
+                    .frame(width: 38, height: 38)
+                    .background(Circle().fill(Color.crema))
+                    .contentTransition(.symbolEffect(.replace))
             }
             .buttonStyle(.plain)
-            .accessibilityLabel(String(localized: "Configuración"))
+            .accessibilityLabel(montosOcultos
+                ? String(localized: "Mostrar montos")
+                : String(localized: "Ocultar montos"))
         }
         .padding(.horizontal)
         .padding(.bottom, 6)
         .frame(maxWidth: .infinity)
         .background(Color.verdeOscuro.ignoresSafeArea(edges: .top))
-    }
-
-    /// Círculo crema con la inicial del usuario (o un ícono si no cargó
-    /// su nombre), que abre Configuración.
-    private var avatarUsuario: some View {
-        let inicial = nombreUsuario.trimmingCharacters(in: .whitespaces).first
-        return Group {
-            if let inicial {
-                Text(String(inicial).uppercased())
-                    .font(.headline.bold())
-            } else {
-                Image(systemName: "gearshape.fill")
-                    .font(.subheadline.weight(.semibold))
-            }
-        }
-        .foregroundStyle(Color.verdeOscuro)
-        .frame(width: 38, height: 38)
-        .background(Circle().fill(Color.crema))
     }
 
     /// Acceso rápido a "Me deben" cuando hay deudas pendientes.
