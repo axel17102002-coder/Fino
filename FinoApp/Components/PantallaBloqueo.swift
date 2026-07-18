@@ -36,7 +36,7 @@ struct PantallaBloqueo: View {
             .padding(.bottom, 32)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.verdeMarca.ignoresSafeArea())
+        .background(Color.fondoPantalla.ignoresSafeArea())
         .task { await autenticar() }
     }
 

@@ -5,6 +5,8 @@ import SwiftUI
 struct CuentaResumenCard: View {
 
     let cuenta: Cuenta
+    /// En carruseles usa un ancho fijo; expandida ocupa todo el ancho disponible.
+    var expandida: Bool = false
 
     private var gastoDelMes: Double {
         CalculosService.gastoDelMes(de: cuenta)
@@ -61,7 +63,8 @@ struct CuentaResumenCard: View {
             }
         }
         .padding(18)
-        .frame(width: 230, height: 120, alignment: .leading)
+        .frame(width: expandida ? nil : 230, height: expandida ? nil : 120, alignment: .leading)
+        .frame(maxWidth: expandida ? .infinity : nil, alignment: .leading)
         .background {
             RoundedRectangle(cornerRadius: 22, style: .continuous)
                 .fill(

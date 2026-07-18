@@ -9,6 +9,7 @@ struct CuentasView: View {
 
     @State private var mostrandoAlta = false
     @State private var cuentaEnEdicion: Cuenta?
+    @State private var cuentaSeleccionada: Cuenta?
     @State private var modoEdicion: EditMode = .inactive
 
     private var tarjetas: [Cuenta] { cuentas.filter(\.esTarjetaCredito) }
@@ -58,6 +59,9 @@ struct CuentasView: View {
         .sheet(item: $cuentaEnEdicion) { cuenta in
             AddCuentaSheet(cuenta: cuenta)
         }
+        .navigationDestination(item: $cuentaSeleccionada) { cuenta in
+            CuentaDetalleView(cuenta: cuenta)
+        }
     }
 
     private var lista: some View {
@@ -70,7 +74,7 @@ struct CuentasView: View {
                             .listRowBackground(Color.clear)
                             .listRowSeparator(.hidden)
                             .contentShape(Rectangle())
-                            .onTapGesture { cuentaEnEdicion = tarjeta }
+                            .onTapGesture { cuentaSeleccionada = tarjeta }
                             .swipeActions(edge: .trailing) {
                                 Button(role: .destructive) {
                                     eliminar(tarjeta)
@@ -96,7 +100,7 @@ struct CuentasView: View {
                     ForEach(otrasCuentas) { cuenta in
                         filaCuenta(cuenta)
                             .contentShape(Rectangle())
-                            .onTapGesture { cuentaEnEdicion = cuenta }
+                            .onTapGesture { cuentaSeleccionada = cuenta }
                             .swipeActions(edge: .trailing) {
                                 Button(role: .destructive) {
                                     eliminar(cuenta)

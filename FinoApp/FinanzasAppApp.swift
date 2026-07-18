@@ -24,6 +24,10 @@ struct FinoApp: App {
         WindowGroup {
             ZStack {
                 RootTabView()
+                    // El id fuerza el redibujado completo al cambiar el
+                    // tema: el fondo (verde u oscuro) se lee al construir
+                    // cada vista.
+                    .id(temaRaw)
                     .preferredColorScheme(tema.esquema)
                 if bloqueada {
                     PantallaBloqueo { bloqueada = false }
@@ -59,7 +63,7 @@ struct FinoApp: App {
 
     private var cortinaPrivacidad: some View {
         ZStack {
-            Color.verdeMarca.ignoresSafeArea()
+            Color.fondoPantalla.ignoresSafeArea()
             Image("Logo")
                 .resizable()
                 .scaledToFit()

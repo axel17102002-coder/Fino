@@ -28,8 +28,8 @@ struct AddTransactionSheet: View {
 
     private let esEdicion: Bool
 
-    init(movimiento: Movimiento? = nil) {
-        _viewModel = State(initialValue: MovimientoFormViewModel(movimiento: movimiento))
+    init(movimiento: Movimiento? = nil, cuentaPreseleccionada: Cuenta? = nil) {
+        _viewModel = State(initialValue: MovimientoFormViewModel(movimiento: movimiento, cuentaPreseleccionada: cuentaPreseleccionada))
         esEdicion = movimiento != nil
     }
 

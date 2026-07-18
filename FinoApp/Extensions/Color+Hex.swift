@@ -43,14 +43,29 @@ extension Color {
     // "Crema" (#FFE7C2) y "VerdeOscuro" (#305E51) viven en Assets:
     // Xcode genera solo los accesos Color.crema y Color.verdeOscuro.
 
-    /// Fondo general de las pantallas: verde de marca fijo.
-    /// El modo claro/oscuro cambia solo las tarjetas, no este fondo.
+    /// Fondo general de las pantallas. En Claro y Automático es el verde
+    /// de marca; con el tema Oscuro se apaga a casi negro y el verde
+    /// queda solo en la franja superior del logo.
     static var fondoPantalla: Color {
-        verdeMarca
+        let tema = TemaApp(rawValue: UserDefaults.standard.string(forKey: Preferencias.claveTema) ?? "")
+        return tema == .oscuro ? Color(hex: "121212") : verdeMarca
     }
 
     /// Relleno neutro para chips, cápsulas y fondos de íconos.
     static var rellenoTerciario: Color {
         Color(uiColor: .tertiarySystemFill)
+    }
+
+    /// Versión del color pensada para leerse sobre el fondo de la app.
+    /// En modo oscuro se aclara y desatura un poco para no desaparecer
+    /// sobre el casi negro (ej: el verde de marca); en claro queda igual.
+    func legible() -> Color {
+        let base = UIColor(self)
+        return Color(uiColor: UIColor { traits in
+            guard traits.userInterfaceStyle == .dark else { return base }
+            var h: CGFloat = 0, s: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
+            guard base.getHue(&h, saturation: &s, brightness: &b, alpha: &a) else { return base }
+            return UIColor(hue: h, saturation: min(s, 0.9), brightness: max(b, 0.66), alpha: a)
+        })
     }
 }

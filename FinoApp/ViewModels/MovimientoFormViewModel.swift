@@ -19,7 +19,7 @@ final class MovimientoFormViewModel {
 
     private let movimientoEditado: Movimiento?
 
-    init(movimiento: Movimiento? = nil) {
+    init(movimiento: Movimiento? = nil, cuentaPreseleccionada: Cuenta? = nil) {
         movimientoEditado = movimiento
         if let movimiento {
             tipo = movimiento.tipo
@@ -40,7 +40,7 @@ final class MovimientoFormViewModel {
             fecha = .now
             notas = ""
             cuotas = 1
-            cuenta = nil
+            cuenta = cuentaPreseleccionada
         }
     }
 

@@ -10,8 +10,11 @@ struct DashboardView: View {
     @Query(sort: \ObjetivoAhorro.creado) private var objetivos: [ObjetivoAhorro]
     @Query(filter: #Predicate<Deuda> { !$0.saldada }) private var deudasPendientes: [Deuda]
 
+    @AppStorage(Preferencias.claveNombre) private var nombreUsuario = ""
+
     @State private var categoriaSeleccionada: String?
     @State private var mostrandoAlta = false
+    @State private var mostrandoConfig = false
     @State private var paginaCarrusel: Int? = 0
 
     private var viewModel: DashboardViewModel {
@@ -51,22 +54,54 @@ struct DashboardView: View {
             .sheet(isPresented: $mostrandoAlta) {
                 AddTransactionSheet()
             }
+            .sheet(isPresented: $mostrandoConfig) {
+                ConfiguracionView()
+            }
         }
     }
 
-    /// Franja verdeOscuro fija en el borde superior: cubre también el
-    /// área del reloj/notch y sostiene el logo.
+    /// Franja verdeOscuro fija en el borde superior: cubre el área del
+    /// reloj/notch, sostiene el logo y el acceso a Configuración.
     private var franjaLogo: some View {
+        HStack(alignment: .center) {
             Image("Logo")
                 .resizable()
                 .scaledToFit()
                 .frame(width: 130, height: 55)
-                .offset(y:-10)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                //.padding(.horizontal)
-                //.padding(.bottom, 4)
-                .background(Color.verdeOscuro.ignoresSafeArea(edges: .top))
+
+            Spacer()
+
+            Button {
+                mostrandoConfig = true
+            } label: {
+                avatarUsuario
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(String(localized: "Configuración"))
         }
+        .padding(.horizontal)
+        .padding(.bottom, 6)
+        .frame(maxWidth: .infinity)
+        .background(Color.verdeOscuro.ignoresSafeArea(edges: .top))
+    }
+
+    /// Círculo crema con la inicial del usuario (o un ícono si no cargó
+    /// su nombre), que abre Configuración.
+    private var avatarUsuario: some View {
+        let inicial = nombreUsuario.trimmingCharacters(in: .whitespaces).first
+        return Group {
+            if let inicial {
+                Text(String(inicial).uppercased())
+                    .font(.headline.bold())
+            } else {
+                Image(systemName: "gearshape.fill")
+                    .font(.subheadline.weight(.semibold))
+            }
+        }
+        .foregroundStyle(Color.verdeOscuro)
+        .frame(width: 38, height: 38)
+        .background(Circle().fill(Color.crema))
+    }
 
     /// Acceso rápido a "Me deben" cuando hay deudas pendientes.
     @ViewBuilder
@@ -78,9 +113,9 @@ struct DashboardView: View {
                 HStack(spacing: 12) {
                     Image(systemName: "person.2.fill")
                         .font(.subheadline)
-                        .foregroundStyle(.green)
+                        .foregroundStyle(Color.green.legible())
                         .frame(width: 34, height: 34)
-                        .background(Circle().fill(.green.opacity(0.15)))
+                        .background(Circle().fill(Color.green.legible().opacity(0.18)))
 
                     VStack(alignment: .leading, spacing: 2) {
                         Text("Te deben")
@@ -95,7 +130,7 @@ struct DashboardView: View {
                     Text(deudasPendientes.reduce(0) { $0 + $1.monto }.enMoneda)
                         .font(.callout.bold())
                         .monospacedDigit()
-                        .foregroundStyle(.green)
+                        .foregroundStyle(Color.green.legible())
                     Image(systemName: "chevron.right")
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(.tertiary)
@@ -237,9 +272,9 @@ struct DashboardView: View {
         return HStack(spacing: 10) {
             Image(systemName: item.categoria.icono)
                 .font(.caption.weight(.semibold))
-                .foregroundStyle(item.categoria.color)
+                .foregroundStyle(item.categoria.color.legible())
                 .frame(width: 30, height: 30)
-                .background(Circle().fill(item.categoria.color.opacity(0.14)))
+                .background(Circle().fill(item.categoria.color.legible().opacity(0.18)))
 
             VStack(alignment: .leading, spacing: 5) {
                 HStack {
@@ -259,7 +294,7 @@ struct DashboardView: View {
                         .fill(Color.rellenoTerciario)
                         .overlay(alignment: .leading) {
                             Capsule()
-                                .fill(item.categoria.color.gradient)
+                                .fill(item.categoria.color.legible().gradient)
                                 .frame(width: proxy.size.width * progreso)
                         }
                 }
@@ -284,7 +319,12 @@ struct DashboardView: View {
                     encabezado(String(localized: "Cuentas")) { CuentasView() }
                     filaHorizontal {
                         ForEach(otrasCuentas) { cuenta in
-                            CuentaResumenCard(cuenta: cuenta)
+                            NavigationLink {
+                                CuentaDetalleView(cuenta: cuenta)
+                            } label: {
+                                CuentaResumenCard(cuenta: cuenta)
+                            }
+                            .buttonStyle(.plain)
                         }
                     }
                 }
@@ -294,7 +334,12 @@ struct DashboardView: View {
                     encabezado(String(localized: "Tarjetas")) { CuentasView() }
                     filaHorizontal {
                         ForEach(tarjetas) { tarjeta in
-                            TarjetaCreditoCard(cuenta: tarjeta)
+                            NavigationLink {
+                                CuentaDetalleView(cuenta: tarjeta)
+                            } label: {
+                                TarjetaCreditoCard(cuenta: tarjeta)
+                            }
+                            .buttonStyle(.plain)
                         }
                     }
                 }

@@ -53,35 +53,40 @@ struct BalanceCard: View {
     }
 
     private var bloqueBalance: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 6) {
                 Text("Resumen de \(Date.now.nombreMes)")
-                    .font(.headline)
-                    .foregroundStyle(.primary)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.secondary)
                 Image(systemName: "sparkles")
-                    .font(.caption.weight(.semibold))
+                    .font(.caption2.weight(.semibold))
                     .foregroundStyle(.indigo)
             }
 
             Text(balance.enMoneda)
-                .font(.system(size: 38, weight: .bold, design: .rounded))
+                .font(.system(size: 46, weight: .heavy, design: .rounded))
                 .monospacedDigit()
                 .lineLimit(1)
-                .minimumScaleFactor(0.45)
+                .minimumScaleFactor(0.4)
                 .contentTransition(.numericText())
 
-            HStack(spacing: 8) {
-                Image(systemName: balance >= 0 ? "arrow.up.right" : "arrow.down.right")
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(balance >= 0 ? .green : .red)
-                    .frame(width: 24, height: 24)
-                    .background(Circle().fill((balance >= 0 ? Color.green : Color.red).opacity(0.14)))
-
-                Text(balance >= 0 ? "Balance positivo" : "Balance negativo")
-                    .font(.caption.weight(.medium))
-                    .foregroundStyle(.secondary)
-            }
+            chipBalance
         }
+    }
+
+    private var chipBalance: some View {
+        let positivo = balance >= 0
+        let color: Color = positivo ? .green : .red
+        return HStack(spacing: 5) {
+            Image(systemName: positivo ? "arrow.up.right" : "arrow.down.right")
+                .font(.caption2.weight(.bold))
+            Text(positivo ? "Balance positivo" : "Balance negativo")
+                .font(.caption.weight(.semibold))
+        }
+        .foregroundStyle(color.legible())
+        .padding(.horizontal, 10)
+        .padding(.vertical, 5)
+        .background(Capsule().fill(color.legible().opacity(0.16)))
     }
 
     private var bloqueMetricas: some View {
@@ -113,9 +118,9 @@ struct BalanceCard: View {
         HStack(spacing: 9) {
             Image(systemName: icono)
                 .font(.caption.weight(.bold))
-                .foregroundStyle(color)
+                .foregroundStyle(color.legible())
                 .frame(width: 28, height: 28)
-                .background(Circle().fill(color.opacity(0.15)))
+                .background(Circle().fill(color.legible().opacity(0.18)))
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(titulo)
@@ -134,9 +139,9 @@ struct BalanceCard: View {
         HStack(spacing: 8) {
             Image(systemName: movimiento.iconoCategoria)
                 .font(.caption.weight(.semibold))
-                .foregroundStyle(movimiento.categoria?.color ?? .gray)
+                .foregroundStyle((movimiento.categoria?.color ?? .gray).legible())
                 .frame(width: 24, height: 24)
-                .background(Circle().fill((movimiento.categoria?.color ?? .gray).opacity(0.14)))
+                .background(Circle().fill((movimiento.categoria?.color ?? .gray).legible().opacity(0.18)))
 
             Text(movimiento.nombre)
                 .font(.caption.weight(.medium))
