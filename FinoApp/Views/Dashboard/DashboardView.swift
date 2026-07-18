@@ -43,12 +43,20 @@ struct DashboardView: View {
                         seccionTarjetas
                     }
                     .padding(.horizontal)
-                    .padding(.top, 12)
+                    .padding(.top, 16)
                     .padding(.bottom, 100)
                 }
                 .scrollIndicators(.hidden)
+                // El contenido es una "lámina" con las esquinas de arriba
+                // redondeadas que se monta sobre el verde de la franja.
+                .clipShape(UnevenRoundedRectangle(topLeadingRadius: 26, topTrailingRadius: 26))
+                .background(
+                    UnevenRoundedRectangle(topLeadingRadius: 26, topTrailingRadius: 26)
+                        .fill(Color.fondoPantalla)
+                        .ignoresSafeArea(edges: .bottom)
+                )
             }
-            .background(Color.fondoPantalla)
+            .background(Color.verdeOscuro.ignoresSafeArea())
             .toolbar(.hidden, for: .navigationBar)
             .sheet(isPresented: $mostrandoAlta) {
                 AddTransactionSheet()
@@ -63,7 +71,8 @@ struct DashboardView: View {
             Image("Logo")
                 .resizable()
                 .scaledToFit()
-                .frame(width: 130, height: 55)
+                .frame(width: 106, height: 44)
+                //.padding(.bottom, 5)
 
             Spacer()
 
@@ -86,10 +95,20 @@ struct DashboardView: View {
                 ? String(localized: "Mostrar montos")
                 : String(localized: "Ocultar montos"))
         }
-        .padding(.horizontal)
-        .padding(.bottom, 6)
+        .padding(.leading, 5)
+        .padding(.trailing)
+        .padding(.bottom, 11)
+        .padding(.top, -3)
         .frame(maxWidth: .infinity)
-        .background(Color.verdeOscuro.ignoresSafeArea(edges: .top))
+        .frame(height: 45)
+        .background(
+                UnevenRoundedRectangle(
+                    bottomLeadingRadius: 24,
+                    bottomTrailingRadius: 24
+                )
+                .fill(Color.verdeOscuro)
+                .ignoresSafeArea(edges: .top)
+            )
     }
 
     /// Acceso rápido a "Me deben" cuando hay deudas pendientes.
