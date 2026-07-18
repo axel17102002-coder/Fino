@@ -73,12 +73,16 @@ enum DeudasService {
     static func saldar(_ deuda: Deuda, registrandoIngreso: Bool, en contexto: ModelContext) {
         deuda.saldada = true
         if registrandoIngreso {
-            contexto.insert(Movimiento(
+            let devolucion = Movimiento(
                 tipo: .ingreso,
                 nombre: String(localized: "Devolución de \(deuda.persona)"),
                 categoriaRaw: CategoriaIngreso.otros.rawValue,
                 monto: deuda.monto
-            ))
+            )
+            // Suma al saldo de la cuenta pero no infla los ingresos del
+            // mes: es plata que vuelve, no plata ganada.
+            devolucion.montoAjeno = deuda.monto
+            contexto.insert(devolucion)
         }
         try? contexto.save()
     }

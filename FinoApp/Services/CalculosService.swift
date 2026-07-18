@@ -88,13 +88,16 @@ enum CalculosService {
         return movimientos.filter { $0.fecha >= inicio && $0.fecha < fin }
     }
 
+    /// Total de un tipo contando solo el consumo propio: los gastos
+    /// compartidos aportan tu parte y las devoluciones de deudas no
+    /// cuentan como ingreso.
     static func total(_ movimientos: [Movimiento], tipo: TipoMovimiento) -> Double {
-        movimientos.filter { $0.tipo == tipo }.reduce(0) { $0 + $1.monto }
+        movimientos.filter { $0.tipo == tipo }.reduce(0) { $0 + $1.montoPropio }
     }
 
-    /// Ingresos - Gastos + Cashback.
+    /// Ingresos - Gastos + Cashback (consumo propio).
     static func balance(_ movimientos: [Movimiento]) -> Double {
-        movimientos.reduce(0) { $0 + $1.montoConSigno }
+        movimientos.reduce(0) { $0 + $1.montoPropioConSigno }
     }
 
     // MARK: - Porcentajes
@@ -140,7 +143,7 @@ enum CalculosService {
             guard let categoria = tipo.categoria(raw: raw) ?? CustomCategoryStore.categoria(raw: raw, tipo: tipo) else {
                 return nil
             }
-            return TotalCategoria(categoria: categoria, total: items.reduce(0) { $0 + $1.monto })
+            return TotalCategoria(categoria: categoria, total: items.reduce(0) { $0 + $1.montoPropio })
         }
         .sorted { $0.total > $1.total }
     }
@@ -214,11 +217,11 @@ enum CalculosService {
 
     // MARK: - Presupuestos
 
-    /// Total gastado en una categoría durante el mes indicado.
+    /// Total gastado en una categoría durante el mes indicado (tu parte).
     static func gastado(en categoria: CategoriaGasto, movimientos: [Movimiento], mes: Date = .now) -> Double {
         delMes(movimientos, mes: mes)
             .filter { $0.tipo == .gasto && $0.categoriaRaw == categoria.rawValue }
-            .reduce(0) { $0 + $1.monto }
+            .reduce(0) { $0 + $1.montoPropio }
     }
 
     // MARK: - Otros indicadores
@@ -226,7 +229,7 @@ enum CalculosService {
     static func mayorGasto(_ movimientos: [Movimiento], mes: Date = .now) -> Movimiento? {
         delMes(movimientos, mes: mes)
             .filter { $0.tipo == .gasto }
-            .max { $0.monto < $1.monto }
+            .max { $0.montoPropio < $1.montoPropio }
     }
 
     /// Índice de día de la semana (1 = domingo, como `Calendar.weekday`)
@@ -238,7 +241,7 @@ enum CalculosService {
             Calendar.current.component(.weekday, from: $0.fecha)
         }
         return porDia.max { a, b in
-            a.value.reduce(0) { $0 + $1.monto } < b.value.reduce(0) { $0 + $1.monto }
+            a.value.reduce(0) { $0 + $1.montoPropio } < b.value.reduce(0) { $0 + $1.montoPropio }
         }?.key
     }
 }

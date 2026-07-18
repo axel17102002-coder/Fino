@@ -65,6 +65,8 @@ struct MovimientoBackup: Codable {
     let notas: String
     let cuotas: Int
     let cuentaID: UUID?
+    /// Parte del monto que no es consumo propio (gastos compartidos).
+    let montoAjeno: Double?
 }
 
 struct PresupuestoBackup: Codable {
@@ -113,7 +115,8 @@ enum BackupService {
                 MovimientoBackup(
                     id: $0.id, tipoRaw: $0.tipoRaw, nombre: $0.nombre,
                     categoriaRaw: $0.categoriaRaw, monto: $0.monto, fecha: $0.fecha,
-                    notas: $0.notas, cuotas: $0.cuotas, cuentaID: $0.cuenta?.id
+                    notas: $0.notas, cuotas: $0.cuotas, cuentaID: $0.cuenta?.id,
+                    montoAjeno: $0.montoAjeno
                 )
             },
             presupuestos: presupuestos.map {
@@ -210,6 +213,7 @@ enum BackupService {
                 cuenta: dto.cuentaID.flatMap { cuentasPorID[$0] }
             )
             movimiento.id = dto.id
+            movimiento.montoAjeno = dto.montoAjeno
             contexto.insert(movimiento)
         }
 

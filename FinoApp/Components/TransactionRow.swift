@@ -41,6 +41,15 @@ struct TransactionRow: View {
                         .padding(.vertical, 3)
                         .background(Capsule().fill(Color.rellenoTerciario))
                 }
+
+                if movimiento.esCompartido {
+                    Text("Compartido · Tu parte: \(movimiento.montoPropio.enMoneda)")
+                        .font(.caption2.weight(.medium))
+                        .foregroundStyle(Color.green.legible())
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(Capsule().fill(Color.green.legible().opacity(0.14)))
+                }
             }
 
             Spacer(minLength: 8)

@@ -684,6 +684,16 @@
         }
       }
     },
+    "Compartido · Tu parte: %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shared · Your share: %@"
+          }
+        }
+      }
+    },
     "Compras Online": {
       "localizations": {
         "en": {

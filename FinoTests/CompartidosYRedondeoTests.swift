@@ -101,6 +101,44 @@ struct CompartidosYRedondeoTests {
         #expect(restantes.first?.persona == "Pedro")
     }
 
+    // MARK: - Consumo propio
+
+    @Test func elGastoCompartidoCuentaSoloTuParte() {
+        // Pagaste 3 vuelos ($104), tu parte es $34.
+        let vuelos = movimientoConAjeno(.gasto, monto: 104, ajeno: 70)
+        #expect(vuelos.montoPropio == 34)
+        #expect(CalculosService.total([vuelos], tipo: .gasto) == 34)
+        // La plata que salió sigue completa (para el saldo de la cuenta).
+        #expect(vuelos.montoConSigno == -104)
+    }
+
+    @Test func laDevolucionNoInflaLosIngresos() {
+        let sueldo = movimientoConAjeno(.ingreso, monto: 1000, ajeno: nil)
+        let devolucion = movimientoConAjeno(.ingreso, monto: 70, ajeno: 70)
+        #expect(CalculosService.total([sueldo, devolucion], tipo: .ingreso) == 1000)
+        // Pero sí suma al flujo real de plata.
+        #expect(devolucion.montoConSigno == 70)
+    }
+
+    @Test func balanceDelMesUsaConsumoPropio() {
+        let movimientos = [
+            movimientoConAjeno(.ingreso, monto: 1000, ajeno: nil),
+            movimientoConAjeno(.gasto, monto: 104, ajeno: 70),   // tu parte 34
+            movimientoConAjeno(.ingreso, monto: 70, ajeno: 70),  // devolución
+        ]
+        #expect(CalculosService.balance(movimientos) == 966)
+    }
+
+    private func movimientoConAjeno(_ tipo: TipoMovimiento, monto: Double, ajeno: Double?) -> Movimiento {
+        let movimiento = Movimiento(
+            tipo: tipo, nombre: "Test",
+            categoriaRaw: tipo == .gasto ? CategoriaGasto.viajes.rawValue : CategoriaIngreso.otros.rawValue,
+            monto: monto
+        )
+        movimiento.montoAjeno = ajeno
+        return movimiento
+    }
+
     // MARK: - Redondeo a metas
 
     @Test func vueltoDelRedondeo() {

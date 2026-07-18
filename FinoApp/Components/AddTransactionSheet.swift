@@ -200,7 +200,7 @@ struct AddTransactionSheet: View {
                             NotificacionesService.verificarPresupuestos(en: contexto)
                             if !esEdicion, viewModel.tipo == .gasto, let monto = viewModel.monto {
                                 if esCompartido {
-                                    crearDeudas(total: monto, movimientoID: movimiento.id)
+                                    crearDeudas(total: monto, para: movimiento)
                                 }
                                 RedondeoService.aplicar(aGastoDe: monto, en: contexto)
                             }
@@ -292,29 +292,29 @@ struct AddTransactionSheet: View {
         }
     }
 
-    private func crearDeudas(total: Double, movimientoID: UUID) {
+    private func crearDeudas(total: Double, para movimiento: Movimiento) {
+        let nombres = DeudasService.nombres(desde: conQuienes)
+        let partes: [(persona: String, monto: Double)]
         if partesIguales {
-            DeudasService.crear(
-                conNombres: conQuienes,
-                total: total,
-                detalle: viewModel.nombre,
-                movimientoID: movimientoID,
-                en: contexto
-            )
+            let parte = DeudasService.parteDeCadaUno(total: total, nombres: nombres)
+            partes = nombres.map { ($0, parte) }
         } else {
-            let nombres = DeudasService.nombres(desde: conQuienes)
-            let partes = nombres.compactMap { nombre -> (persona: String, monto: Double)? in
+            partes = nombres.compactMap { nombre -> (persona: String, monto: Double)? in
                 guard let monto = Formatters.parsearMonto(montoBinding(para: nombre).wrappedValue),
                       monto > 0 else { return nil }
                 return (nombre, monto)
             }
-            DeudasService.crear(
-                partes: partes,
-                detalle: viewModel.nombre,
-                movimientoID: movimientoID,
-                en: contexto
-            )
         }
+        DeudasService.crear(
+            partes: partes,
+            detalle: viewModel.nombre,
+            movimientoID: movimiento.id,
+            en: contexto
+        )
+        // El gasto recuerda cuánto es de otros: las métricas del mes
+        // cuentan solo tu parte.
+        movimiento.montoAjeno = partes.reduce(0) { $0 + $1.monto }
+        try? contexto.save()
     }
 
     /// Corre el OCR y precarga el formulario con lo que se pudo leer.
