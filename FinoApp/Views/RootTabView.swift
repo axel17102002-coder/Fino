@@ -16,6 +16,9 @@ struct RootTabView: View {
     @AppStorage(Preferencias.claveMontosOcultos) private var montosOcultos = false
 
     @State private var pestaniaActiva: Pestania = .inicio
+    /// Cambia con cada toque en "Inicio": recrea el Dashboard para que
+    /// vuelva a su raíz aunque esté en una pantalla anidada (tarjeta, etc.).
+    @State private var reinicioInicio = 0
     @State private var mostrandoMenuAlta = false
     @State private var mostrandoAlta = false
     @State private var mostrandoAporte = false
@@ -34,6 +37,7 @@ struct RootTabView: View {
             TabView(selection: $pestaniaActiva) {
                 Tab("Inicio", systemImage: "house.fill", value: Pestania.inicio) {
                     DashboardView()
+                        .id(reinicioInicio)
                         .toolbar(.hidden, for: .tabBar)
                 }
                 Tab("Movimientos", systemImage: "list.bullet.rectangle.fill", value: Pestania.movimientos) {
@@ -59,7 +63,10 @@ struct RootTabView: View {
                 Color.clear.frame(height: 70)
             }
 
-            BarraInferiorView(seleccion: $pestaniaActiva) { mostrandoMenuAlta = true }
+            BarraInferiorView(
+                seleccion: $pestaniaActiva,
+                alTocarInicio: { reinicioInicio += 1 }
+            ) { mostrandoMenuAlta = true }
         }
         .confirmationDialog("¿Qué querés hacer?", isPresented: $mostrandoMenuAlta, titleVisibility: .visible) {
             Button("Nuevo movimiento") { mostrandoAlta = true }

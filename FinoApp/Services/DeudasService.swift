@@ -73,11 +73,17 @@ enum DeudasService {
     static func saldar(_ deuda: Deuda, registrandoIngreso: Bool, en contexto: ModelContext) {
         deuda.saldada = true
         if registrandoIngreso {
+            // Misma cuenta del gasto original: así la devolución la
+            // netea a ella y no queda de menos para siempre.
+            let cuentaOrigen = deuda.movimientoID.flatMap { id in
+                (try? contexto.fetch(FetchDescriptor<Movimiento>()))?.first { $0.id == id }?.cuenta
+            }
             let devolucion = Movimiento(
                 tipo: .ingreso,
                 nombre: String(localized: "Devolución de \(deuda.persona)"),
                 categoriaRaw: CategoriaIngreso.otros.rawValue,
-                monto: deuda.monto
+                monto: deuda.monto,
+                cuenta: cuentaOrigen
             )
             // Suma al saldo de la cuenta pero no infla los ingresos del
             // mes: es plata que vuelve, no plata ganada.

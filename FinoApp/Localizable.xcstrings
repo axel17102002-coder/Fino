@@ -202,6 +202,36 @@
         }
       }
     },
+    "Activalas para recibir los vencimientos de tarjetas, las alertas de presupuesto y el recordatorio de backup.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turn them on to get card due dates, budget alerts and the backup reminder."
+          }
+        }
+      }
+    },
+    "Activar en Ajustes de iOS": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enable in iOS Settings"
+          }
+        }
+      }
+    },
+    "Activar notificaciones": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turn on notifications"
+          }
+        }
+      }
+    },
     "Agregar": {
       "localizations": {
         "en": {
@@ -390,6 +420,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Automatic"
+          }
+        }
+      }
+    },
+    "Avisos activados": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alerts on"
           }
         }
       }
@@ -1403,6 +1443,16 @@
         }
       }
     },
+    "Están bloqueadas en iOS: sin ellas no vas a recibir los avisos de vencimiento de tarjetas, presupuestos ni backup.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "They are blocked in iOS: without them you will not get card due dates, budget alerts or backup reminders."
+          }
+        }
+      }
+    },
     "Euro": {
       "localizations": {
         "en": {
@@ -2156,6 +2206,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Notes (optional)"
+          }
+        }
+      }
+    },
+    "Notificaciones": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Notifications"
           }
         }
       }
@@ -2949,6 +3009,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Credit cards"
+          }
+        }
+      }
+    },
+    "Te avisamos el día antes de cada vencimiento de tarjeta, al llegar al 80% y 100% de un presupuesto, y para recordarte el backup.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "We notify you the day before each card due date, at 80% and 100% of a budget, and to remind you to back up."
           }
         }
       }

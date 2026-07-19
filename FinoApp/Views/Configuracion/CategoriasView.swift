@@ -208,14 +208,44 @@ struct CategoriaFormSheet: View {
     @State private var colorHex: String
 
     static let iconos = [
-        "fork.knife", "cart.fill", "car.fill", "bus.fill", "house.fill",
-        "cross.case.fill", "popcorn.fill", "tshirt.fill", "airplane",
-        "graduationcap.fill", "bolt.fill", "pawprint.fill", "gift.fill",
-        "shippingbox.fill", "gamecontroller.fill", "cup.and.saucer.fill",
-        "dumbbell.fill", "fuelpump.fill", "banknote.fill", "briefcase.fill",
-        "chart.line.uptrend.xyaxis", "laptopcomputer", "creditcard.fill",
-        "music.note", "book.fill", "scissors", "wrench.and.screwdriver.fill",
-        "star.fill", "heart.fill", "ellipsis.circle.fill"
+        // Comida y bebida
+        "fork.knife", "cup.and.saucer.fill", "wineglass.fill",
+        "birthday.cake.fill", "carrot.fill", "takeoutbag.and.cup.and.straw.fill",
+        // Compras
+        "cart.fill", "bag.fill", "handbag.fill", "tshirt.fill",
+        "gift.fill", "shippingbox.fill",
+        // Transporte y viajes
+        "car.fill", "bus.fill", "tram.fill", "bicycle", "fuelpump.fill",
+        "airplane", "map.fill", "tent.fill", "beach.umbrella.fill",
+        "globe.americas.fill",
+        // Hogar
+        "house.fill", "bed.double.fill", "sofa.fill", "washer.fill",
+        "lightbulb.fill", "bolt.fill", "flame.fill", "drop.fill",
+        "key.fill", "hammer.fill", "paintbrush.fill",
+        "wrench.and.screwdriver.fill",
+        // Salud y cuidado personal
+        "cross.case.fill", "pills.fill", "stethoscope", "dumbbell.fill",
+        "figure.run", "scissors", "comb.fill",
+        // Entretenimiento
+        "popcorn.fill", "film.fill", "theatermasks.fill",
+        "gamecontroller.fill", "music.note", "headphones", "tv.fill",
+        "party.popper.fill", "balloon.fill", "soccerball", "trophy.fill",
+        // Tecnología y comunicación
+        "laptopcomputer", "desktopcomputer", "iphone", "wifi", "phone.fill",
+        "camera.fill",
+        // Educación y trabajo
+        "graduationcap.fill", "book.fill", "briefcase.fill",
+        "envelope.fill",
+        // Plata
+        "banknote.fill", "creditcard.fill", "dollarsign.circle.fill",
+        "chart.line.uptrend.xyaxis", "building.columns.fill",
+        // Familia y mascotas
+        "pawprint.fill", "cat.fill", "dog.fill", "teddybear.fill",
+        "stroller.fill",
+        // Varios
+        "leaf.fill", "tree.fill", "sun.max.fill", "snowflake",
+        "umbrella.fill", "sparkles", "crown.fill", "star.fill",
+        "heart.fill", "ellipsis.circle.fill"
     ]
 
     private static let paleta = Paleta.colores

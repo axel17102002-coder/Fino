@@ -33,6 +33,9 @@ struct BarraConMuesca: Shape {
 /// integrado en una muesca circular, como una cuna.
 struct BarraInferiorView: View {
     @Binding var seleccion: RootTabView.Pestania
+    /// Se llama cada vez que se toca "Inicio", esté donde esté el usuario:
+    /// permite volver el Dashboard a su raíz.
+    var alTocarInicio: () -> Void = {}
     let accionAgregar: () -> Void
 
     private let alturaBarra: CGFloat = 62
@@ -72,6 +75,7 @@ struct BarraInferiorView: View {
         _ icono: String
     ) -> some View {
         Button {
+            if pestania == .inicio { alTocarInicio() }
             seleccion = pestania
         } label: {
             VStack(spacing: 3) {

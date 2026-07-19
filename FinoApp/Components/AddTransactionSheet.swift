@@ -27,10 +27,18 @@ struct AddTransactionSheet: View {
     @State private var montosPorPersona: [String: String] = [:]
 
     private let esEdicion: Bool
+    /// Abre la cámara de escaneo apenas aparece el formulario (lo usa el
+    /// botón de la franja del Dashboard).
+    private let escanearAlAbrir: Bool
 
-    init(movimiento: Movimiento? = nil, cuentaPreseleccionada: Cuenta? = nil) {
+    init(
+        movimiento: Movimiento? = nil,
+        cuentaPreseleccionada: Cuenta? = nil,
+        escanearAlAbrir: Bool = false
+    ) {
         _viewModel = State(initialValue: MovimientoFormViewModel(movimiento: movimiento, cuentaPreseleccionada: cuentaPreseleccionada))
         esEdicion = movimiento != nil
+        self.escanearAlAbrir = escanearAlAbrir
     }
 
     private var categoriasDisponibles: [any CategoriaInfo] {
@@ -214,6 +222,9 @@ struct AddTransactionSheet: View {
             }
             .onAppear {
                 recargarCategoriasPersonalizadas()
+                if escanearAlAbrir && EscanerTicketView.disponible {
+                    mostrandoEscaner = true
+                }
             }
             .onChange(of: viewModel.tipo) { _, _ in
                 recargarCategoriasPersonalizadas()

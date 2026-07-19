@@ -10,10 +10,9 @@ struct DashboardView: View {
     @Query(sort: \ObjetivoAhorro.creado) private var objetivos: [ObjetivoAhorro]
     @Query(filter: #Predicate<Deuda> { !$0.saldada }) private var deudasPendientes: [Deuda]
 
-    @AppStorage(Preferencias.claveMontosOcultos) private var montosOcultos = false
-
     @State private var categoriaSeleccionada: String?
     @State private var mostrandoAlta = false
+    @State private var mostrandoEscanerTicket = false
     @State private var paginaCarrusel: Int? = 0
 
     private var viewModel: DashboardViewModel {
@@ -61,6 +60,9 @@ struct DashboardView: View {
             .sheet(isPresented: $mostrandoAlta) {
                 AddTransactionSheet()
             }
+            .sheet(isPresented: $mostrandoEscanerTicket) {
+                AddTransactionSheet(escanearAlAbrir: true)
+            }
         }
     }
 
@@ -76,24 +78,20 @@ struct DashboardView: View {
 
             Spacer()
 
-            // Modo privacidad: tapa todos los montos de la app.
+            // Atajo al escáner de tickets: la vía más rápida de cargar
+            // un gasto real.
             Button {
-                withAnimation(.easeOut(duration: 0.15)) {
-                    montosOcultos.toggle()
-                }
+                mostrandoEscanerTicket = true
                 Haptics.seleccion()
             } label: {
-                Image(systemName: montosOcultos ? "eye.slash.fill" : "eye.fill")
+                Image(systemName: "doc.text.viewfinder")
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(Color.verdeOscuro)
                     .frame(width: 38, height: 38)
                     .background(Circle().fill(Color.crema))
-                    .contentTransition(.symbolEffect(.replace))
             }
             .buttonStyle(.plain)
-            .accessibilityLabel(montosOcultos
-                ? String(localized: "Mostrar montos")
-                : String(localized: "Ocultar montos"))
+            .accessibilityLabel(String(localized: "Escanear ticket"))
         }
         .padding(.leading, 5)
         .padding(.trailing)

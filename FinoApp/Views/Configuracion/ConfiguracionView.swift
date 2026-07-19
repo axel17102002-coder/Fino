@@ -1,5 +1,6 @@
 import SwiftUI
 import SwiftData
+import UserNotifications
 
 /// Preferencias de la app: general, finanzas, seguridad y acerca de.
 /// El backup y la gestión de datos viven en su propia pestaña (`DatosView`).
@@ -14,6 +15,10 @@ struct ConfiguracionView: View {
     @AppStorage(Preferencias.claveRedondeoObjetivoID) private var redondeoObjetivoID = ""
     @AppStorage(Preferencias.claveRedondeoPaso) private var redondeoPaso = 1000.0
     @AppStorage(Preferencias.claveTotalRedondeado) private var totalRedondeado = 0.0
+    @AppStorage(Preferencias.claveMontosOcultos) private var montosOcultos = false
+
+    @State private var permisoNotificaciones: UNAuthorizationStatus = .notDetermined
+    @State private var avisosProgramados = 0
 
     @Query private var movimientos: [Movimiento]
     @Query(sort: \ObjetivoAhorro.creado) private var objetivos: [ObjetivoAhorro]
@@ -34,6 +39,7 @@ struct ConfiguracionView: View {
                     seccionGeneral
                     seccionFinanzas
                     seccionRedondeo
+                    seccionNotificaciones
                     seccionDatos
                     seccionSeguridad
                     seccionAcercaDe
@@ -64,6 +70,9 @@ struct ConfiguracionView: View {
                 ForEach(Moneda.allCases) { moneda in
                     Text("\(moneda.simbolo) · \(moneda.nombre)").tag(moneda.rawValue)
                 }
+            }
+            Toggle(isOn: $montosOcultos) {
+                Label("Ocultar montos", systemImage: montosOcultos ? "eye.slash.fill" : "eye.fill")
             }
         } header: {
             textoSobreFondo("General")
@@ -134,9 +143,63 @@ struct ConfiguracionView: View {
             }
         }
     }
+    /// Estado de las notificaciones: sin permiso, todos los avisos de la
+    /// app (vencimientos, presupuestos, backup) fallan en silencio.
+    @ViewBuilder
+    private var seccionNotificaciones: some View {
+        Section {
+            switch permisoNotificaciones {
+            case .authorized, .provisional, .ephemeral:
+                LabeledContent {
+                    Text("\(avisosProgramados)")
+                        .monospacedDigit()
+                } label: {
+                    Label("Avisos activados", systemImage: "bell.badge.fill")
+                        .foregroundStyle(Color.green.legible())
+                }
+            case .denied:
+                Button {
+                    if let url = URL(string: UIApplication.openSettingsURLString) {
+                        UIApplication.shared.open(url)
+                    }
+                } label: {
+                    Label("Activar en Ajustes de iOS", systemImage: "bell.slash.fill")
+                        .foregroundStyle(.orange)
+                }
+            default:
+                Button {
+                    Task {
+                        await NotificacionesService.pedirPermiso()
+                        await revisarNotificaciones()
+                    }
+                } label: {
+                    Label("Activar notificaciones", systemImage: "bell")
+                }
+            }
+        } header: {
+            textoSobreFondo("Notificaciones")
+        } footer: {
+            switch permisoNotificaciones {
+            case .denied:
+                textoSobreFondo("Están bloqueadas en iOS: sin ellas no vas a recibir los avisos de vencimiento de tarjetas, presupuestos ni backup.", esFooter: true)
+            case .authorized, .provisional, .ephemeral:
+                textoSobreFondo("Te avisamos el día antes de cada vencimiento de tarjeta, al llegar al 80% y 100% de un presupuesto, y para recordarte el backup.", esFooter: true)
+            default:
+                textoSobreFondo("Activalas para recibir los vencimientos de tarjetas, las alertas de presupuesto y el recordatorio de backup.", esFooter: true)
+            }
+        }
+        .task { await revisarNotificaciones() }
+    }
+
+    private func revisarNotificaciones() async {
+        permisoNotificaciones = await NotificacionesService.estadoPermiso()
+        avisosProgramados = await NotificacionesService.programadas()
+    }
+
     /// Acceso a la pantalla de backup y gestión de datos.
     private var seccionDatos: some View {
         Section {
+            LabeledContent("Movimientos guardados", value: "\(movimientos.count)")
             NavigationLink {
                 DatosView()
             } label: {
@@ -171,7 +234,6 @@ struct ConfiguracionView: View {
     private var seccionAcercaDe: some View {
         Section {
             LabeledContent("Versión", value: "1.2")
-            LabeledContent("Movimientos guardados", value: "\(movimientos.count)")
             LabeledContent("Hecho con", value: "SwiftUI + SwiftData")
         } header: {
             textoSobreFondo("Acerca de")

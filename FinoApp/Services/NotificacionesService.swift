@@ -15,6 +15,17 @@ enum NotificacionesService {
         return (try? await centro.requestAuthorization(options: [.alert, .sound, .badge])) ?? false
     }
 
+    /// Estado del permiso, para que Configuración pueda avisar cuando
+    /// las notificaciones están apagadas y todo falla en silencio.
+    static func estadoPermiso() async -> UNAuthorizationStatus {
+        await UNUserNotificationCenter.current().notificationSettings().authorizationStatus
+    }
+
+    /// Cantidad de avisos programados (vencimientos + backup).
+    static func programadas() async -> Int {
+        await UNUserNotificationCenter.current().pendingNotificationRequests().count
+    }
+
     // MARK: - Recordatorio de backup
 
     /// Programa un recordatorio que se repite cada 15 días.
@@ -81,6 +92,10 @@ enum NotificacionesService {
         let cuentas = (try? contexto.fetch(FetchDescriptor<Cuenta>())) ?? []
         let tarjetas = cuentas.filter { $0.esTarjetaCredito && $0.diaVencimiento > 0 }
         guard !tarjetas.isEmpty else { return }
+        // Sin permiso los avisos se descartan en silencio; pedirlo acá
+        // cubre a quien lo saltó en el onboarding y después configuró
+        // una tarjeta.
+        Task { await pedirPermiso() }
 
         let centro = UNUserNotificationCenter.current()
         let calendario = Calendar.current
