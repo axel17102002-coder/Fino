@@ -143,12 +143,18 @@ enum TicketScannerService {
         return montos.map(\.valor).max()
     }
 
+    /// Códigos fiscales y de comprobante: suelen ser números grandes que,
+    /// si no se descartan, le ganan al total real en el heurístico de
+    /// "el monto más grande del ticket".
+    private static let palabrasFiscales = [
+        "CUIT", "C.U.I.T", "IIBB", "CAE", "CHK", "PV ", "N°", "NRO",
+    ]
+
     private static func montosDetectados(en lineas: [String]) -> [MontoDetectado] {
         var resultado: [MontoDetectado] = []
         for (indice, linea) in lineas.enumerated() {
             let mayusculas = linea.uppercased()
-            // Los CUIT y códigos de barras no son montos.
-            if mayusculas.contains("CUIT") || mayusculas.contains("C.U.I.T") { continue }
+            if palabrasFiscales.contains(where: { mayusculas.contains($0) }) { continue }
 
             for coincidencia in linea.matches(of: /\$?\d[\d.,]*\d|\$?\d/) {
                 let token = String(coincidencia.output)

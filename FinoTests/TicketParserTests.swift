@@ -64,6 +64,20 @@ struct TicketParserTests {
         #expect(TicketScannerService.parsear(lineas: lineas).monto == 500)
     }
 
+    @Test func ignoraElIIBBComoMontoMasGrande() {
+        // Caso real: el número de IIBB (646446) es más grande que el
+        // total real y, sin la palabra "TOTAL" atada al importe, ganaba
+        // el heurístico de "el monto más grande del ticket".
+        let lineas = [
+            "KFC",
+            "CUIT 30-71184094-6",
+            "IIBB 902-646446-0",
+            "CAFE DOBLE 4.200,00",
+            "MEDIALUNA 1.800,00",
+        ]
+        #expect(TicketScannerService.parsear(lineas: lineas).monto == 4200)
+    }
+
     @Test func fechaFueraDeRangoSeIgnora() {
         // Una fecha de vencimiento lejana no es la fecha de compra.
         let lineas = ["KIOSCO", "VTO 01/01/2031", "TOTAL 500,00"]

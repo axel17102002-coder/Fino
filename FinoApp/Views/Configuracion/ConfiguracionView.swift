@@ -26,14 +26,7 @@ struct ConfiguracionView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                // Título propio en blanco: el título grande del sistema
-                // toma el color del tema y se pierde sobre el fondo verde.
-                Text("Configuración")
-                    .font(.largeTitle.bold())
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal)
-                    .padding(.top, 8)
+                BarraSuperior("Configuración")
 
                 Form {
                     seccionGeneral
@@ -48,8 +41,9 @@ struct ConfiguracionView: View {
                 // Deja pasar el último renglón por encima de la barra
                 // inferior flotante (62 de barra + margen).
                 .contentMargins(.bottom, 84, for: .scrollContent)
+                .laminaRedondeada()
             }
-            .background(Color.fondoPantalla)
+            .background(Color.verdeOscuro.ignoresSafeArea())
             .toolbar(.hidden, for: .navigationBar)
         }
     }
@@ -233,7 +227,7 @@ struct ConfiguracionView: View {
 
     private var seccionAcercaDe: some View {
         Section {
-            LabeledContent("Versión", value: "1.2")
+            LabeledContent("Versión", value: "1.3")
             LabeledContent("Hecho con", value: "SwiftUI + SwiftData")
         } header: {
             textoSobreFondo("Acerca de")

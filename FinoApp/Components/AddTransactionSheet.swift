@@ -80,11 +80,21 @@ struct AddTransactionSheet: View {
                     TextField("Nombre", text: $viewModel.nombre)
 
                     HStack {
-                        Text(Formatters.monedaActual.simbolo)
+                        Text(viewModel.moneda.simbolo)
                             .foregroundStyle(.secondary)
                         TextField("0", text: $viewModel.montoTexto)
                             .keyboardType(.decimalPad)
                             .monospacedDigit()
+                    }
+
+                    Picker("Moneda", selection: $viewModel.moneda) {
+                        ForEach(Moneda.allCases) { moneda in
+                            Text("\(moneda.simbolo) · \(moneda.rawValue)").tag(moneda)
+                        }
+                    }
+
+                    if viewModel.esMonedaExtranjera {
+                        conversionMoneda
                     }
 
                     DatePicker("Fecha", selection: $viewModel.fecha, displayedComponents: .date)
@@ -101,7 +111,7 @@ struct AddTransactionSheet: View {
                         Stepper(value: $viewModel.cuotas, in: 1...36) {
                             Text(viewModel.cuotas == 1 ? "Pago único" : "\(viewModel.cuotas) cuotas")
                         }
-                        if viewModel.cuotas > 1, let monto = viewModel.monto {
+                        if viewModel.cuotas > 1, let monto = viewModel.montoConvertido {
                             LabeledContent(
                                 "Valor de la cuota",
                                 value: (monto / Double(viewModel.cuotas)).enMoneda
@@ -229,6 +239,9 @@ struct AddTransactionSheet: View {
             .onChange(of: viewModel.tipo) { _, _ in
                 recargarCategoriasPersonalizadas()
             }
+            .onChange(of: viewModel.moneda) { _, _ in
+                Task { await viewModel.actualizarTasa() }
+            }
             .sheet(isPresented: $mostrandoNuevaCategoria) {
                 // Mismo formulario completo que el editor de Configuración
                 // (grilla de íconos y paleta de colores compartida).
@@ -277,6 +290,37 @@ struct AddTransactionSheet: View {
             } message: {
                 Text("Probá de nuevo con más luz o con el ticket más plano. También podés cargar el gasto a mano.")
             }
+        }
+    }
+
+    // MARK: - Conversión de moneda
+
+    /// Tasa editable + previsualización del monto ya convertido a la moneda
+    /// global. La tasa se precarga con la cotización oficial (dolarapi).
+    @ViewBuilder
+    private var conversionMoneda: some View {
+        HStack {
+            Text("Cotización")
+            Spacer()
+            if viewModel.cargandoTasa {
+                ProgressView()
+            }
+            Text("1 \(viewModel.moneda.rawValue) =")
+                .foregroundStyle(.secondary)
+                .font(.callout)
+            TextField("0", text: $viewModel.tasaTexto)
+                .keyboardType(.decimalPad)
+                .multilineTextAlignment(.trailing)
+                .monospacedDigit()
+                .frame(maxWidth: 90)
+            Text(viewModel.monedaGlobal.rawValue)
+                .foregroundStyle(.secondary)
+                .font(.callout)
+        }
+
+        if let convertido = viewModel.montoConvertido {
+            LabeledContent("Equivale a", value: Formatters.moneda(convertido, moneda: viewModel.monedaGlobal))
+                .foregroundStyle(.secondary)
         }
     }
 

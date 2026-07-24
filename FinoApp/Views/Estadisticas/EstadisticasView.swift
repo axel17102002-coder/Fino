@@ -47,114 +47,251 @@ struct EstadisticasView: View {
     @State private var mesComparado: Date?
     @State private var categoriaTocada: String?
 
-    private var viewModel: EstadisticasViewModel {
-        EstadisticasViewModel(movimientos: movimientos)
-    }
+    /// Página del carrusel: 0 = gráficos, 1 = Top categorías + Insights.
+    @State private var paginaCarrusel: Int? = 0
+
+    /// Mes que se está mirando en las tarjetas de un solo mes (categorías,
+    /// promedios, top categorías). Navegable con el selector de arriba.
+    @State private var mesElegido: Date = .now
+
+    /// Se recalcula solo cuando cambian los movimientos o el mes elegido,
+    /// no en cada redibujado del `body` (antes era una computed property
+    /// que repetía todo el cálculo en cada acceso).
+    @State private var viewModel = EstadisticasViewModel(movimientos: [])
 
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 0) {
-                // Título propio en blanco: el título grande del sistema
-                // toma el color del tema y se pierde sobre el fondo verde.
-                Text("Estadísticas")
-                    .font(.largeTitle.bold())
-                    .foregroundStyle(.white)
-                    .padding(.horizontal)
-                    .padding(.top, 8)
-                    .padding(.bottom, 10)
+                BarraSuperior("Estadísticas")
+                    .foregroundStyle(Color.crema)
 
-                if viewModel.hayDatos {
-                    contenido
-                } else {
-                    EmptyState(
-                        icono: "chart.bar.xaxis",
-                        titulo: String(localized: "Sin estadísticas"),
-                        mensaje: String(localized: "Cuando registres movimientos vas a ver acá tus gráficos e insights.")
-                    )
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                Group {
+                    if viewModel.hayDatos {
+                        contenido
+                    } else {
+                        EmptyState(
+                            icono: "chart.bar.xaxis",
+                            titulo: String(localized: "Sin estadísticas"),
+                            mensaje: String(localized: "Cuando registres movimientos vas a ver acá tus gráficos e insights.")
+                        )
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    }
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .laminaRedondeada()
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Color.fondoPantalla)
+            .background(Color.verdeOscuro.ignoresSafeArea())
             .toolbar(.hidden, for: .navigationBar)
         }
+        .onAppear { actualizarViewModel() }
+        .onChange(of: movimientos) { _, _ in actualizarViewModel() }
+        .onChange(of: mesElegido) { _, _ in actualizarViewModel() }
+    }
+
+    private func actualizarViewModel() {
+        viewModel = EstadisticasViewModel(movimientos: movimientos, mes: mesElegido)
     }
 
     private var contenido: some View {
         ScrollView {
-            VStack(spacing: 16) {
-                graficoEvolucion
-                indicadoresRapidos
-                graficoGastosPorCategoria
-                graficoIngresosVsGastos
-                tarjetaTopCategorias
-                seccionInsights
+            VStack(spacing: 14) {
+                selectorDeMes
+                indicadorPaginas
+                carrusel
             }
             .padding(.horizontal)
-            .padding(.bottom, 24)
+            // Aire arriba para que el selector de mes no quede pegado a la
+            // franja verde.
+            .padding(.top, 12)
+            // Deja pasar el contenido por encima de la barra inferior
+            // flotante para que no lo tape al llegar al final.
+            .padding(.bottom, 96)
         }
         .scrollIndicators(.hidden)
     }
 
-    // MARK: - Indicadores
+    // MARK: - Carrusel (gráficos ← → resumen)
 
-    private var indicadoresRapidos: some View {
-        LazyVGrid(columns: [GridItem(.flexible(), spacing: 14), GridItem(.flexible())], spacing: 14) {
-            indicador(
-                titulo: String(localized: "Gasto promedio/día"),
-                valor: viewModel.promedioDiarioGastos.enMoneda,
-                icono: "arrow.up.right",
-                color: .red
-            )
-            indicador(
-                titulo: String(localized: "Ingreso promedio/día"),
-                valor: viewModel.promedioDiarioIngresos.enMoneda,
-                icono: "arrow.down.left",
-                color: .green
-            )
-            indicador(
-                titulo: String(localized: "Mayor gasto en"),
-                valor: viewModel.categoriaTopGasto?.categoria.nombre ?? "—",
-                icono: viewModel.categoriaTopGasto?.categoria.icono ?? "questionmark",
-                color: viewModel.categoriaTopGasto?.categoria.color ?? .gray
-            )
-            indicador(
-                titulo: String(localized: "Movimientos"),
-                valor: "\(viewModel.totalMovimientos)",
-                icono: "list.bullet",
-                color: .indigo
-            )
+    /// Gráficos como página principal; deslizando a la derecha aparecen
+    /// Top categorías e Insights. Mismo patrón que el Dashboard.
+    private var carrusel: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            // 32 = margen de pantalla a cada lado: la página siguiente
+            // queda fuera de la zona visible en reposo.
+            HStack(alignment: .top, spacing: 32) {
+                paginaGraficos
+                    .containerRelativeFrame(.horizontal)
+                    .id(0)
+                paginaResumen
+                    .containerRelativeFrame(.horizontal)
+                    .id(1)
+            }
+            .scrollTargetLayout()
+        }
+        .scrollTargetBehavior(.viewAligned)
+        .scrollPosition(id: $paginaCarrusel)
+        .scrollClipDisabled()
+    }
+
+    private var indicadorPaginas: some View {
+        HStack(spacing: 7) {
+            ForEach(0..<2, id: \.self) { indice in
+                Capsule()
+                    .fill(.white.opacity(paginaCarrusel == indice ? 0.95 : 0.35))
+                    .frame(width: paginaCarrusel == indice ? 18 : 7, height: 7)
+            }
+        }
+        .animation(.spring(duration: 0.25), value: paginaCarrusel)
+    }
+
+    private var paginaGraficos: some View {
+        VStack(spacing: 16) {
+            tarjetasResumen
+            graficoEvolucion
+            graficoGastosPorCategoria
+            graficoIngresosVsGastos
         }
     }
 
-    private func indicador(titulo: String, valor: String, icono: String, color: Color) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Image(systemName: icono)
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(color)
-                .frame(width: 28, height: 28)
-                .background(Circle().fill(color.opacity(0.15)))
-            Text(titulo)
-                .font(.caption)
-                .foregroundStyle(.secondary)
+    private var paginaResumen: some View {
+        VStack(spacing: 16) {
+            tarjetaTopCategorias
+            seccionInsights
+            Spacer(minLength: 0)
+        }
+    }
+
+    // MARK: - Selector de mes
+
+    private var esMesActual: Bool {
+        Calendar.current.isDate(mesElegido, equalTo: .now, toGranularity: .month)
+    }
+
+    /// Pill centrado con el mes y las flechas como botones circulares, para
+    /// que se lea como un control y no como texto suelto sobre la costura.
+    private var selectorDeMes: some View {
+        HStack(spacing: 10) {
+            flechaMes(sistema: "chevron.left", meses: -1, deshabilitado: false)
+
+            Text(mesElegido.mesYAnio)
+                .font(.subheadline.bold())
+                .foregroundStyle(.primary)
+                .contentTransition(.numericText())
+                .animation(.snappy(duration: 0.2), value: mesElegido)
+                .frame(minWidth: 130)
+
+            flechaMes(sistema: "chevron.right", meses: 1, deshabilitado: esMesActual)
+        }
+        .padding(.vertical, 7)
+        .padding(.horizontal, 10)
+        .background(Capsule().fill(Color.fondoTarjeta))
+        .frame(maxWidth: .infinity)
+    }
+
+    private func flechaMes(sistema: String, meses: Int, deshabilitado: Bool) -> some View {
+        Button {
+            mesElegido = mesElegido.agregandoMeses(meses)
+        } label: {
+            Image(systemName: sistema)
+                .font(.footnote.weight(.bold))
+                .foregroundStyle(deshabilitado ? .secondary : .primary)
+                .frame(width: 30, height: 30)
+                .background(Circle().fill(Color.rellenoTerciario))
+        }
+        .disabled(deshabilitado)
+    }
+
+    // MARK: - Indicadores
+
+    /// Dos tarjetas lado a lado; cada una agrupa dos métricas apiladas.
+    /// Izquierda: promedios diarios. Derecha: mayor gasto y movimientos.
+    private var tarjetasResumen: some View {
+        HStack(spacing: 14) {
+            tarjetaMetricas {
+                contenidoIndicador(
+                    titulo: String(localized: "Gasto promedio/día"),
+                    valor: viewModel.promedioDiarioGastos.enMoneda,
+                    icono: "arrow.up.right",
+                    color: .red
+                )
+                Divider()
+                contenidoIndicador(
+                    titulo: String(localized: "Ingreso promedio/día"),
+                    valor: viewModel.promedioDiarioIngresos.enMoneda,
+                    icono: "arrow.down.left",
+                    color: .green
+                )
+            }
+            tarjetaMetricas {
+                contenidoIndicador(
+                    titulo: String(localized: "Mayor gasto en"),
+                    valor: viewModel.categoriaTopGasto?.categoria.nombre ?? "—",
+                    icono: viewModel.categoriaTopGasto?.categoria.icono ?? "questionmark",
+                    color: viewModel.categoriaTopGasto?.categoria.color ?? .gray
+                )
+                Divider()
+                contenidoIndicador(
+                    titulo: String(localized: "Movimientos"),
+                    valor: "\(viewModel.totalMovimientos)",
+                    icono: "list.bullet",
+                    color: .indigo
+                )
+            }
+        }
+    }
+
+    /// Tarjeta media con dos métricas apiladas separadas por una línea fina.
+    private func tarjetaMetricas<Contenido: View>(
+        @ViewBuilder contenido: () -> Contenido
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            contenido()
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .estiloTarjeta(padding: 12)
+    }
+
+    private func contenidoIndicador(titulo: String, valor: String, icono: String, color: Color) -> some View {
+        VStack(alignment: .leading, spacing: 5) {
+            // Ícono y título en la misma línea: la métrica ocupa dos
+            // renglones en vez de tres, y la tarjeta queda más cuadrada.
+            HStack(spacing: 7) {
+                Image(systemName: icono)
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(color)
+                    .frame(width: 22, height: 22)
+                    .background(Circle().fill(color.opacity(0.15)))
+                Text(titulo)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
+            }
             Text(valor)
                 .font(.subheadline.bold())
                 .lineLimit(1)
                 .minimumScaleFactor(0.6)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .estiloTarjeta(padding: 14)
         .accessibilityElement(children: .combine)
     }
 
     // MARK: - Gráficos
 
     private var graficoGastosPorCategoria: some View {
-        StatisticsCard(titulo: String(localized: "Gastos por categoría"), subtitulo: Date.now.mesYAnio) {
-            if viewModel.gastosPorCategoria.isEmpty {
+        let items = viewModel.gastosPorCategoria
+        let maximo = items.map(\.total).max() ?? 0
+
+        return StatisticsCard(titulo: String(localized: "Gastos por categoría"), subtitulo: mesElegido.mesYAnio) {
+            if items.isEmpty {
                 sinDatos
             } else {
-                Chart(viewModel.gastosPorCategoria) { item in
+                Chart(items) { item in
+                    // Barras muy largas no dejan lugar para el monto afuera:
+                    // en ese caso el número se dibuja adentro, en blanco.
+                    let montoAdentro = maximo > 0 && item.total / maximo > 0.6
+
                     BarMark(
                         x: .value("Monto", item.total),
                         y: .value("Categoría", item.categoria.nombre)
@@ -166,7 +303,8 @@ struct EstadisticasView: View {
                             ? 1 : 0.35
                     )
                     .annotation(
-                        position: .trailing,
+                        position: montoAdentro ? .overlay : .trailing,
+                        alignment: montoAdentro ? .trailing : .center,
                         spacing: 4,
                         overflowResolution: .init(x: .fit(to: .chart), y: .disabled)
                     ) {
@@ -174,13 +312,14 @@ struct EstadisticasView: View {
                             Text(item.total.enMoneda)
                                 .font(.caption2.bold())
                                 .monospacedDigit()
-                                .foregroundStyle(item.categoria.color)
+                                .foregroundStyle(montoAdentro ? .white : item.categoria.color)
+                                .padding(.trailing, montoAdentro ? 8 : 0)
                         }
                     }
                 }
                 .chartYSelection(value: $categoriaTocada)
                 .chartXAxis { ejeMonetario }
-                .frame(height: CGFloat(viewModel.gastosPorCategoria.count) * 34 + 30)
+                .frame(height: CGFloat(items.count) * 34 + 30)
                 .animation(.snappy(duration: 0.2), value: categoriaTocada)
             }
         }
@@ -357,7 +496,7 @@ struct EstadisticasView: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Top categorías")
                         .font(.headline)
-                        .foregroundStyle(.white)
+                        //.foregroundStyle(Color.crema)
                     Text("Dónde se va la plata este mes")
                         .font(.caption)
                         .foregroundStyle(.white.opacity(0.65))
@@ -407,7 +546,7 @@ struct EstadisticasView: View {
             VStack(alignment: .leading, spacing: 12) {
                 Text("Insights")
                     .font(.headline)
-                    .foregroundStyle(.white)
+                    //.foregroundStyle(Color.crema)
                     .frame(maxWidth: .infinity, alignment: .leading)
 
                 VStack(spacing: 0) {

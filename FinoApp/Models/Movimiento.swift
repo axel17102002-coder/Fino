@@ -20,6 +20,17 @@ final class Movimiento {
     /// Es opcional para que las bases existentes migren sin drama.
     var montoAjeno: Double?
 
+    /// Moneda en la que el usuario cargó el gasto, cuando difiere de la
+    /// moneda global. `nil` = se cargó en la moneda global (sin conversión).
+    /// `monto` siempre queda expresado en la moneda global (ya convertido),
+    /// así todos los totales de la app siguen sumando sin cambios.
+    var monedaOriginalRaw: String?
+    /// Monto tal como lo tecleó el usuario, en `monedaOriginalRaw`.
+    var montoOriginal: Double?
+    /// Unidades de la moneda global por 1 unidad de la moneda original,
+    /// usada para convertir (se guarda para mostrarla y para auditoría).
+    var tasaCambio: Double?
+
     init(
         tipo: TipoMovimiento,
         nombre: String,
@@ -40,6 +51,9 @@ final class Movimiento {
         self.cuotas = max(1, cuotas)
         self.cuenta = cuenta
         self.montoAjeno = nil
+        self.monedaOriginalRaw = nil
+        self.montoOriginal = nil
+        self.tasaCambio = nil
     }
 
     // MARK: - Tipo y categoría
@@ -71,6 +85,23 @@ final class Movimiento {
     var montoPropioConSigno: Double { tipo == .gasto ? -montoPropio : montoPropio }
 
     var esCompartido: Bool { (montoAjeno ?? 0) > 0 }
+
+    // MARK: - Moneda
+
+    /// Moneda en la que se cargó el gasto, si difiere de la global.
+    var monedaOriginal: Moneda? {
+        guard let monedaOriginalRaw else { return nil }
+        return Moneda(rawValue: monedaOriginalRaw)
+    }
+
+    /// El gasto se cargó en una moneda distinta a la global.
+    var esMonedaExtranjera: Bool { monedaOriginal != nil }
+
+    /// Monto original formateado en su moneda, ej: `US$ 100`.
+    var montoOriginalFormateado: String? {
+        guard let monedaOriginal, let montoOriginal else { return nil }
+        return Formatters.moneda(montoOriginal, moneda: monedaOriginal)
+    }
 
     // MARK: - Cuotas
 

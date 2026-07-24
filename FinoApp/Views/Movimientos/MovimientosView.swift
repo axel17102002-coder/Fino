@@ -19,13 +19,7 @@ struct MovimientosView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                // Título propio en blanco: el título grande del sistema
-                // toma el color del tema y se pierde sobre el fondo verde.
-                HStack {
-                    Text("Movimientos")
-                        .font(.largeTitle.bold())
-                        .foregroundStyle(.white)
-                    Spacer()
+                BarraSuperior("Movimientos") {
                     Button {
                         mostrandoFiltros = true
                     } label: {
@@ -37,24 +31,25 @@ struct MovimientosView: View {
                     }
                     .accessibilityLabel("Filtros")
                 }
-                .padding(.horizontal)
-                .padding(.top, 8)
 
-                if movimientos.isEmpty {
-                    EmptyState(
-                        icono: "tray",
-                        titulo: String(localized: "Sin movimientos"),
-                        mensaje: String(localized: "Registrá tus gastos, ingresos y cashback para empezar."),
-                        tituloAccion: String(localized: "Agregar movimiento")
-                    ) {
-                        mostrandoAlta = true
+                Group {
+                    if movimientos.isEmpty {
+                        EmptyState(
+                            icono: "tray",
+                            titulo: String(localized: "Sin movimientos"),
+                            mensaje: String(localized: "Registrá tus gastos, ingresos y cashback para empezar."),
+                            tituloAccion: String(localized: "Agregar movimiento")
+                        ) {
+                            mostrandoAlta = true
+                        }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    } else {
+                        lista
                     }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else {
-                    lista
                 }
+                .laminaRedondeada()
             }
-            .background(Color.fondoPantalla)
+            .background(Color.verdeOscuro.ignoresSafeArea())
             .toolbar(.hidden, for: .navigationBar)
             .sheet(isPresented: $mostrandoFiltros) {
                 FilterSheet(

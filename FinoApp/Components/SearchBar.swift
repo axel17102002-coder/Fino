@@ -26,14 +26,16 @@ struct SearchBar: View {
                 .accessibilityLabel("Borrar búsqueda")
             }
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 10)
-        // Mismo fondo que las tarjetas: contrasta con el fondo verde
-        // tanto en modo claro como en oscuro.
+        .padding(.horizontal, 14)
+        .padding(.vertical, 11)
+        // Mismo fondo que las tarjetas, con un borde sutil en vez de una
+        // sombra marcada: así se integra con la lista en vez de flotar.
         .background {
             Capsule()
                 .fill(Color.fondoTarjeta)
-                .shadow(color: .black.opacity(0.05), radius: 8, y: 3)
+                .overlay(
+                    Capsule().stroke(Color.primary.opacity(0.06), lineWidth: 1)
+                )
         }
         .animation(.snappy(duration: 0.2), value: texto.isEmpty)
     }

@@ -54,10 +54,18 @@ struct TransactionRow: View {
 
             Spacer(minLength: 8)
 
-            Text(textoMonto)
-                .font(.callout.bold())
-                .monospacedDigit()
-                .foregroundStyle(movimiento.tipo.color)
+            VStack(alignment: .trailing, spacing: 2) {
+                Text(textoMonto)
+                    .font(.callout.bold())
+                    .monospacedDigit()
+                    .foregroundStyle(movimiento.tipo.color)
+
+                if let original = movimiento.montoOriginalFormateado {
+                    Text(original)
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                }
+            }
         }
         .padding(.vertical, 4)
         .accessibilityElement(children: .combine)

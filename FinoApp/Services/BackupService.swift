@@ -15,6 +15,21 @@ struct BackupFino: Codable {
     let preferencias: PreferenciasBackup?
     /// Deudas de gastos compartidos (desde la versión 2.1).
     let deudas: [DeudaBackup]?
+    /// Plantillas de movimientos recurrentes (desde la versión 2.2).
+    let recurrentes: [RecurrenteBackup]?
+}
+
+struct RecurrenteBackup: Codable {
+    let id: UUID
+    let nombre: String
+    let tipoRaw: String
+    let categoriaRaw: String
+    let monto: Double
+    let diaDelMes: Int
+    let activo: Bool
+    let creado: Date
+    let ultimaGenerada: Date?
+    let cuentaID: UUID?
 }
 
 struct DeudaBackup: Codable {
@@ -67,6 +82,10 @@ struct MovimientoBackup: Codable {
     let cuentaID: UUID?
     /// Parte del monto que no es consumo propio (gastos compartidos).
     let montoAjeno: Double?
+    /// Moneda extranjera del gasto (nil = moneda global).
+    var monedaOriginalRaw: String?
+    var montoOriginal: Double?
+    var tasaCambio: Double?
 }
 
 struct PresupuestoBackup: Codable {
@@ -98,7 +117,8 @@ enum BackupService {
         movimientos: [Movimiento],
         presupuestos: [Presupuesto],
         objetivos: [ObjetivoAhorro],
-        deudas: [Deuda] = []
+        deudas: [Deuda] = [],
+        recurrentes: [MovimientoRecurrente] = []
     ) throws -> URL {
         let backup = BackupFino(
             fecha: .now,
@@ -116,7 +136,10 @@ enum BackupService {
                     id: $0.id, tipoRaw: $0.tipoRaw, nombre: $0.nombre,
                     categoriaRaw: $0.categoriaRaw, monto: $0.monto, fecha: $0.fecha,
                     notas: $0.notas, cuotas: $0.cuotas, cuentaID: $0.cuenta?.id,
-                    montoAjeno: $0.montoAjeno
+                    montoAjeno: $0.montoAjeno,
+                    monedaOriginalRaw: $0.monedaOriginalRaw,
+                    montoOriginal: $0.montoOriginal,
+                    tasaCambio: $0.tasaCambio
                 )
             },
             presupuestos: presupuestos.map {
@@ -145,6 +168,14 @@ enum BackupService {
                 DeudaBackup(
                     id: $0.id, persona: $0.persona, detalle: $0.detalle,
                     monto: $0.monto, fecha: $0.fecha, saldada: $0.saldada
+                )
+            },
+            recurrentes: recurrentes.map {
+                RecurrenteBackup(
+                    id: $0.id, nombre: $0.nombre, tipoRaw: $0.tipoRaw,
+                    categoriaRaw: $0.categoriaRaw, monto: $0.monto,
+                    diaDelMes: $0.diaDelMes, activo: $0.activo, creado: $0.creado,
+                    ultimaGenerada: $0.ultimaGenerada, cuentaID: $0.cuenta?.id
                 )
             }
         )
@@ -180,6 +211,7 @@ enum BackupService {
         try? contexto.delete(model: Presupuesto.self)
         try? contexto.delete(model: ObjetivoAhorro.self)
         try? contexto.delete(model: Deuda.self)
+        try? contexto.delete(model: MovimientoRecurrente.self)
 
         var cuentasPorID: [UUID: Cuenta] = [:]
         for dto in backup.cuentas {
@@ -214,6 +246,9 @@ enum BackupService {
             )
             movimiento.id = dto.id
             movimiento.montoAjeno = dto.montoAjeno
+            movimiento.monedaOriginalRaw = dto.monedaOriginalRaw
+            movimiento.montoOriginal = dto.montoOriginal
+            movimiento.tasaCambio = dto.tasaCambio
             contexto.insert(movimiento)
         }
 
@@ -251,6 +286,22 @@ enum BackupService {
             )
             deuda.id = dto.id
             contexto.insert(deuda)
+        }
+
+        for dto in backup.recurrentes ?? [] {
+            let recurrente = MovimientoRecurrente(
+                nombre: dto.nombre,
+                tipo: TipoMovimiento(rawValue: dto.tipoRaw) ?? .gasto,
+                categoriaRaw: dto.categoriaRaw,
+                monto: dto.monto,
+                diaDelMes: dto.diaDelMes,
+                cuenta: dto.cuentaID.flatMap { cuentasPorID[$0] }
+            )
+            recurrente.id = dto.id
+            recurrente.activo = dto.activo
+            recurrente.creado = dto.creado
+            recurrente.ultimaGenerada = dto.ultimaGenerada
+            contexto.insert(recurrente)
         }
 
         CustomCategoryStore.reemplazarTodas(backup.categoriasPersonalizadas)
