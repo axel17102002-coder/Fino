@@ -93,6 +93,16 @@ struct RootTabView: View {
             RecurrentesService.generarPendientes(en: contexto)
             WidgetDataService.publicar(movimientos: movimientos)
             NotificacionesService.programarVencimientosTarjetas(en: contexto)
+            // Atajo del ícono que abrió la app desde cero: la señal ya
+            // quedó marcada antes de que la vista la observe.
+            if AccionesRapidas.shared.abrirAltaMovimiento {
+                mostrandoAlta = true
+                AccionesRapidas.shared.abrirAltaMovimiento = false
+            }
+            if AccionesRapidas.shared.escanearTicket {
+                mostrandoEscaner = true
+                AccionesRapidas.shared.escanearTicket = false
+            }
         }
         // El intent "Agregar gasto" (Atajos / botón de acción) pide abrir
         // el formulario apenas la app está en pantalla.

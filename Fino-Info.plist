@@ -13,5 +13,24 @@
 			</array>
 		</dict>
 	</array>
+	<key>UIApplicationShortcutItems</key>
+	<array>
+		<dict>
+			<key>UIApplicationShortcutItemType</key>
+			<string>com.axelmorano.FinoApp.addExpense</string>
+			<key>UIApplicationShortcutItemTitle</key>
+			<string>Agregar gasto</string>
+			<key>UIApplicationShortcutItemIconSymbolName</key>
+			<string>plus.circle.fill</string>
+		</dict>
+		<dict>
+			<key>UIApplicationShortcutItemType</key>
+			<string>com.axelmorano.FinoApp.scanReceipt</string>
+			<key>UIApplicationShortcutItemTitle</key>
+			<string>Escanear ticket</string>
+			<key>UIApplicationShortcutItemIconSymbolName</key>
+			<string>doc.text.viewfinder</string>
+		</dict>
+	</array>
 </dict>
 </plist>

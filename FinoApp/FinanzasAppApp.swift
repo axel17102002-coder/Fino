@@ -8,6 +8,9 @@ struct FinoApp: App {
     @AppStorage(Preferencias.claveBloqueoBiometrico) private var bloqueoActivado = false
     @Environment(\.scenePhase) private var scenePhase
 
+    // Necesario para recibir los Quick Actions del ícono.
+    @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
+
     /// Arranca bloqueada si el usuario tiene el bloqueo activado.
     @State private var bloqueada = UserDefaults.standard.bool(forKey: Preferencias.claveBloqueoBiometrico)
 
