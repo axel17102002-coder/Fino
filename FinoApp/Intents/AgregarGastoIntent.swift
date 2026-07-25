@@ -9,6 +9,9 @@ final class AccionesRapidas {
     static let shared = AccionesRapidas()
     /// Cuando es `true`, RootTabView abre el formulario de nuevo movimiento.
     var abrirAltaMovimiento = false
+    /// Cuando es `true`, RootTabView abre el formulario con la cámara de
+    /// escaneo de tickets ya activa.
+    var escanearTicket = false
 }
 
 // MARK: - Borrador compartido entre el intent y el snippet
@@ -382,6 +385,22 @@ struct AgregarGastoIntent: AppIntent {
     }
 }
 
+/// Abre la app directo en la cámara de escaneo de tickets.
+struct EscanearTicketIntent: AppIntent {
+
+    static let title: LocalizedStringResource = "Escanear ticket"
+    static let description = IntentDescription(
+        "Abre Fino y arranca la cámara para escanear un ticket y cargar el gasto."
+    )
+    static let openAppWhenRun = true
+
+    @MainActor
+    func perform() async throws -> some IntentResult {
+        AccionesRapidas.shared.escanearTicket = true
+        return .result()
+    }
+}
+
 /// Registra los atajos para que aparezcan solos en la app Atajos, en
 /// Spotlight y como opciones del botón de acción.
 struct FinoShortcuts: AppShortcutsProvider {
@@ -401,8 +420,17 @@ struct FinoShortcuts: AppShortcutsProvider {
             phrases: [
                 "Abrir formulario de gasto en \(.applicationName)"
             ],
-            shortTitle: "Abrir formulario",
+            shortTitle: "Agregar gasto",
             systemImageName: "plus.circle.fill"
+        )
+        AppShortcut(
+            intent: EscanearTicketIntent(),
+            phrases: [
+                "Escanear ticket en \(.applicationName)",
+                "Escanear un ticket en \(.applicationName)"
+            ],
+            shortTitle: "Escanear ticket",
+            systemImageName: "doc.text.viewfinder"
         )
     }
 }

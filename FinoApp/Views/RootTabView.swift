@@ -21,6 +21,7 @@ struct RootTabView: View {
     @State private var reinicioInicio = 0
     @State private var mostrandoMenuAlta = false
     @State private var mostrandoAlta = false
+    @State private var mostrandoEscaner = false
     @State private var mostrandoAporte = false
 
     init() {
@@ -76,6 +77,9 @@ struct RootTabView: View {
         .sheet(isPresented: $mostrandoAlta) {
             AddTransactionSheet()
         }
+        .sheet(isPresented: $mostrandoEscaner) {
+            AddTransactionSheet(escanearAlAbrir: true)
+        }
         .sheet(isPresented: $mostrandoAporte) {
             AportarObjetivoSheet()
         }
@@ -96,6 +100,13 @@ struct RootTabView: View {
             if abrir {
                 mostrandoAlta = true
                 AccionesRapidas.shared.abrirAltaMovimiento = false
+            }
+        }
+        // Quick Action "Escanear ticket" (mantener el ícono de la app).
+        .onChange(of: AccionesRapidas.shared.escanearTicket) { _, escanear in
+            if escanear {
+                mostrandoEscaner = true
+                AccionesRapidas.shared.escanearTicket = false
             }
         }
         // El botón (+) del widget abre el formulario vía fino://nueva.
