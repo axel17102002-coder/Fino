@@ -6,44 +6,53 @@ enum AtajoIcono {
     static let agregarGasto = "com.axelmorano.FinoApp.addExpense"
     static let escanearTicket = "com.axelmorano.FinoApp.scanReceipt"
 
-    /// Traduce el atajo tocado en una señal para la interfaz.
-    @MainActor
+    /// Traduce el atajo tocado en una señal para la interfaz. UIKit llama
+    /// a los métodos de atajos siempre en el hilo principal, así que la
+    /// marca queda puesta de inmediato: si fuera asíncrona, en el arranque
+    /// en frío la vista podría leerla antes de que se escriba.
     static func manejar(_ item: UIApplicationShortcutItem) {
-        switch item.type {
-        case agregarGasto:
-            AccionesRapidas.shared.abrirAltaMovimiento = true
-        case escanearTicket:
-            AccionesRapidas.shared.escanearTicket = true
-        default:
-            break
+        MainActor.assumeIsolated {
+            switch item.type {
+            case agregarGasto:
+                AccionesRapidas.shared.abrirAltaMovimiento = true
+            case escanearTicket:
+                AccionesRapidas.shared.escanearTicket = true
+            default:
+                break
+            }
         }
     }
 }
 
-/// Recibe los Quick Actions del ícono sin tocar el manejo de escenas de
-/// SwiftUI (implementar `configurationForConnecting` o poner un scene
-/// delegate propio deja la pantalla en negro).
+/// Los Quick Actions llegan por la escena, no por la app: en apps con
+/// escenas (todas las de SwiftUI) iOS ignora los métodos de atajos del
+/// app delegate.
 final class AppDelegate: NSObject, UIApplicationDelegate {
-
-    /// Arranque en frío desde un atajo: el ícono viene en las opciones de
-    /// lanzamiento.
     func application(
         _ application: UIApplication,
-        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
-    ) -> Bool {
-        if let item = launchOptions?[.shortcutItem] as? UIApplicationShortcutItem {
-            Task { @MainActor in AtajoIcono.manejar(item) }
+        configurationForConnecting connectingSceneSession: UISceneSession,
+        options: UIScene.ConnectionOptions
+    ) -> UISceneConfiguration {
+        // App abierta desde cero tocando un atajo.
+        if let item = options.shortcutItem {
+            AtajoIcono.manejar(item)
         }
-        return true
+        let config = UISceneConfiguration(name: nil, sessionRole: connectingSceneSession.role)
+        config.delegateClass = SceneDelegate.self
+        return config
     }
+}
 
-    /// App ya abierta (en segundo plano) y se toca un atajo.
-    func application(
-        _ application: UIApplication,
+/// OJO: este delegate NO debe implementar `scene(_:willConnectTo:)`.
+/// Si lo hace, SwiftUI deja de montar su ventana y la app arranca en
+/// negro; con solo el método de atajos, SwiftUI sigue armando la interfaz.
+final class SceneDelegate: NSObject, UIWindowSceneDelegate {
+    func windowScene(
+        _ windowScene: UIWindowScene,
         performActionFor shortcutItem: UIApplicationShortcutItem,
         completionHandler: @escaping (Bool) -> Void
     ) {
-        Task { @MainActor in AtajoIcono.manejar(shortcutItem) }
+        AtajoIcono.manejar(shortcutItem)
         completionHandler(true)
     }
 }
