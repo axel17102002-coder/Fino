@@ -128,23 +128,34 @@ enum NotificacionesService {
         }
     }
 
-    // MARK: - Categorización pendiente
+    // MARK: - Pagos automáticos
 
-    /// Avisa cuando un pago automático (Atajos + Apple Pay) quedó en
-    /// "Otros" porque nadie eligió la categoría a mano y el historial
-    /// tampoco supo sugerir una. Tocar la notificación abre ese movimiento
-    /// para corregirlo, como el banner de revisión de Atajos.
-    static func avisarCategorizar(_ movimiento: Movimiento) {
+    /// Avisa que se registró un pago automático (Atajos + Apple Pay). La
+    /// automatización corre sin abrir la app ni pedir confirmación, así que
+    /// este aviso es la única señal de que el gasto entró.
+    ///
+    /// `necesitaCategoria` cambia el texto en vez de mandar un segundo
+    /// aviso: dos notificaciones por el mismo pago serían ruido. Y suena
+    /// solo cuando hay algo para hacer; la confirmación llega callada, que
+    /// si no cada compra del día interrumpe.
+    ///
+    /// Tocarla abre ese movimiento, en los dos casos.
+    static func avisarPagoRegistrado(_ movimiento: Movimiento, necesitaCategoria: Bool) {
         Task { await pedirPermiso() }
 
         let contenido = UNMutableNotificationContent()
-        contenido.title = String(localized: "Revisá la categoría 🏷️")
-        contenido.body = String(localized: "\(movimiento.nombre) · \(movimiento.monto.enMoneda) quedó en Otros. Tocá para elegir la categoría correcta.")
-        contenido.sound = .default
+        if necesitaCategoria {
+            contenido.title = String(localized: "Revisá la categoría 🏷️")
+            contenido.body = String(localized: "\(movimiento.nombre) · \(movimiento.monto.enMoneda) quedó en Otros. Tocá para elegir la categoría correcta.")
+            contenido.sound = .default
+        } else {
+            contenido.title = String(localized: "Pago registrado 💳")
+            contenido.body = String(localized: "\(movimiento.nombre) · \(movimiento.monto.enMoneda) en \(movimiento.nombreCategoria). Tocá para editarlo.")
+        }
         contenido.userInfo = ["movimientoId": movimiento.id.uuidString]
 
         let pedido = UNNotificationRequest(
-            identifier: "categorizar-\(movimiento.id.uuidString)",
+            identifier: "pago-\(movimiento.id.uuidString)",
             content: contenido,
             trigger: nil
         )

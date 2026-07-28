@@ -166,6 +166,16 @@
         }
       }
     },
+    "%@ · %@ en %@. Tocá para editarlo." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ · %2$@ en %3$@. Tocá para editarlo."
+          }
+        }
+      }
+    },
     "%@ · %@ quedó en Otros. Tocá para elegir la categoría correcta." : {
       "localizations" : {
         "es" : {
@@ -2694,6 +2704,9 @@
           }
         }
       }
+    },
+    "Pago registrado 💳" : {
+
     },
     "Pago único" : {
       "localizations" : {

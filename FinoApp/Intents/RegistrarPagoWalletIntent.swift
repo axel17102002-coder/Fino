@@ -129,12 +129,12 @@ struct RegistrarPagoWalletIntent: AppIntent {
 
         RedondeoService.aplicar(aGastoDe: monto, en: contexto)
         NotificacionesService.verificarPresupuestos(en: contexto)
-        // Nadie eligió la categoría a mano y el historial tampoco supo
-        // sugerir una: el gasto quedó en "Otros" a ciegas. Un aviso invita
-        // a corregirlo, como el banner de revisión de Atajos.
-        if categoria == nil && categoriaPredicha == nil {
-            NotificacionesService.avisarCategorizar(nuevoMovimiento)
-        }
+        // Un único aviso por pago: confirma que entró y, si nadie eligió la
+        // categoría y el historial tampoco supo sugerir una, pide revisarla.
+        NotificacionesService.avisarPagoRegistrado(
+            nuevoMovimiento,
+            necesitaCategoria: categoria == nil && categoriaPredicha == nil
+        )
         let movimientos = (try? contexto.fetch(FetchDescriptor<Movimiento>())) ?? []
         WidgetDataService.publicar(movimientos: movimientos)
 
