@@ -78,6 +78,34 @@ struct TicketParserTests {
         #expect(TicketScannerService.parsear(lineas: lineas).monto == 4200)
     }
 
+    @Test func ignoraElNumeroDeLeyDeTransparenciaFiscal() {
+        // Caso real (ticket de KFC): Vision devuelve las columnas como
+        // observaciones sueltas, así que el importe no queda pegado a la
+        // palabra "TOTAL" y se cae al heurístico del monto más grande.
+        // Ahí el 27743 de la ley —que figura en todos los tickets
+        // argentinos desde 2024— le ganaba al total real de 16.499,00.
+        let lineas = [
+            "KFC",
+            "DEGASA S.A.",
+            "TOTAL",
+            "Régimen de Transparencia",
+            "Fiscal al Consumidor (L. 27743)",
+            "16.499,00",
+            "IVA Contenido",
+            "2.863,46",
+            "PAGOS",
+            "MERCADO PAGO",
+            "16.499,00",
+        ]
+        #expect(TicketScannerService.parsear(lineas: lineas).monto == 16499)
+    }
+
+    @Test func prefiereImportesConCentavosSobreNumerosSueltos() {
+        // Un número grande sin centavos no es plata; el que los tiene, sí.
+        let lineas = ["KIOSCO", "REF 998877", "CAFE 4.200,00"]
+        #expect(TicketScannerService.parsear(lineas: lineas).monto == 4200)
+    }
+
     @Test func fechaFueraDeRangoSeIgnora() {
         // Una fecha de vencimiento lejana no es la fecha de compra.
         let lineas = ["KIOSCO", "VTO 01/01/2031", "TOTAL 500,00"]

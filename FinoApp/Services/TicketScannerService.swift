@@ -113,6 +113,10 @@ enum TicketScannerService {
     private struct MontoDetectado {
         let indiceLinea: Int
         let valor: Double
+        /// El token venía con centavos ("16.499,00"). Los importes reales
+        /// de un ticket los tienen; los números de ley, de comprobante o
+        /// de documento, no.
+        let conCentavos: Bool
     }
 
     /// Busca el monto en las líneas que dicen "TOTAL" (el número puede
@@ -140,6 +144,15 @@ enum TicketScannerService {
             }
         }
 
+        // Sin un "TOTAL" con importe al lado hay que caer al más grande,
+        // pero mirando primero los que traen centavos. Vision devuelve las
+        // columnas como observaciones sueltas, así que el importe del total
+        // no siempre queda pegado a la palabra "TOTAL", y entonces competía
+        // contra números que no son plata. Caso real: el "(L. 27743)" de la
+        // ley de transparencia fiscal —que figura en todos los tickets
+        // argentinos— le ganaba a un total de 16.499,00 por ser más grande.
+        let conCentavos = montos.filter(\.conCentavos).map(\.valor)
+        if let mejor = conCentavos.max() { return mejor }
         return montos.map(\.valor).max()
     }
 
@@ -161,7 +174,11 @@ enum TicketScannerService {
                 let digitos = token.filter(\.isNumber).count
                 guard digitos <= 10 else { continue }
                 guard let valor = numero(desde: token), valor >= 1 else { continue }
-                resultado.append(MontoDetectado(indiceLinea: indice, valor: valor))
+                resultado.append(MontoDetectado(
+                    indiceLinea: indice,
+                    valor: valor,
+                    conCentavos: token.contains(/[.,]\d{2}$/)
+                ))
             }
         }
         return resultado
