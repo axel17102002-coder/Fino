@@ -9,8 +9,20 @@ struct BalanceCard: View {
     let cashback: Double
     let ultimosMovimientos: [Movimiento]
 
+    /// Valor que se muestra: arranca en cero y sube hasta el balance real.
+    @State private var balanceMostrado: Double = 0
+    @Environment(\.accessibilityReduceMotion) private var reducirMovimiento
+
     private var movimientosMostrados: [Movimiento] {
         Array(ultimosMovimientos.prefix(3))
+    }
+
+    private func animarBalance(hasta valor: Double) {
+        guard !reducirMovimiento else {
+            balanceMostrado = valor
+            return
+        }
+        withAnimation(.easeOut(duration: 0.7)) { balanceMostrado = valor }
     }
 
     var body: some View {
@@ -63,12 +75,15 @@ struct BalanceCard: View {
                     .foregroundStyle(.indigo)
             }
 
-            Text(balance.enMoneda)
+            // Cuenta desde cero al abrir y rueda al cambiar de valor.
+            Text(balanceMostrado.enMoneda)
                 .font(.system(size: 46, weight: .heavy, design: .rounded))
                 .monospacedDigit()
                 .lineLimit(1)
                 .minimumScaleFactor(0.4)
                 .contentTransition(.numericText())
+                .onAppear { animarBalance(hasta: balance) }
+                .onChange(of: balance) { _, nuevo in animarBalance(hasta: nuevo) }
 
             chipBalance
         }

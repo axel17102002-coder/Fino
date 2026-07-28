@@ -14,6 +14,8 @@ struct DashboardView: View {
     @State private var mostrandoAlta = false
     @State private var mostrandoEscanerTicket = false
     @State private var paginaCarrusel: Int? = 0
+    /// Dispara la aparición escalonada de las secciones.
+    @State private var aparecio = false
 
     private var viewModel: DashboardViewModel {
         DashboardViewModel(movimientos: movimientos)
@@ -37,9 +39,13 @@ struct DashboardView: View {
                 ScrollView {
                     VStack(spacing: 25) {
                         DashboardHeader()
+                            .entradaEscalonada(0, visible: aparecio)
                         carruselPrincipal
+                            .entradaEscalonada(1, visible: aparecio)
                         bannerDeudas
+                            .entradaEscalonada(2, visible: aparecio)
                         seccionTarjetas
+                            .entradaEscalonada(3, visible: aparecio)
                     }
                     .padding(.horizontal)
                     .padding(.top, 16)
@@ -57,8 +63,12 @@ struct DashboardView: View {
                 // pisarlas, y el recorte solo costaría rendimiento.
                 .laminaRedondeada(recortaContenido: true)
             }
-            .background(Color.verdeOscuro.ignoresSafeArea())
+            // Fondo del color de la lámina, no verde: la franja de arriba
+            // ya pinta su propio verde hasta el borde. Con verde acá, el
+            // primer fotograma se veía verde entero y saltaba a oscuro.
+            .background(Color.fondoPantalla.ignoresSafeArea())
             .toolbar(.hidden, for: .navigationBar)
+            .onAppear { aparecio = true }
             .sheet(isPresented: $mostrandoAlta) {
                 AddTransactionSheet()
             }
