@@ -61,16 +61,29 @@ struct AddTransactionSheet: View {
 
                 if !esEdicion {
                     Section {
-                        if EscanerTicketView.disponible {
-                            Button {
-                                mostrandoEscaner = true
-                            } label: {
-                                Label("Escanear ticket", systemImage: "doc.text.viewfinder")
+                        HStack(spacing: 10) {
+                            if EscanerTicketView.disponible {
+                                Button {
+                                    mostrandoEscaner = true
+                                    Haptics.seleccion()
+                                } label: {
+                                    capsulaTicket(
+                                        String(localized: "Cámara"),
+                                        "camera.fill"
+                                    )
+                                }
+                                .buttonStyle(.plain)
+                                .accessibilityLabel(String(localized: "Escanear ticket"))
                             }
+                            PhotosPicker(selection: $fotoTicket, matching: .images) {
+                                capsulaTicket(
+                                    String(localized: "Fotos"),
+                                    "photo.on.rectangle"
+                                )
+                            }
+                            .accessibilityLabel(String(localized: "Leer ticket de una foto"))
                         }
-                        PhotosPicker(selection: $fotoTicket, matching: .images) {
-                            Label("Leer ticket de una foto", systemImage: "photo.on.rectangle")
-                        }
+                        .listRowInsets(EdgeInsets(top: 10, leading: 12, bottom: 10, trailing: 12))
                     } footer: {
                         Text("Lee el total, el comercio y la fecha directo del ticket. Todo pasa en tu teléfono.")
                     }
@@ -291,6 +304,24 @@ struct AddTransactionSheet: View {
                 Text("Probá de nuevo con más luz o con el ticket más plano. También podés cargar el gasto a mano.")
             }
         }
+    }
+
+    // MARK: - Botones de ticket
+
+    /// Cápsula tintada con el color de acento. Las dos se reparten el ancho
+    /// en partes iguales; si la cámara no está disponible, la de fotos
+    /// ocupa la fila completa.
+    private func capsulaTicket(_ titulo: String, _ icono: String) -> some View {
+        HStack(spacing: 6) {
+            Image(systemName: icono)
+            Text(titulo)
+        }
+        .font(.subheadline.weight(.semibold))
+        .foregroundStyle(Color.accentColor)
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 12)
+        .background(Color.accentColor.opacity(0.15), in: Capsule())
+        .contentShape(Capsule())
     }
 
     // MARK: - Conversión de moneda

@@ -801,6 +801,9 @@
         }
       }
     },
+    "Cámara" : {
+
+    },
     "Cancelar" : {
       "localizations" : {
         "en" : {
@@ -1757,6 +1760,9 @@
           }
         }
       }
+    },
+    "Fotos" : {
+
     },
     "Freelance" : {
       "localizations" : {
