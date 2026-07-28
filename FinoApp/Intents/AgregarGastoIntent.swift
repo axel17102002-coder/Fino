@@ -12,6 +12,9 @@ final class AccionesRapidas {
     /// Cuando es `true`, RootTabView abre el formulario con la cámara de
     /// escaneo de tickets ya activa.
     var escanearTicket = false
+    /// Id del movimiento a editar cuando se toca la notificación "Revisá
+    /// la categoría"; RootTabView lo escucha para abrir su formulario.
+    var movimientoIdParaCategorizar: UUID?
 }
 
 // MARK: - Borrador compartido entre el intent y el snippet

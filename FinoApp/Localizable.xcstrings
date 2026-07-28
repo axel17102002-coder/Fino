@@ -166,6 +166,16 @@
         }
       }
     },
+    "%@ · %@ quedó en Otros. Tocá para elegir la categoría correcta." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ · %2$@ quedó en Otros. Tocá para elegir la categoría correcta."
+          }
+        }
+      }
+    },
     "%@ · todos los meses el día %lld" : {
       "localizations" : {
         "en" : {
@@ -2912,6 +2922,9 @@
           }
         }
       }
+    },
+    "Revisá la categoría 🏷️" : {
+
     },
     "Ropa" : {
       "localizations" : {

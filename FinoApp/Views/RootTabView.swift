@@ -23,6 +23,7 @@ struct RootTabView: View {
     @State private var mostrandoAlta = false
     @State private var mostrandoEscaner = false
     @State private var mostrandoAporte = false
+    @State private var movimientoParaCategorizar: Movimiento?
 
     init() {
         // Permite abrir la app en otra pestaña con el argumento de
@@ -83,6 +84,9 @@ struct RootTabView: View {
         .sheet(isPresented: $mostrandoAporte) {
             AportarObjetivoSheet()
         }
+        .sheet(item: $movimientoParaCategorizar) { movimiento in
+            AddTransactionSheet(movimiento: movimiento)
+        }
         .fullScreenCover(isPresented: Binding(
             get: { !onboardingCompletado },
             set: { _ in }
@@ -103,6 +107,11 @@ struct RootTabView: View {
                 mostrandoEscaner = true
                 AccionesRapidas.shared.escanearTicket = false
             }
+            // Notificación "Revisá la categoría" tocada con la app cerrada.
+            if let id = AccionesRapidas.shared.movimientoIdParaCategorizar {
+                movimientoParaCategorizar = movimientos.first { $0.id == id }
+                AccionesRapidas.shared.movimientoIdParaCategorizar = nil
+            }
         }
         // El intent "Agregar gasto" (Atajos / botón de acción) pide abrir
         // el formulario apenas la app está en pantalla.
@@ -118,6 +127,13 @@ struct RootTabView: View {
                 mostrandoEscaner = true
                 AccionesRapidas.shared.escanearTicket = false
             }
+        }
+        // Notificación "Revisá la categoría" tocada con la app abierta o
+        // en segundo plano.
+        .onChange(of: AccionesRapidas.shared.movimientoIdParaCategorizar) { _, id in
+            guard let id else { return }
+            movimientoParaCategorizar = movimientos.first { $0.id == id }
+            AccionesRapidas.shared.movimientoIdParaCategorizar = nil
         }
         // El botón (+) del widget abre el formulario vía fino://nueva.
         .onOpenURL { url in

@@ -115,20 +115,26 @@ struct RegistrarPagoWalletIntent: AppIntent {
         let nombre = NombreComercio.limpiar(comercio)
         // Prioridad: categoría elegida en el atajo → la que el historial
         // sugiere para este comercio → "Otros".
-        let categoriaRaw = categoria?.id
-            ?? CategoriaPredictorService.categoria(paraGasto: nombre, en: contexto)
-            ?? CategoriaGasto.otros.rawValue
-        contexto.insert(Movimiento(
+        let categoriaPredicha = CategoriaPredictorService.categoria(paraGasto: nombre, en: contexto)
+        let categoriaRaw = categoria?.id ?? categoriaPredicha ?? CategoriaGasto.otros.rawValue
+        let nuevoMovimiento = Movimiento(
             tipo: .gasto,
             nombre: nombre.isEmpty ? String(localized: "Pago con tarjeta") : nombre,
             categoriaRaw: categoriaRaw,
             monto: monto,
             cuenta: cuentaModelo
-        ))
+        )
+        contexto.insert(nuevoMovimiento)
         try? contexto.save()
 
         RedondeoService.aplicar(aGastoDe: monto, en: contexto)
         NotificacionesService.verificarPresupuestos(en: contexto)
+        // Nadie eligió la categoría a mano y el historial tampoco supo
+        // sugerir una: el gasto quedó en "Otros" a ciegas. Un aviso invita
+        // a corregirlo, como el banner de revisión de Atajos.
+        if categoria == nil && categoriaPredicha == nil {
+            NotificacionesService.avisarCategorizar(nuevoMovimiento)
+        }
         let movimientos = (try? contexto.fetch(FetchDescriptor<Movimiento>())) ?? []
         WidgetDataService.publicar(movimientos: movimientos)
 

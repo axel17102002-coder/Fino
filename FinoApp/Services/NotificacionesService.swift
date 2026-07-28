@@ -128,6 +128,29 @@ enum NotificacionesService {
         }
     }
 
+    // MARK: - Categorización pendiente
+
+    /// Avisa cuando un pago automático (Atajos + Apple Pay) quedó en
+    /// "Otros" porque nadie eligió la categoría a mano y el historial
+    /// tampoco supo sugerir una. Tocar la notificación abre ese movimiento
+    /// para corregirlo, como el banner de revisión de Atajos.
+    static func avisarCategorizar(_ movimiento: Movimiento) {
+        Task { await pedirPermiso() }
+
+        let contenido = UNMutableNotificationContent()
+        contenido.title = String(localized: "Revisá la categoría 🏷️")
+        contenido.body = String(localized: "\(movimiento.nombre) · \(movimiento.monto.enMoneda) quedó en Otros. Tocá para elegir la categoría correcta.")
+        contenido.sound = .default
+        contenido.userInfo = ["movimientoId": movimiento.id.uuidString]
+
+        let pedido = UNNotificationRequest(
+            identifier: "categorizar-\(movimiento.id.uuidString)",
+            content: contenido,
+            trigger: nil
+        )
+        UNUserNotificationCenter.current().add(pedido)
+    }
+
     private static func avisarPresupuesto(categoria: String, umbral: Int, gastado: Double, limite: Double) {
         Task { await pedirPermiso() }
 
