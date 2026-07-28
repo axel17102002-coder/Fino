@@ -4,8 +4,12 @@ import SwiftData
 /// Contenedor principal de navegación de la app.
 struct RootTabView: View {
 
-    enum Pestania: String, Hashable {
+    enum Pestania: String, Hashable, CaseIterable {
         case inicio, movimientos, estadisticas, configuracion
+
+        /// Posición en la barra: define hacia qué lado desliza la
+        /// transición al cambiar de pestaña.
+        var indice: Int { Self.allCases.firstIndex(of: self) ?? 0 }
     }
 
     @Environment(\.scenePhase) private var scenePhase
@@ -36,24 +40,19 @@ struct RootTabView: View {
 
     var body: some View {
         ZStack(alignment: .bottom) {
-            TabView(selection: $pestaniaActiva) {
-                Tab("Inicio", systemImage: "house.fill", value: Pestania.inicio) {
-                    DashboardView()
-                        .id(reinicioInicio)
-                        .toolbar(.hidden, for: .tabBar)
-                }
-                Tab("Movimientos", systemImage: "list.bullet.rectangle.fill", value: Pestania.movimientos) {
-                    MovimientosView()
-                        .toolbar(.hidden, for: .tabBar)
-                }
-                Tab("Estadísticas", systemImage: "chart.bar.xaxis", value: Pestania.estadisticas) {
-                    EstadisticasView()
-                        .toolbar(.hidden, for: .tabBar)
-                }
-                Tab("Configuración", systemImage: "gearshape.fill", value: Pestania.configuracion) {
-                    ConfiguracionView()
-                        .toolbar(.hidden, for: .tabBar)
-                }
+            // Las cuatro pantallas quedan montadas y solo se muestra la
+            // activa: así el cambio puede animarse y cada una conserva su
+            // scroll y sus filtros, como hacía el TabView.
+            ZStack {
+                DashboardView()
+                    .id(reinicioInicio)
+                    .modifier(PantallaDePestania(indice: 0, activa: pestaniaActiva.indice))
+                MovimientosView()
+                    .modifier(PantallaDePestania(indice: 1, activa: pestaniaActiva.indice))
+                EstadisticasView()
+                    .modifier(PantallaDePestania(indice: 2, activa: pestaniaActiva.indice))
+                ConfiguracionView()
+                    .modifier(PantallaDePestania(indice: 3, activa: pestaniaActiva.indice))
             }
             .sensoryFeedback(.selection, trigger: pestaniaActiva)
             // El ojito de privacidad redibuja todas las pestañas: los
@@ -156,6 +155,30 @@ struct RootTabView: View {
                 NotificacionesService.programarVencimientosTarjetas(en: contexto)
             }
         }
+    }
+}
+
+/// Muestra la pestaña activa y desliza el cambio hacia el lado que
+/// corresponde según el orden de la barra.
+private struct PantallaDePestania: ViewModifier {
+    let indice: Int
+    let activa: Int
+
+    @Environment(\.accessibilityReduceMotion) private var reducirMovimiento
+
+    private var esActiva: Bool { indice == activa }
+
+    func body(content: Content) -> some View {
+        content
+            .opacity(esActiva ? 1 : 0)
+            .offset(x: esActiva ? 0 : (indice < activa ? -32 : 32))
+            // Las ocultas no reciben toques ni las lee VoiceOver.
+            .allowsHitTesting(esActiva)
+            .accessibilityHidden(!esActiva)
+            .animation(
+                reducirMovimiento ? nil : .easeOut(duration: 0.22),
+                value: activa
+            )
     }
 }
 

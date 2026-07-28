@@ -27,6 +27,9 @@ struct FinoApp: App {
         WindowGroup {
             ZStack {
                 RootTabView()
+                    // Tipografía redondeada en toda la app, para que
+                    // acompañe al logo.
+                    .fontDesign(.rounded)
                     // El id fuerza el redibujado completo al cambiar el
                     // tema: el fondo (verde u oscuro) se lee al construir
                     // cada vista.
