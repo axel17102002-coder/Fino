@@ -59,11 +59,12 @@ struct RootTabView: View {
             // El ojito de privacidad redibuja todas las pestañas: los
             // montos se formatean al construir cada vista.
             .id(montosOcultos)
-            // Reserva el alto de la barra propia para que el contenido
-            // de las pestañas no quede tapado detrás de ella.
-            .safeAreaInset(edge: .bottom) {
-                Color.clear.frame(height: 70)
-            }
+            // Sin reserva de alto para la barra: reservarlo cortaba el
+            // contenido 70pt antes del borde y dejaba abajo una franja del
+            // color de fondo (negra en modo oscuro, verde en claro). Ahora
+            // el contenido llega hasta el final y pasa por detrás del
+            // vidrio. El aire para el último renglón lo dan los
+            // `contentMargins` de cada lista.
 
             BarraInferiorView(
                 seleccion: $pestaniaActiva,

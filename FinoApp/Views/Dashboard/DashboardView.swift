@@ -46,14 +46,12 @@ struct DashboardView: View {
                     .padding(.bottom, 100)
                 }
                 .scrollIndicators(.hidden)
-                // El contenido es una "lámina" con las esquinas de arriba
-                // redondeadas que se monta sobre el verde de la franja.
-                .clipShape(UnevenRoundedRectangle(topLeadingRadius: 26, topTrailingRadius: 26))
-                .background(
-                    UnevenRoundedRectangle(topLeadingRadius: 26, topTrailingRadius: 26)
-                        .fill(Color.fondoPantalla)
-                        .ignoresSafeArea(edges: .bottom)
-                )
+                // Mismo helper que el resto de las pantallas. Antes esto
+                // estaba armado a mano y sumaba un `clipShape`: el recorte
+                // terminaba en el área segura y cortaba el contenido con un
+                // canto recto, mientras el fondo seguía hasta el borde. Eso
+                // dejaba la franja de color abajo de todo.
+                .laminaRedondeada()
             }
             .background(Color.verdeOscuro.ignoresSafeArea())
             .toolbar(.hidden, for: .navigationBar)
