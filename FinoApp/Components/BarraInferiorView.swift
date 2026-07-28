@@ -4,7 +4,7 @@ import SwiftUI
 /// circular recortada en el centro del borde superior, donde reposa
 /// el botón (+).
 struct BarraConMuesca: Shape {
-    var radioEsquinas: CGFloat = 31
+    var radioEsquinas: CGFloat = 27 // modifica el redondeado
     var radioMuesca: CGFloat = 36
     /// Posición vertical del centro de la muesca respecto del borde superior.
     var centroMuescaY: CGFloat = 0
@@ -38,8 +38,7 @@ struct BarraInferiorView: View {
     var alTocarInicio: () -> Void = {}
     let accionAgregar: () -> Void
 
-    /// Más baja que antes: sin las etiquetas, 62pt dejaban mucho aire.
-    private let alturaBarra: CGFloat = 54
+    private let alturaBarra: CGFloat = 58
     private let diametroBoton: CGFloat = 58
 
     /// Separación horizontal de la píldora respecto de las puntas de la
@@ -63,7 +62,9 @@ struct BarraInferiorView: View {
         .padding(.horizontal, 14)
         // Negativo para bajarla: come parte del margen sobre el indicador
         // de inicio, sin llegar a pisarlo.
-        .padding(.bottom, 2)
+        // Negativo para bajarla: se mete en el margen sobre el indicador de
+        // inicio, dejándole aire suficiente para no pisarlo.
+        .padding(.bottom, -10)
     }
 
     private var barra: some View {
@@ -182,13 +183,23 @@ struct BarraInferiorView: View {
 
     /// Única fuente del ícono de cada pestaña: lo usan tanto el ítem de la
     /// fila como la copia nítida que va sobre la burbuja.
+    ///
+    /// Contorno en reposo y relleno en la activa. Antes eran todas
+    /// rellenas menos Estadísticas, y esa mezcla de pesos era lo que
+    /// recargaba la barra. Así solo hay un glifo sólido a la vez y la
+    /// selección se lee por forma, no solo por color.
     private func icono(de pestania: RootTabView.Pestania) -> String {
-        switch pestania {
-        case .inicio: "house.fill"
-        case .movimientos: "list.bullet.rectangle.fill"
-        case .estadisticas: "chart.bar.xaxis"
-        case .configuracion: "gearshape.fill"
+        let base = switch pestania {
+        case .inicio: "house"
+        case .movimientos: "list.bullet.rectangle"
+        // `chart.bar` y no `chart.bar.xaxis`: este último no tiene variante
+        // rellena (lo confirma el mapeo del sistema), así que al
+        // seleccionarlo el símbolo no existiría. Es el mismo gráfico de
+        // barras, sin la línea del eje.
+        case .estadisticas: "chart.bar"
+        case .configuracion: "gearshape"
         }
+        return pestania == seleccion ? "\(base).fill" : base
     }
 
     /// Copia del ícono activo por encima del vidrio. Sin esto, la burbuja
@@ -201,7 +212,11 @@ struct BarraInferiorView: View {
                 .foregroundStyle(Color.accentColor)
                 .position(x: marco.midX, y: alturaBarra / 2)
                 .allowsHitTesting(false)
-                .animation(.spring(response: 0.32, dampingFraction: 0.72), value: seleccion)
+                // Sin animación de posición a propósito: con el spring, al
+                // arrastrar el ícono activo se deslizaba de una pestaña a
+                // la otra. Así aparece quieto en la que corresponde y la
+                // única que se mueve es la burbuja.
+                .animation(nil, value: seleccion)
         }
     }
 
@@ -265,7 +280,7 @@ private struct FondoBarraConMuesca: ViewModifier {
                 .background(.ultraThinMaterial, in: BarraConMuesca())
                 .overlay {
                     BarraConMuesca()
-                        .stroke(.white.opacity(0.12), lineWidth: 0.5)
+                        .stroke(.white.opacity(0.05), lineWidth: 0.5)
                 }
         }
     }
