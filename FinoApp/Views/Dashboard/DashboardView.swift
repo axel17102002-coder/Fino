@@ -51,7 +51,11 @@ struct DashboardView: View {
                 // terminaba en el área segura y cortaba el contenido con un
                 // canto recto, mientras el fondo seguía hasta el borde. Eso
                 // dejaba la franja de color abajo de todo.
-                .laminaRedondeada()
+                // Única pantalla con el recorte: acá el contenido scrollea
+                // por debajo de las esquinas de arriba y sin él se sale de
+                // la curva. En las otras tres el contenido no llega a
+                // pisarlas, y el recorte solo costaría rendimiento.
+                .laminaRedondeada(recortaContenido: true)
             }
             .background(Color.verdeOscuro.ignoresSafeArea())
             .toolbar(.hidden, for: .navigationBar)

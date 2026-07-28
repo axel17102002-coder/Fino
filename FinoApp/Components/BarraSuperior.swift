@@ -57,8 +57,9 @@ extension BarraSuperior where Trailing == EmptyView {
 /// Estirando el path hacia abajo, el recorte solo actúa arriba.
 private struct RecorteLamina: Shape {
     var radio: CGFloat = 26
-    /// Suficiente para tapar cualquier alto de pantalla más el área segura.
-    var excedenteInferior: CGFloat = 3000
+    /// Solo tiene que pasar el área segura de abajo; de más agranda la
+    /// geometría del recorte sin ningún beneficio.
+    var excedenteInferior: CGFloat = 120
 
     func path(in rect: CGRect) -> Path {
         UnevenRoundedRectangle(
@@ -75,18 +76,38 @@ private struct RecorteLamina: Shape {
     }
 }
 
+/// Aplica el recorte solo si hace falta. Envuelto en un modificador para
+/// que, cuando está apagado, la vista quede exactamente igual que antes:
+/// un `clipShape` condicional dentro del cuerpo cambiaría la identidad de
+/// la vista y forzaría rearmarla.
+private struct RecorteOpcional: ViewModifier {
+    let activo: Bool
+
+    func body(content: Content) -> some View {
+        if activo {
+            content.clipShape(RecorteLamina())
+        } else {
+            content
+        }
+    }
+}
+
 extension View {
     /// Monta el contenido sobre una lámina con esquinas superiores
     /// redondeadas, dejando ver el verde de la base en los vértices, igual
     /// que la pantalla de inicio. Se usa junto a `BarraSuperior` sobre un
     /// fondo `Color.verdeOscuro`.
     ///
-    /// El recorte llega hasta las esquinas de arriba y nada más: sin él, el
-    /// contenido que scrollea se sale por encima de la curva; con un
-    /// recorte común, el borde de abajo se corta recto contra la pantalla.
-    func laminaRedondeada() -> some View {
+    /// `recortaContenido` solo hace falta donde el contenido scrollea por
+    /// debajo de las esquinas de arriba y se sale de la curva (el
+    /// Dashboard). Va apagado por defecto porque un recorte fuerza render
+    /// fuera de pantalla y se recompone en cada frame del cambio de
+    /// pestaña: ponérselo a todas las pantallas trababa la transición.
+    /// El recorte llega hasta las esquinas de arriba y nada más: con uno
+    /// común, el borde de abajo se corta recto contra la pantalla.
+    func laminaRedondeada(recortaContenido: Bool = false) -> some View {
         self
-            .clipShape(RecorteLamina())
+            .modifier(RecorteOpcional(activo: recortaContenido))
             .background(
                 UnevenRoundedRectangle(topLeadingRadius: 26, topTrailingRadius: 26)
                     .fill(Color.fondoPantalla)
