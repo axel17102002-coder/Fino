@@ -64,6 +64,9 @@
         }
       }
     },
+    "¿Cargaste los gastos de hoy? 🧾" : {
+
+    },
     "¿Cómo te llamás?" : {
       "localizations" : {
         "en" : {
@@ -597,6 +600,9 @@
           }
         }
       }
+    },
+    "Anotalos ahora que los tenés frescos, antes de que se te mezclen con los de mañana." : {
+
     },
     "Aportar a meta" : {
       "localizations" : {

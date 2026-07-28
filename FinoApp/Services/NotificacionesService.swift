@@ -52,6 +52,38 @@ enum NotificacionesService {
             .removePendingNotificationRequests(withIdentifiers: [idRecordatorioBackup])
     }
 
+    // MARK: - Recordatorio diario
+
+    private static let idRecordatorioDiario = "recordatorioDiario"
+
+    /// Aviso de todas las noches para cargar los gastos del día. El
+    /// identificador es fijo a propósito: reprogramarlo en cada arranque
+    /// reemplaza el pendiente en vez de ir acumulando avisos repetidos.
+    static func programarRecordatorioDiario(hora: Int = 23, minuto: Int = 0) {
+        Task { await pedirPermiso() }
+
+        let contenido = UNMutableNotificationContent()
+        contenido.title = String(localized: "¿Cargaste los gastos de hoy? 🧾")
+        contenido.body = String(localized: "Anotalos ahora que los tenés frescos, antes de que se te mezclen con los de mañana.")
+        contenido.sound = .default
+
+        var componentes = DateComponents()
+        componentes.hour = hora
+        componentes.minute = minuto
+
+        let pedido = UNNotificationRequest(
+            identifier: idRecordatorioDiario,
+            content: contenido,
+            trigger: UNCalendarNotificationTrigger(dateMatching: componentes, repeats: true)
+        )
+        UNUserNotificationCenter.current().add(pedido)
+    }
+
+    static func cancelarRecordatorioDiario() {
+        UNUserNotificationCenter.current()
+            .removePendingNotificationRequests(withIdentifiers: [idRecordatorioDiario])
+    }
+
     // MARK: - Alertas de presupuesto
 
     /// Revisa todos los presupuestos y notifica al cruzar el 80% o el 100%

@@ -98,6 +98,7 @@ struct RootTabView: View {
             RecurrentesService.generarPendientes(en: contexto)
             WidgetDataService.publicar(movimientos: movimientos)
             NotificacionesService.programarVencimientosTarjetas(en: contexto)
+            NotificacionesService.programarRecordatorioDiario()
             // Atajo del ícono que abrió la app desde cero: la señal ya
             // quedó marcada antes de que la vista la observe.
             if AccionesRapidas.shared.abrirAltaMovimiento {
