@@ -63,9 +63,16 @@ struct DashboardView: View {
                 // pisarlas, y el recorte solo costaría rendimiento.
                 .laminaRedondeada(recortaContenido: true)
             }
-            // Fondo del color de la lámina, no verde: la franja de arriba
-            // ya pinta su propio verde hasta el borde. Con verde acá, el
-            // primer fotograma se veía verde entero y saltaba a oscuro.
+            // Verde solo en la franja de arriba: es lo que asoma por las
+            // esquinas redondeadas de la lámina y les da la curva cóncava,
+            // igual que en las otras pantallas. El resto va del color de
+            // la lámina, porque con verde en toda la pantalla el primer
+            // fotograma se veía verde entero y saltaba a oscuro.
+            .background(alignment: .top) {
+                Color.verdeOscuro
+                    .frame(height: 260)
+                    .ignoresSafeArea(edges: .top)
+            }
             .background(Color.fondoPantalla.ignoresSafeArea())
             .toolbar(.hidden, for: .navigationBar)
             .onAppear { aparecio = true }
