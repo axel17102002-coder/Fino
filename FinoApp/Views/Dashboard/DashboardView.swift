@@ -9,6 +9,12 @@ struct DashboardView: View {
     @Query private var presupuestos: [Presupuesto]
     @Query(sort: \ObjetivoAhorro.creado) private var objetivos: [ObjetivoAhorro]
     @Query(filter: #Predicate<Deuda> { !$0.saldada }) private var deudasPendientes: [Deuda]
+    @Query(sort: \Inversion.orden) private var inversiones: [Inversion]
+
+    /// Cuántos dólares vale un peso, para llevar todas las tenencias a una
+    /// sola moneda. Se pide al aparecer y queda cacheada por el servicio.
+    @State private var dolaresPorPeso: Double?
+    @State private var mostrandoAltaInversion = false
 
     @State private var categoriaSeleccionada: String?
     @State private var mostrandoAlta = false
@@ -40,6 +46,8 @@ struct DashboardView: View {
                         carruselPrincipal
                         bannerDeudas
                         seccionTarjetas
+
+                        seccionInversiones
                     }
                     .padding(.horizontal)
                     .padding(.top, 16)
@@ -69,6 +77,14 @@ struct DashboardView: View {
             }
             .background(Color.fondoPantalla.ignoresSafeArea())
             .toolbar(.hidden, for: .navigationBar)
+            .sheet(isPresented: $mostrandoAltaInversion) {
+                InversionFormSheet()
+            }
+            .task {
+                // Una sola vez por aparición: el servicio cachea, así que
+                // sin red usa la última cotización conocida.
+                dolaresPorPeso = await ExchangeRateService.tasa(de: .ars, a: .usd)
+            }
             .sheet(isPresented: $mostrandoAlta) {
                 AddTransactionSheet()
             }
@@ -372,6 +388,32 @@ struct DashboardView: View {
                 // tengan configurados).
                 VencimientosCard(tarjetas: tarjetas)
             }
+        }
+    }
+
+    /// Las inversiones van con las cuentas y las tarjetas, no en el
+    /// carrusel de Estadísticas: no son del mes, son una posición que
+    /// está ahí, igual que un saldo.
+    @ViewBuilder
+    private var seccionInversiones: some View {
+        if !inversiones.isEmpty {
+            HStack {
+                Text("Inversiones")
+                    .font(.headline)
+                    .foregroundStyle(Color.crema)
+                Spacer()
+                Button {
+                    mostrandoAltaInversion = true
+                    Haptics.seleccion()
+                } label: {
+                    Image(systemName: "plus.circle.fill")
+                        .font(.title3)
+                        .foregroundStyle(.white.opacity(0.85))
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Agregar inversión")
+            }
+            InversionesCard(cartera: Cartera(inversiones, dolaresPorPeso: dolaresPorPeso))
         }
     }
 

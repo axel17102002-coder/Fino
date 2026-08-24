@@ -17,6 +17,22 @@ struct BackupFino: Codable {
     let deudas: [DeudaBackup]?
     /// Plantillas de movimientos recurrentes (desde la versión 2.2).
     let recurrentes: [RecurrenteBackup]?
+    /// Tenencias de inversión (desde la versión 2.3).
+    let inversiones: [InversionBackup]?
+}
+
+struct InversionBackup: Codable {
+    let id: UUID
+    let nombre: String
+    let tipoRaw: String
+    let donde: String
+    let monedaRaw: String
+    let cantidad: Double?
+    let precio: Double?
+    let monto: Double?
+    let tasaAnual: Double?
+    let vencimiento: Date?
+    let orden: Int
 }
 
 struct RecurrenteBackup: Codable {
@@ -132,7 +148,8 @@ enum BackupService {
         presupuestos: [Presupuesto],
         objetivos: [ObjetivoAhorro],
         deudas: [Deuda] = [],
-        recurrentes: [MovimientoRecurrente] = []
+        recurrentes: [MovimientoRecurrente] = [],
+        inversiones: [Inversion] = []
     ) throws -> URL {
         let backup = BackupFino(
             fecha: .now,
@@ -196,6 +213,15 @@ enum BackupService {
                     diaDelMes: $0.diaDelMes, activo: $0.activo, creado: $0.creado,
                     ultimaGenerada: $0.ultimaGenerada, cuentaID: $0.cuenta?.id,
                     monedaOriginalRaw: $0.monedaOriginalRaw
+                )
+            },
+            inversiones: inversiones.map {
+                InversionBackup(
+                    id: $0.id, nombre: $0.nombre, tipoRaw: $0.tipoRaw,
+                    donde: $0.donde, monedaRaw: $0.monedaRaw,
+                    cantidad: $0.cantidad, precio: $0.precio, monto: $0.monto,
+                    tasaAnual: $0.tasaAnual, vencimiento: $0.vencimiento,
+                    orden: $0.orden
                 )
             }
         )
@@ -311,6 +337,23 @@ enum BackupService {
             deuda.montoOriginal = dto.montoOriginal
             deuda.tasaCambio = dto.tasaCambio
             contexto.insert(deuda)
+        }
+
+        for dto in backup.inversiones ?? [] {
+            let inversion = Inversion(
+                nombre: dto.nombre,
+                tipo: TipoInversion(rawValue: dto.tipoRaw) ?? .otro,
+                donde: dto.donde,
+                moneda: Moneda(rawValue: dto.monedaRaw) ?? .usd,
+                cantidad: dto.cantidad,
+                precio: dto.precio,
+                monto: dto.monto,
+                tasaAnual: dto.tasaAnual,
+                vencimiento: dto.vencimiento,
+                orden: dto.orden
+            )
+            inversion.id = dto.id
+            contexto.insert(inversion)
         }
 
         for dto in backup.recurrentes ?? [] {

@@ -17,6 +17,10 @@ struct DonutChart: View {
     @Binding var seleccion: String?
     var tituloCentro: String = "Gastos"
     var valorCentro: Double = 0
+    /// Moneda en la que están los montos. Sin esto el centro los formatea
+    /// con la moneda de la app, y en Inversiones —que va todo en dólares—
+    /// mostraba el símbolo de pesos sobre cifras en dólares.
+    var moneda: Moneda?
     var altura: CGFloat = 250
     var compacto = false
 
@@ -60,7 +64,11 @@ struct DonutChart: View {
                 .font(compacto ? .caption2 : .subheadline)
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
-            Text(valorMostrado.enMoneda)
+            Text(Formatters.moneda(valorMostrado, moneda: moneda))
+                .lineLimit(1)
+                // "US$ 13.016,86" no entra en el hueco del donut chico:
+                // se achica en vez de pisar el aro.
+                .minimumScaleFactor(0.6)
                 .font(compacto ? .caption.bold() : .title2.bold())
                 .monospacedDigit()
                 .lineLimit(1)
@@ -96,7 +104,7 @@ struct DonutChart: View {
 
     private var descripcionAccesible: String {
         segmentos
-            .map { "\($0.nombre): \($0.monto.enMoneda)" }
+            .map { "\($0.nombre): \(Formatters.moneda($0.monto, moneda: moneda))" }
             .joined(separator: ", ")
     }
 }

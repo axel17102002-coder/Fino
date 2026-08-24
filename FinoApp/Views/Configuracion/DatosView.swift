@@ -15,6 +15,7 @@ struct DatosView: View {
     @Query private var objetivos: [ObjetivoAhorro]
     @Query private var deudas: [Deuda]
     @Query private var recurrentes: [MovimientoRecurrente]
+    @Query private var inversiones: [Inversion]
 
     @State private var confirmandoBorrado = false
     @State private var importando = false
@@ -223,7 +224,8 @@ struct DatosView: View {
             presupuestos: presupuestos,
             objetivos: objetivos,
             deudas: deudas,
-            recurrentes: recurrentes
+            recurrentes: recurrentes,
+            inversiones: inversiones
         ) else {
             Haptics.error()
             return

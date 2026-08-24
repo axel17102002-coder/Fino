@@ -17,7 +17,8 @@ final class PersistenceService {
             Presupuesto.self,
             ObjetivoAhorro.self,
             MovimientoRecurrente.self,
-            Deuda.self
+            Deuda.self,
+            Inversion.self
         ])
         let configuracion = ModelConfiguration(schema: esquema)
         do {
