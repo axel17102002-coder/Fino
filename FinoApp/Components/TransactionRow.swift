@@ -8,6 +8,14 @@ struct TransactionRow: View {
     /// en cada renglón solo hace ruido. En el detalle de una cuenta, donde
     /// la lista no está agrupada, sigue haciendo falta.
     var mostrarFecha: Bool = true
+    /// Avisa cuándo pesa el gasto si no es en el mes de la compra.
+    ///
+    /// Con tarjeta, lo comprado después del cierre lo pagás en el resumen
+    /// siguiente, así que la lista lo muestra bajo su fecha real pero los
+    /// totales lo cuentan en otro mes. Sin este aviso parece un error.
+    /// En el detalle de la tarjeta sobra: ahí ya está agrupado por
+    /// resumen.
+    var mostrarMesContable: Bool = false
 
     private var colorCategoria: Color {
         movimiento.categoria?.color ?? .gray
@@ -15,6 +23,16 @@ struct TransactionRow: View {
 
     private var tieneTicket: Bool {
         movimiento.itemsTicket?.isEmpty == false
+    }
+
+    /// El mes en que pesa, cuando no es el de la compra.
+    private var mesContable: String? {
+        guard mostrarMesContable else { return nil }
+        let contable = CalculosService.fechaContable(de: movimiento)
+        let dePeriodo = CalculosService.inicioPeriodo(conteniendo: movimiento.fecha)
+        let aPeriodo = CalculosService.inicioPeriodo(conteniendo: contable)
+        guard dePeriodo != aPeriodo else { return nil }
+        return contable.formatted(.dateTime.month(.wide))
     }
 
     private var subtitulo: String {
@@ -63,6 +81,15 @@ struct TransactionRow: View {
                 if movimiento.esEnCuotas {
                     Text("Cuota \(movimiento.cuotaActual())/\(movimiento.cuotas) · \(movimiento.montoCuota.enMoneda)/mes")
                         .font(.caption2.weight(.medium))
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(Capsule().fill(Color.rellenoTerciario))
+                }
+
+                if let mes = mesContable {
+                    Text("Entra en \(mes)")
+                        .font(.caption2.weight(.medium))
+                        .foregroundStyle(.secondary)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 3)
                         .background(Capsule().fill(Color.rellenoTerciario))

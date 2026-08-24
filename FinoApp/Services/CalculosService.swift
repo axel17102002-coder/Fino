@@ -346,6 +346,53 @@ enum CalculosService {
         return max(cuenta.limite - consumoActual(de: cuenta, al: referencia), 0)
     }
 
+    /// Los resúmenes de una tarjeta, del más nuevo al más viejo, con lo
+    /// que entra en cada uno.
+    ///
+    /// Una compra financiada aparece en tantos resúmenes como cuotas
+    /// tenga, con el importe de la cuota y no el total: es lo que la
+    /// tarjeta te cobra en cada uno.
+    ///
+    /// Los importes van enteros, sin descontar la parte de los gastos
+    /// compartidos, porque a la tarjeta le debés todo aunque después te
+    /// devuelvan: es lo mismo que hace `consumoActual`.
+    static func resumenesDeTarjeta(_ cuenta: Cuenta) -> [ResumenDeTarjeta] {
+        guard cuenta.esTarjetaCredito, cuenta.diaCierre > 0 else { return [] }
+        let calendario = Calendar.current
+        var porCierre: [Date: [ResumenDeTarjeta.Renglon]] = [:]
+
+        for movimiento in (cuenta.movimientos ?? []) where movimiento.tipo == .gasto {
+            guard let primerCierre = proximaFecha(dia: cuenta.diaCierre, desde: movimiento.fecha) else {
+                continue
+            }
+            guard movimiento.esEnCuotas else {
+                porCierre[primerCierre, default: []].append(
+                    ResumenDeTarjeta.Renglon(movimiento: movimiento, monto: movimiento.monto, cuota: nil)
+                )
+                continue
+            }
+            for indice in 0..<movimiento.cuotas {
+                guard let cierre = calendario.date(byAdding: .month, value: indice, to: primerCierre) else {
+                    continue
+                }
+                porCierre[cierre, default: []].append(
+                    ResumenDeTarjeta.Renglon(
+                        movimiento: movimiento,
+                        monto: movimiento.montoCuota,
+                        cuota: indice + 1
+                    )
+                )
+            }
+        }
+
+        return porCierre.keys.sorted(by: >).map { cierre in
+            ResumenDeTarjeta(
+                cierre: cierre,
+                renglones: (porCierre[cierre] ?? []).sorted { $0.movimiento.fecha > $1.movimiento.fecha }
+            )
+        }
+    }
+
     // MARK: - Presupuestos
 
     /// Total gastado en una categoría durante el mes indicado (tu parte).

@@ -162,7 +162,7 @@ struct MovimientosView: View {
 
     private func fila(_ movimiento: Movimiento) -> some View {
         // La fecha no se repite en el renglón: está en el encabezado del día.
-        TransactionRow(movimiento: movimiento, mostrarFecha: false)
+        TransactionRow(movimiento: movimiento, mostrarFecha: false, mostrarMesContable: true)
             .filaDeVidrio()
             .contentShape(Rectangle())
             // Si el gasto se cargó escaneando, primero se ve el ticket;

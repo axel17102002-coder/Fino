@@ -554,3 +554,71 @@ extension ConsumoDeTarjetaEnCuotasTests {
         #expect(tv.numeroDeCuota(al: fecha(20, 11)) == 5)
     }
 }
+
+/// Los gastos de una tarjeta agrupados por resumen.
+struct ResumenesDeTarjetaTests {
+
+    private func fecha(_ dia: Int, _ mes: Int, _ anio: Int = 2026) -> Date {
+        var c = DateComponents(); c.year = anio; c.month = mes; c.day = dia
+        return Calendar.current.date(from: c)!
+    }
+
+    private func tarjetaCon(_ movimientos: [Movimiento]) -> Cuenta {
+        let tarjeta = Cuenta(nombre: "Visa", tipo: .tarjetaCredito, diaCierre: 25, diaVencimiento: 10)
+        for m in movimientos { m.cuenta = tarjeta }
+        tarjeta.movimientos = movimientos
+        return tarjeta
+    }
+
+    private func compra(_ nombre: String, _ monto: Double, dia: Int, mes: Int, cuotas: Int = 1) -> Movimiento {
+        let m = Movimiento(
+            tipo: .gasto, nombre: nombre,
+            categoriaRaw: CategoriaGasto.otros.rawValue,
+            monto: monto, fecha: fecha(dia, mes)
+        )
+        m.cuotas = cuotas
+        return m
+    }
+
+    @Test func loCompradoDespuesDelCierreVaAlResumenSiguiente() {
+        // Cierre el 25: el 10 entra en el de julio, el 28 en el de agosto.
+        let tarjeta = tarjetaCon([
+            compra("Nafta", 20_000, dia: 10, mes: 7),
+            compra("Cena", 30_000, dia: 28, mes: 7),
+        ])
+        let resumenes = CalculosService.resumenesDeTarjeta(tarjeta)
+        #expect(resumenes.count == 2)
+        // Ordenados del más nuevo al más viejo.
+        #expect(resumenes[0].total == 30_000)
+        #expect(resumenes[1].total == 20_000)
+    }
+
+    @Test func unaCompraEnCuotasApareceEnVariosResumenes() {
+        let tarjeta = tarjetaCon([compra("TV", 30_000, dia: 10, mes: 7, cuotas: 3)])
+        let resumenes = CalculosService.resumenesDeTarjeta(tarjeta)
+        #expect(resumenes.count == 3)
+        // En cada uno entra la cuota, no el total.
+        #expect(resumenes.allSatisfy { $0.total == 10_000 })
+        // Y sabe cuál cuota es: del más nuevo al más viejo, 3, 2 y 1.
+        #expect(resumenes.map { $0.renglones.first?.cuota } == [3, 2, 1])
+    }
+
+    @Test func lasCuotasViejasSeSumanALasComprasNuevas() {
+        let tarjeta = tarjetaCon([
+            compra("TV", 30_000, dia: 10, mes: 7, cuotas: 3),
+            compra("Nafta", 5_000, dia: 10, mes: 8),
+        ])
+        let resumenes = CalculosService.resumenesDeTarjeta(tarjeta)
+        let agosto = resumenes.first { Calendar.current.component(.month, from: $0.cierre) == 8 }
+        #expect(agosto?.total == 15_000)
+        #expect(agosto?.renglones.count == 2)
+    }
+
+    @Test func sinDiaDeCierreNoHayResumenes() {
+        let tarjeta = Cuenta(nombre: "Visa", tipo: .tarjetaCredito)
+        let compra = compra("Nafta", 5_000, dia: 10, mes: 7)
+        compra.cuenta = tarjeta
+        tarjeta.movimientos = [compra]
+        #expect(CalculosService.resumenesDeTarjeta(tarjeta).isEmpty)
+    }
+}
