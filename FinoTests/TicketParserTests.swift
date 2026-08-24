@@ -46,9 +46,172 @@ struct TicketParserTests {
         #expect(TicketScannerService.parsear(lineas: lineas).monto == 3500)
     }
 
+    @Test func noConfundeElSubtotalCuandoElOCRSeparaLasColumnas() {
+        // Caso reportado: en el papel dice "SUBTOTAL 8.300,50" y
+        // "TOTAL 8.000,00", pero Vision devuelve primero los dos rótulos
+        // y después los dos importes. El número que quedaba pegado a la
+        // palabra TOTAL era el del subtotal.
+        let lineas = [
+            "DIA ARGENTINA S.A.",
+            "SUBTOTAL",
+            "TOTAL",
+            "8.300,50",
+            "8.000,00",
+        ]
+        #expect(TicketScannerService.parsear(lineas: lineas).monto == 8000)
+    }
+
+    @Test func noSeVaAlVueltoAlBuscarLaColumnaDeImportes() {
+        // Después del total vienen los pagos; el importe del total es el
+        // de su columna, no el último número del ticket.
+        let lineas = ["KIOSCO", "TOTAL", "8.000,00", "Efectivo 10.000,00", "Vuelto 2.000,00"]
+        #expect(TicketScannerService.parsear(lineas: lineas).monto == 8000)
+    }
+
+    @Test func ignoraSubtotalEscritoSeparado() {
+        let lineas = ["KIOSCO", "SUB TOTAL 8.300,50", "TOTAL 8.000,00"]
+        #expect(TicketScannerService.parsear(lineas: lineas).monto == 8000)
+    }
+
+    @Test func ignoraLosTotalesQueNoSonPlata() {
+        // "TOTAL ITEMS" y "TOTAL DESCUENTOS" van después del total real y,
+        // como se toma el último "TOTAL", le ganaban.
+        let lineas = [
+            "SUPERMERCADO",
+            "TOTAL                  8.000,00",
+            "TOTAL ITEMS                   7",
+            "TOTAL DESCUENTOS         300,50",
+        ]
+        #expect(TicketScannerService.parsear(lineas: lineas).monto == 8000)
+    }
+
     @Test func sinPalabraTotalUsaElMontoMasGrande() {
         let lineas = ["CAFE MARTINEZ", "CAFE DOBLE 4.200,00", "MEDIALUNA 1.800,00"]
         #expect(TicketScannerService.parsear(lineas: lineas).monto == 4200)
+    }
+
+    @Test func separaLosProductosDelTicket() {
+        let productos = TicketScannerService.parsear(lineas: ticketSupermercado)
+            .items.filter { $0.monto > 0 }
+        #expect(productos.count == 3)
+        #expect(productos.first?.nombre == "Leche Entera 1L")
+        #expect(productos.first?.monto == 1850)
+        #expect(productos.total == 8300.50)
+    }
+
+    @Test func agregaElDescuentoParaCerrarConLoPagado() {
+        // Los productos suman 8.300,50 y el ticket cobró 8.000: el
+        // detalle lleva un renglón de -300,50 para que cierre.
+        let datos = TicketScannerService.parsear(lineas: ticketSupermercado)
+        #expect(abs(datos.items.total - 8000) < 0.01)
+        // Comparado contra la traducción y no contra el literal: el
+        // renglón se arma con String(localized:) y los tests corren en
+        // inglés, donde sale "Discounts".
+        #expect(datos.items.last?.nombre == String(localized: "Descuentos"))
+    }
+
+    @Test func noTomaComoProductoElTotalNiLosPagos() {
+        let productos = TicketScannerService.parsear(lineas: ticketSupermercado)
+            .items.filter { $0.monto > 0 }
+        let nombres = productos.map(\.nombre).joined(separator: " ")
+        #expect(!nombres.contains("Total"))
+        #expect(!nombres.contains("Subtotal"))
+        #expect(!nombres.contains("Descuento"))
+        #expect(!nombres.contains("Tarjeta"))
+    }
+
+    @Test func separaProductosCuandoElOCRDevuelveLasColumnas() {
+        let lineas = [
+            "DIA ARGENTINA S.A.",
+            "LECHE ENTERA",
+            "PAN LACTAL",
+            "QUESO CREMOSO",
+            "1.850,00",
+            "2.300,50",
+            "4.150,00",
+            "TOTAL 8.300,50",
+        ]
+        let items = TicketScannerService.parsear(lineas: lineas).items
+        #expect(items.count == 3)
+        #expect(items.last?.nombre == "Queso Cremoso")
+        #expect(items.last?.monto == 4150)
+    }
+
+    @Test func separaProductosConPreciosSinCentavos() {
+        // Kiosco que imprime los precios enteros. La lectura estricta pide
+        // centavos y no encuentra nada; la permisiva sí, y cierra con el
+        // total, así que es la que gana.
+        let lineas = [
+            "KIOSCO EL SOL",
+            "ALFAJOR JORGITO        900",
+            "COCA COLA 500ML       1200",
+            "AGUA MINERAL           800",
+            "TOTAL                 2900",
+        ]
+        let items = TicketScannerService.parsear(lineas: lineas).items
+        #expect(items.count == 3)
+        #expect(items.total == 2900)
+    }
+
+    @Test func noDescartaUnProductoLlamadoTarjeta() {
+        // "TARJETA SUBE" es un producto, no la forma de pago: la lectura
+        // que lo incluye es la que cuadra con el total.
+        let lineas = [
+            "KIOSCO",
+            "TARJETA SUBE           2.500,00",
+            "GOLOSINAS              1.200,00",
+            "TOTAL                  3.700,00",
+        ]
+        let items = TicketScannerService.parsear(lineas: lineas).items
+        #expect(items.count == 2)
+        #expect(items.contains { $0.nombre == "Tarjeta Sube" })
+    }
+
+    @Test func separaProductosConNumerosEnElNombreYColumnasSueltas() {
+        // "COCA 2L" tiene un número en el nombre: en la lectura estricta
+        // eso cortaba la columna y no se emparejaba nada.
+        let lineas = [
+            "ALMACEN",
+            "COCA 2L",
+            "FIDEOS 500G",
+            "ARROZ 1KG",
+            "3.200,00",
+            "1.450,00",
+            "2.100,00",
+            "TOTAL 6.750,00",
+        ]
+        let items = TicketScannerService.parsear(lineas: lineas).items
+        #expect(items.count == 3)
+        #expect(items.first?.nombre == "Coca 2L")
+        #expect(items.total == 6750)
+    }
+
+    @Test func separaProductosCuandoNombreYPrecioVienenIntercalados() {
+        let lineas = [
+            "PANADERIA",
+            "MEDIALUNAS",
+            "2.400,00",
+            "PAN FRANCES",
+            "1.900,00",
+            "TOTAL 4.300,00",
+        ]
+        let items = TicketScannerService.parsear(lineas: lineas).items
+        #expect(items.count == 2)
+        #expect(items.total == 4300)
+    }
+
+    @Test func noInventaProductosCuandoLaSumaNoCierra() {
+        // Un ticket sin detalle legible: aflojar las reglas podría sacar
+        // renglones de cualquier lado, pero como no suman el total, no se
+        // acepta esa lectura.
+        let lineas = ["KIOSCO", "TOTAL", "$ 3.500,00"]
+        let items = TicketScannerService.parsear(lineas: lineas).items
+        #expect(items.isEmpty)
+    }
+
+    @Test func ticketSinDetalleLegibleDevuelveSinItems() {
+        let lineas = ["KIOSCO", "TOTAL", "$ 3.500,00"]
+        #expect(TicketScannerService.parsear(lineas: lineas).items.isEmpty)
     }
 
     @Test func numerosEnDistintosFormatos() {

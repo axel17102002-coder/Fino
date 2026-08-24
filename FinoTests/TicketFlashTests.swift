@@ -1,0 +1,433 @@
+import Testing
+import Foundation
+@testable import Fino
+
+/// Tickets fotografiados dos veces, con y sin flash, para ver qué tanto
+/// cambia la lectura según la foto. Son las cadenas exactas que devolvió
+/// Vision en cada caso, con sus errores incluidos.
+struct TicketFlashTests {
+
+    /// Carrefour del 18/08/26, sin flash.
+    let carrefourSinFlash = [
+        "Carrefour",
+        "109 LA PLA A I",
+        "CALLE / No 767",
+        "INC SA - CUIT Nro:30-68731043-4",
+        "IBCM 30-68731043-4",
+        "Inició actividad cemercial: 02/02/1986",
+        "ORJENTACION AL CONSUMIDUR",
+        "AVELLANEDA",
+        "0-800-666-1518",
+        "IVA RESPONSABLE INSCRIPTO",
+        "ORIGINAL",
+        "FACTURA B (Cod.006)",
+        "A CONSUMIDOR FINAL",
+        "P.V. Nro.: 18675",
+        "Fecha 18/08/26",
+        "Caja 0011",
+        "Nro T. 00194479",
+        "Hora 19:57:28",
+        "Cajero/a: Local109-s",
+        "Almacen",
+        "SNACKS BUCKIN RANCH TAKIS X 85 GRS",
+        "1 x 3300,00 (21.00%)",
+        "25%uni SNACKS Y",
+        "3300.00",
+        "-825.00",
+        "7500810047095",
+        "NACHOS SABOR QUESO DORITOS X 40 GRS",
+        "1 x 2299,00 (21.00%)",
+        "25%uni-SNACKS Y",
+        "2299.00",
+        "-574.75",
+        "7790310985267",
+        "QUESO UNTABLE GRUYERE TONADITA X 180 GRS",
+        "1 x 2699,00 (21.00%)",
+        "2699.00",
+        "7798060853034",
+        "Bebidas",
+        "CERVEZA NEGRA STELLA ARTOIS NOIRE LATA X",
+        "2 x 4025,00 (21.00%)-[16/56%]",
+        "2do50%-STELLA A-CE",
+        "8050.00",
+        "-2012.50",
+        "7792798010639",
+        "Panaderia",
+        "GRISINES SALVADO X 180 GRS (PX)",
+        "1 x 3090,00 (21.00%)",
+        "3090.00",
+        "7798133510109",
+        "SUBTOTAL SIN DESCUENTOS",
+        "$",
+        "19438,00",
+        "DESCUENTOS",
+        "25%uni-SNACKS Y",
+        "2do50%-STELLA A-CE",
+        "-1399.75",
+        "-2012.50",
+        "AHORRO",
+        "$",
+        "3412.25",
+        "TOTAL",
+        "$",
+        "16025.75",
+        "REG. TRANSPARENCIA FISCAL AL CONSUMIDOR LEY 27743",
+        "IVA Contenido",
+        "2733.47",
+        "Otros impuestos nacionales indirectos",
+        "0.00",
+        "LOS IMPUESTOS INFORMADOS SON A NIVEL NACIONAL",
+        "Pago VISA PREPAGA",
+        "Precio Contado",
+        "Importe financiado(PFT)",
+        "Cantidad de cuotas mensuales",
+        "Monto de cuota",
+        "TEA",
+        "CFT",
+        "$16025,75",
+        "$ 16025,75",
+        "$ 16025,75",
+        "0,00%",
+        "0,00%",
+        "Sistema de amortizacion Frances",
+        "Por informacion referida a gastos extra,",
+        "seguros",
+        "o adicionales consulte a la",
+        "emisora de su tarjeta.",
+        "16025.75",
+        "Suma de sus pagos",
+        "8033 0109 017 031/ 180826 1957 AC-00",
+        "FACJURA ELECTRONICA",
+        "Vto: 26/08/2",
+        "CAE 86338907925976",
+    ]
+
+    /// El mismo ticket con flash: lee mejor el encabezado
+    /// pero desordena la columna de importes.
+    let carrefourConFlash = [
+        "Carrefour",
+        "109 LA PLATA I",
+        "CALLE 7 No 767",
+        "TNC SA - CUIT Nro:30-68731043-4",
+        "IBCM 30-68731043-4",
+        "Inicto actividad comerctal: 02/02/1986",
+        "DRIENTACION AL CONSUMIDOR",
+        "AVELLANEDA",
+        "0-800-666-1518",
+        "IVA RESPONSABLE INSCRIPTO",
+        "ORIGINAL",
+        "FACTURA B (Cod.006)",
+        "A CONSUMIDOR FINAL",
+        "P.V. Nro.: 18675",
+        "Fecha 18/08/26",
+        "Caja 0011",
+        "Nro T. 00194479",
+        "Hora 19:57:28",
+        "Cajero/a: Local 109-s",
+        "Almacen",
+        "SNACKS BUCKIN RANCH_ TAKIS X 85 GRS",
+        "1 x 3300,00 (21.00%)",
+        "25%uni-SNACKS Y",
+        "-825.00",
+        "7500810047095",
+        "NACHOS SABOR QUESO DORITOS X 40 GRS",
+        "2299.00",
+        "1 x 2299,00 (21.00%)",
+        "25%uni-SNACKS Y",
+        "7790310985267",
+        "QUESO UNTABLE GRUYERE TONADITA X 180 GRS",
+        "2699.00",
+        "1 x 2699,00 (21.00%)",
+        "7798060853034",
+        "Bebidas",
+        "CERVEZA NEGRA STELLA ARTOIS NOIRE LATA X",
+        "2 x 4025,00 (21.00%)-[16.56%]",
+        "-2012.50",
+        "2do50%-STELLA A-CE",
+        "7792798010639",
+        "Panaderia",
+        "GRISINES SALVADO X 180 GRS (PX)",
+        "1 x 3090,00 (21.00%)",
+        "3090.00",
+        "7798133510109",
+        "SUBTOTAL SIN DESCUENTOS",
+        "$ 19438,00",
+        "DESCUENTOS",
+        "25%uni-SNACKS Y",
+        "2do50%-STELLA A-CE",
+        "-1399.75",
+        "-2012.50",
+        "$",
+        "3412.25",
+        "AHORRO",
+        "TOTAL",
+        "$",
+        "16025.75",
+        "REG. TRANSPARENCIA FISCAL AL CONSUMIDOR LEY 27743",
+        "2733.47",
+        "IVA Contenido",
+        "Otros impuestos nacionales indirectos",
+        "0.00",
+        "LOS IMPUESTOS INFORMADOS SON A NIVEL NACIONAL",
+        "Pago VISA PREPAGA",
+        "Precio Contado",
+        "Importe finariciado(PFT)",
+        "Cantidad de cuotas menisuales",
+        "Monto de cuota",
+        "TEA",
+        "CFT",
+        "$ 16025,75",
+        "$ 16025,75",
+        "$ 16025,75",
+        "0,00%",
+        "0,00%",
+        "Sistema de amortizacion Frances",
+        "Por informacion referida a gastos extra,",
+        "seguros o adicionales consulte a la",
+        "emisora de su tarjela.",
+        "16025,75",
+        "Suma de sus pagos",
+        "8033 0109 011 031 180826 1957 AC-00",
+        "FACTURA ELECTRONICA",
+        "Vto: 28/08/26",
+        "CAE 86338907925976",
+    ]
+
+    /// Disco del 21/08/26 sin flash: el peor de los cuatro.
+    /// Se come el borde izquierdo y los rótulos quedan mutilados
+    /// ("UBTOTAL", "ESCUENTOS", "OTAL").
+    let discoSinFlash = [
+        "Disco Li",
+        "CENCOSUD S.A",
+        "CUIT: 30590360763",
+        "-1]",
+        "DOM. COM. Diagonal 79 96",
+        "La PlataBuenos Aires",
+        "DOM.L FGAL: SUIPACHA_111",
+        "INICIO ACTIVIDAD: 16/09",
+        "IVA RESPONSABLE INSCRIF",
+        "21/08/2026 20:39:14",
+        "NRO. TIENDA: 62",
+        "NRO. TICKET: 145",
+        "COND. VENTA: CONTADO",
+        "FACTI",
+        "ORIGINAL",
+        "Consumidor Final",
+        "Sopa D P6l1 Knorr C/Cat",
+        "1x2.850,00 / 7794000005",
+        "10% SOPAS",
+        "layonesa ARYTZA con Ajc",
+        "1x10.100,00 / 77981262C",
+        "0% LIQUÍDA SM62",
+        "UBTOTAL SIN DESCUENTOS",
+        "ESCUENTOS",
+        "1% SOPAS",
+        "1% LIDUIDA SM62",
+        "ITAL DESCUENTOS",
+        "OTAL",
+        "GIMEN DE TRANSPARENCI",
+        "Y 27,743)",
+        ", Contenido",
+        "OS IMPUESTOS NACIONA",
+        ". Internos importados",
+        "; IMPUESTOS INFORMADC",
+        "BRESPONDEN A NIVEL NA",
+        "ISTDATA COMPRA Modo:[",
+        ":683157 Cupon:91161",
+        "J:435786**+**+8944 |",
+        ":1 Imp.Cuota: 4740,C",
+        "JUM",
+        "801846344094",
+        "LDO:",
+        "22001 PUNTOS",
+        "lala 3",
+        "CM: 902-30590360/03",
+        "0 18 CABA",
+        "IMP: 14949-00130391",
+        "JA: 63",
+        "T: 99006263",
+        "B",
+        "006)",
+        "•ang 105.6 (21,00)",
+        "2.850,00",
+        "-1.140,00",
+        "Ir FCO 340 g (21",
+        ",00)",
+        "10.100,00",
+        "-7.070,00",
+        "12.950,00",
+        "-1.140,00",
+        "-7.070,00",
+        "-8.210,00",
+        "4.740,00",
+        "CAL AL CONSUMIDOR",
+        "822,64",
+        "NDIRECTUS",
+        "ISOLO LOS QUE",
+        "0,00",
+        "4.740,00",
+        ":28 Com:21319893",
+        "425809",
+        "›+",
+        "SUMO: 161 PUNTOS",
+        "Cod. OR",
+        "+RERENCIA",
+        "MECTRE",
+        "кSА. F. N0-: 65249402625",
+        "ULOS",
+        "52/20",
+        "UL CNPI0/4122020",
+        "U10.-",
+        "JDUT",
+        "Atención al Clier",
+        ")810-777-8888",
+        "om.ar",
+    ]
+
+    /// El mismo ticket de Disco con flash, que lo salva.
+    let discoConFlash = [
+        "Disco Li",
+        "CENCOSUD S.A",
+        "CUIl: 30590360763",
+        "- I]",
+        "DOM. COM. Diagonal 79 9€",
+        "la PlataBuenos Aires",
+        "DOM. LEGAL: SUIPACHA 111",
+        "INLEOU ALIIVIDAD: 16/09",
+        "IVA RESPONSABLE INSCRIF",
+        "21/08/2026 20:39:14",
+        "NRO. TIENDA: 62",
+        "NRO.TICKET: 145",
+        "C",
+        "COND.VENTA: CONTADO",
+        "FACTI",
+        "ORIGINAL",
+        "Consumidor Final",
+        "Sopa D Poll Knorr C/Cat",
+        "1x2.850.00 / 779400000E",
+        "40% SOPAS",
+        "Mayonesa ARYTZA con AJC",
+        "1x10.100,00 / 779812622",
+        "70% [IQUIDA SM62",
+        "SUBTOTAL SIN DESCUENTOS",
+        "DESCUENTOS",
+        "40% SOPAS",
+        "70% LIQUIDA SM62",
+        "TOTAL DESCUENTOS",
+        "TOTAL",
+        "REGIMEN DE TRANSPARENCI",
+        "(LEY 27.743)",
+        "IVA Contenido",
+        "OTROS IMPUESTOS NACIUNA",
+        "Imp. Internos importados",
+        "TOS INPUESTOS INFORMADC",
+        "CORRESPONDEN A NIVEL NA",
+        "VISA",
+        "FIRSIDATA COMPRA Modo:(",
+        "Aut :683157 Cupon:9116 |",
+        "Tàrj:435786******8944(",
+        "Cts: i Imp.Cuota: 4740,0",
+        "JUM",
+        "TARJ.: 801846344094",
+        "SALDO: 22001 PUNTOS",
+        "Cod. QR",
+        "HAREFERENCIA FLECTRC",
+        "C..A. E.Nro.:863494025292",
+        "ARTICULOS",
+        "Atención al Clier",
+        "DiSCO",
+        "cencosud",
+        "lata",
+        "3",
+        "CM: 902-30590360763",
+        "0 18 CABA",
+        "IMP: 14949-00130391",
+        ".JA: 63",
+        ": 99006263",
+        "B",
+        "006)",
+        "• ang 105.6 (21,00)",
+        "2.850,00",
+        "-1.140,00",
+        "ir FCO 340 g (21,00)",
+        "10.100,00",
+        "-7.070,00",
+        "12.950,00",
+        "-1.140,00",
+        "-7.070,00",
+        "-8.210,00",
+        "4.740,00",
+        "CAL AL CONSUMIDOR",
+        "822,64",
+        "NDIRECTOS",
+        "I SOLO LOS QUE",
+        "0,00",
+        "4.740,00",
+        ":28_Com:21319893",
+        "425809",
+        "SUMO: 161 PUNTOS",
+        "192/20",
+        "DEL COMPROBANIE++",
+        "Vto.:31/08/2026",
+        "1100S 2",
+        "1810-777-8888",
+        "om.ar",
+    ]
+
+    // MARK: - Carrefour 18/08/26 · total 16.025,75
+
+    @Test func carrefourLeeElTotalConYSinFlash() {
+        for (caso, lineas) in [("sin flash", carrefourSinFlash), ("con flash", carrefourConFlash)] {
+            let datos = TicketScannerService.parsear(lineas: lineas)
+            #expect(datos.monto == 16025.75, "\(caso)")
+        }
+    }
+
+    @Test func carrefourLeeLaFechaConYSinFlash() {
+        for (caso, lineas) in [("sin flash", carrefourSinFlash), ("con flash", carrefourConFlash)] {
+            let fecha = TicketScannerService.parsear(lineas: lineas).fecha
+            let partes = Calendar.current.dateComponents([.day, .month, .year], from: fecha ?? .distantPast)
+            #expect(partes.day == 18 && partes.month == 8 && partes.year == 2026, "\(caso)")
+        }
+    }
+
+    @Test func carrefourDetectaElComercioConYSinFlash() {
+        for (caso, lineas) in [("sin flash", carrefourSinFlash), ("con flash", carrefourConFlash)] {
+            #expect(TicketScannerService.parsear(lineas: lineas).nombre == "Carrefour", "\(caso)")
+        }
+    }
+
+    @Test func carrefourSeparaLosCincoProductos() {
+        for (caso, lineas) in [("sin flash", carrefourSinFlash), ("con flash", carrefourConFlash)] {
+            let productos = TicketScannerService.parsear(lineas: lineas).items.filter { $0.monto > 0 }
+            #expect(productos.count == 5, "\(caso)")
+            // Los renglones suman el subtotal impreso, antes de las promos.
+            #expect(productos.total == 19438, "\(caso)")
+        }
+    }
+
+    // MARK: - Disco 21/08/26 · total 4.740,00
+
+    @Test func discoLeeElTotalConYSinFlash() {
+        for (caso, lineas) in [("sin flash", discoSinFlash), ("con flash", discoConFlash)] {
+            #expect(TicketScannerService.parsear(lineas: lineas).monto == 4740, "\(caso)")
+        }
+    }
+
+    @Test func discoLeeLaFechaConYSinFlash() {
+        for (caso, lineas) in [("sin flash", discoSinFlash), ("con flash", discoConFlash)] {
+            let fecha = TicketScannerService.parsear(lineas: lineas).fecha
+            let partes = Calendar.current.dateComponents([.day, .month, .year], from: fecha ?? .distantPast)
+            #expect(partes.day == 21 && partes.month == 8 && partes.year == 2026, "\(caso)")
+        }
+    }
+
+    @Test func discoNoInventaProductos() {
+        // Los nombres vienen partidos de la columna de importes, así que
+        // acá lo importante no es separarlos sino no inventar renglones.
+        for (caso, lineas) in [("sin flash", discoSinFlash), ("con flash", discoConFlash)] {
+            let items = TicketScannerService.parsear(lineas: lineas).items
+            #expect(items.filter { $0.monto > 0 }.count <= 2, "\(caso)")
+        }
+    }
+}
