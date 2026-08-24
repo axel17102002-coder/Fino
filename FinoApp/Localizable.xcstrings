@@ -147,6 +147,9 @@
         }
       }
     },
+    "%" : {
+
+    },
     "%@" : {
 
     },
@@ -211,6 +214,19 @@
           }
         }
       }
+    },
+    "%@ vence en %lld días" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ vence en %2$lld días"
+          }
+        }
+      }
+    },
+    "%@ vence hoy" : {
+
     },
     "%lld" : {
 
@@ -351,6 +367,9 @@
         }
       }
     },
+    "%lld%%" : {
+
+    },
     "•••• %@" : {
 
     },
@@ -444,6 +463,9 @@
         }
       }
     },
+    "Acciones" : {
+
+    },
     "Acerca de" : {
       "localizations" : {
         "en" : {
@@ -485,6 +507,9 @@
       }
     },
     "Acumulado" : {
+
+    },
+    "Además" : {
 
     },
     "Agregá tu primer movimiento con el botón + o explorá con datos de ejemplo." : {
@@ -569,6 +594,9 @@
           }
         }
       }
+    },
+    "Agregar inversión" : {
+
     },
     "Agregar movimiento" : {
       "localizations" : {
@@ -890,6 +918,12 @@
         }
       }
     },
+    "Cantidad" : {
+
+    },
+    "Capital" : {
+
+    },
     "Carga un gasto sin abrir la app: ponés monto y nombre, y confirmás categoría y cuenta en una tarjeta emergente." : {
       "localizations" : {
         "en" : {
@@ -965,6 +999,9 @@
           }
         }
       }
+    },
+    "Cerró el %@" : {
+
     },
     "Cierra el %@" : {
       "localizations" : {
@@ -1205,6 +1242,9 @@
         }
       }
     },
+    "Cripto" : {
+
+    },
     "Cuando cargues un gasto, marcalo como compartido y Fino divide la cuenta y se acuerda por vos." : {
       "localizations" : {
         "en" : {
@@ -1224,6 +1264,9 @@
           }
         }
       }
+    },
+    "Cuánto" : {
+
     },
     "Cuenta" : {
       "localizations" : {
@@ -1245,6 +1288,9 @@
         }
       }
     },
+    "Cuenta remunerada" : {
+
+    },
     "Cuentas" : {
       "localizations" : {
         "en" : {
@@ -1261,6 +1307,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Accounts & wallets"
+          }
+        }
+      }
+    },
+    "Cuota %lld/%lld" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Cuota %1$lld/%2$lld"
           }
         }
       }
@@ -1422,6 +1478,9 @@
         }
       }
     },
+    "Dónde está (IBKR, Binance, Galicia)" : {
+
+    },
     "Dónde se va la plata este mes" : {
       "localizations" : {
         "en" : {
@@ -1491,6 +1550,9 @@
           }
         }
       }
+    },
+    "Editar inversión" : {
+
     },
     "Editar objetivo" : {
       "localizations" : {
@@ -1634,9 +1696,6 @@
     "El que más usás" : {
 
     },
-    "El reparto sale del detalle del ticket: los renglones marcados como tuyos van enteros a tu parte y el resto se divide. Los descuentos se reparten en la misma proporción." : {
-
-    },
     "Elegí la categoría" : {
       "localizations" : {
         "en" : {
@@ -1757,6 +1816,9 @@
           }
         }
       }
+    },
+    "Entra en %@" : {
+
     },
     "Equivale a" : {
 
@@ -2196,7 +2258,13 @@
         }
       }
     },
+    "La cotización se carga a mano por ahora. El valor sale de multiplicarla por la cantidad." : {
+
+    },
     "La que más te devuelve" : {
+
+    },
+    "La tasa y el vencimiento no entran en ningún total: sirven para avisarte cuando esté por vencer." : {
 
     },
     "Las partes suman más que el gasto." : {
@@ -2673,6 +2741,9 @@
         }
       }
     },
+    "Nueva inversión" : {
+
+    },
     "Nuevo movimiento" : {
       "localizations" : {
         "en" : {
@@ -2833,6 +2904,9 @@
         }
       }
     },
+    "Otras" : {
+
+    },
     "Otros" : {
       "localizations" : {
         "en" : {
@@ -2847,6 +2921,7 @@
 
     },
     "Pagaste vos: el gasto queda completo y Fino anota lo que te debe cada uno en \"Me deben\"." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2919,6 +2994,9 @@
         }
       }
     },
+    "Plazo fijo" : {
+
+    },
     "Porcentaje" : {
 
     },
@@ -2972,7 +3050,7 @@
         }
       }
     },
-    "Queda como un movimiento de cashback aparte, con la misma fecha y la misma cuenta que el gasto." : {
+    "Qué es" : {
 
     },
     "Quitar" : {
@@ -3305,6 +3383,9 @@
     "Sin consumos" : {
 
     },
+    "Sin cotización del dólar: faltan las tenencias en pesos." : {
+
+    },
     "Sin cuenta" : {
       "localizations" : {
         "en" : {
@@ -3498,6 +3579,9 @@
         }
       }
     },
+    "Tasa anual" : {
+
+    },
     "Te avisamos el día antes de cada vencimiento de tarjeta, al llegar al 80% y 100% de un presupuesto, y para recordarte el backup." : {
       "localizations" : {
         "en" : {
@@ -3541,6 +3625,9 @@
         }
       }
     },
+    "Ticker (AAPL, BTC)" : {
+
+    },
     "Ticket" : {
       "localizations" : {
         "en" : {
@@ -3560,6 +3647,9 @@
           }
         }
       }
+    },
+    "Tiene vencimiento" : {
+
     },
     "Tipo" : {
       "localizations" : {
@@ -3650,6 +3740,9 @@
           }
         }
       }
+    },
+    "Total" : {
+
     },
     "TOTAL" : {
 
@@ -3744,6 +3837,9 @@
         }
       }
     },
+    "Vale" : {
+
+    },
     "Valor de la cuota" : {
       "localizations" : {
         "en" : {
@@ -3753,6 +3849,9 @@
           }
         }
       }
+    },
+    "Vence" : {
+
     },
     "Vence el %@" : {
       "localizations" : {

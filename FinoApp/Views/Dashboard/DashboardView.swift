@@ -191,9 +191,12 @@ struct DashboardView: View {
                     paginaPresupuestos
                         .containerRelativeFrame(.horizontal)
                         .id(1)
-                    paginaObjetivos
+                    paginaInversiones
                         .containerRelativeFrame(.horizontal)
                         .id(2)
+                    paginaObjetivos
+                        .containerRelativeFrame(.horizontal)
+                        .id(3)
                 }
                 .scrollTargetLayout()
             }
@@ -207,13 +210,30 @@ struct DashboardView: View {
 
     private var indicadorPaginas: some View {
         HStack(spacing: 7) {
-            ForEach(0..<3, id: \.self) { indice in
+            ForEach(0..<4, id: \.self) { indice in
                 Capsule()
                     .fill(.white.opacity(paginaCarrusel == indice ? 0.95 : 0.35))
                     .frame(width: paginaCarrusel == indice ? 18 : 7, height: 7)
             }
         }
         .animation(.spring(duration: 0.25), value: paginaCarrusel)
+    }
+
+    /// Página del carrusel: el donut con el reparto y las tres más
+    /// grandes. La lista completa vive en el bloque de abajo, para que
+    /// esta página entre en el alto de las otras tres.
+    @ViewBuilder
+    private var paginaInversiones: some View {
+        if inversiones.isEmpty {
+            accesoVacio(String(localized: "Registrar inversiones"), icono: "chart.pie.fill") {
+                InversionesView()
+            }
+        } else {
+            InversionesCard(
+                cartera: Cartera(inversiones, dolaresPorPeso: dolaresPorPeso),
+                maximoEnLista: 3
+            )
+        }
     }
 
     // MARK: - Secciones
@@ -402,18 +422,22 @@ struct DashboardView: View {
                     .font(.headline)
                     .foregroundStyle(Color.crema)
                 Spacer()
-                Button {
-                    mostrandoAltaInversion = true
-                    Haptics.seleccion()
+                NavigationLink {
+                    InversionesView()
                 } label: {
-                    Image(systemName: "plus.circle.fill")
-                        .font(.title3)
-                        .foregroundStyle(.white.opacity(0.85))
+                    HStack(spacing: 3) {
+                        Text("Ver todo")
+                        Image(systemName: "chevron.right")
+                            .font(.caption2)
+                    }
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(.white.opacity(0.85))
                 }
-                .buttonStyle(.plain)
-                .accessibilityLabel("Agregar inversión")
             }
-            InversionesCard(cartera: Cartera(inversiones, dolaresPorPeso: dolaresPorPeso))
+            InversionesCard(
+                cartera: Cartera(inversiones, dolaresPorPeso: dolaresPorPeso),
+                conDonut: false
+            )
         }
     }
 

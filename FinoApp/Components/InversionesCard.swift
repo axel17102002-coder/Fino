@@ -9,8 +9,26 @@ import SwiftUI
 struct InversionesCard: View {
 
     let cartera: Cartera
+    /// Con donut y reparto por clase arriba. En falso queda solo la
+    /// lista, para el bloque de abajo que las junta todas.
+    var conDonut: Bool = true
+    /// Cuántas tenencias listar. `nil` las lista todas.
+    ///
+    /// En el carrusel se muestran las tres más grandes: la página tiene
+    /// que entrar en el alto de las otras, y nueve renglones la harían
+    /// tres veces más larga.
+    var maximoEnLista: Int?
 
     @State private var seleccion: String?
+
+    private var listadas: [(inversion: Inversion, dolares: Double)] {
+        guard let maximoEnLista else { return cartera.ordenadas }
+        return Array(cartera.ordenadas.prefix(maximoEnLista))
+    }
+
+    private var ocultas: Int {
+        cartera.ordenadas.count - listadas.count
+    }
 
     var body: some View {
         if cartera.ordenadas.isEmpty {
@@ -19,6 +37,7 @@ struct InversionesCard: View {
             VStack(alignment: .leading, spacing: 14) {
                 encabezado
 
+                if conDonut {
                 HStack(alignment: .center, spacing: 12) {
                     DonutChart(
                         segmentos: cartera.segmentos,
@@ -39,11 +58,19 @@ struct InversionesCard: View {
                 }
 
                 Divider().overlay(Color.primary.opacity(0.12))
+                }
 
                 VStack(spacing: 12) {
-                    ForEach(cartera.ordenadas, id: \.inversion.id) { item in
+                    ForEach(listadas, id: \.inversion.id) { item in
                         fila(item.inversion, dolares: item.dolares)
                     }
+                }
+
+                if ocultas > 0 {
+                    Text("y \(ocultas) más")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .center)
                 }
             }
             .estiloTarjetaVidrio()
