@@ -231,9 +231,39 @@ struct DashboardView: View {
         } else {
             InversionesCard(
                 cartera: Cartera(inversiones, dolaresPorPeso: dolaresPorPeso),
-                maximoEnLista: 3
-            )
+                maximoEnLista: 4
+            ) {
+                HStack(spacing: 10) {
+                    NavigationLink {
+                        InversionesView()
+                    } label: {
+                        pastilla(String(localized: "Ver todas"), icono: "list.bullet")
+                    }
+                    .buttonStyle(.plain)
+
+                    Button {
+                        mostrandoAltaInversion = true
+                        Haptics.seleccion()
+                    } label: {
+                        pastilla(String(localized: "Agregar"), icono: "plus")
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
         }
+    }
+
+    /// Botón de la fila del pie de Inversiones.
+    private func pastilla(_ titulo: String, icono: String) -> some View {
+        HStack(spacing: 6) {
+            Image(systemName: icono)
+                .font(.caption)
+            Text(titulo)
+                .font(.subheadline.weight(.medium))
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 10)
+        .background(Capsule().fill(Color.rellenoTerciario))
     }
 
     // MARK: - Secciones

@@ -6,7 +6,7 @@ import SwiftUI
 /// da un número. El donut reparte por tenencia y al lado va el reparto
 /// por clase, que responden dos preguntas distintas —cuánto hay en cada
 /// cosa y cuánto en cada tipo de cosa— sin necesitar dos tarjetas.
-struct InversionesCard: View {
+struct InversionesCard<Pie: View>: View {
 
     let cartera: Cartera
     /// Con donut y reparto por clase arriba. En falso queda solo la
@@ -18,6 +18,11 @@ struct InversionesCard: View {
     /// que entrar en el alto de las otras, y nueve renglones la harían
     /// tres veces más larga.
     var maximoEnLista: Int?
+    /// Fila de acciones al pie. Va abajo de todo a propósito: llena el
+    /// alto que sobra en la página del carrusel y deja "ver todas" y
+    /// "agregar" juntos, que es donde uno los busca después de mirar la
+    /// lista.
+    @ViewBuilder var pie: () -> Pie
 
     @State private var seleccion: String?
 
@@ -72,6 +77,9 @@ struct InversionesCard: View {
                         .foregroundStyle(.secondary)
                         .frame(maxWidth: .infinity, alignment: .center)
                 }
+
+                Spacer(minLength: 0)
+                pie()
             }
             .estiloTarjetaVidrio()
         }
@@ -187,5 +195,19 @@ struct InversionesCard: View {
                 : String(format: "%g", cantidad))
         }
         return partes.joined(separator: " · ")
+    }
+}
+
+extension InversionesCard where Pie == EmptyView {
+
+    /// Sin fila de acciones, para el bloque de abajo que ya tiene su
+    /// propio acceso en el encabezado.
+    init(cartera: Cartera, conDonut: Bool = true, maximoEnLista: Int? = nil) {
+        self.init(
+            cartera: cartera,
+            conDonut: conDonut,
+            maximoEnLista: maximoEnLista,
+            pie: { EmptyView() }
+        )
     }
 }

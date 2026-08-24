@@ -75,7 +75,9 @@ struct CarteraTests {
         let segmentos = Cartera(muchas, dolaresPorPeso: tasa).segmentos
         #expect(segmentos.count == 7)
         #expect(segmentos.first?.nombre == "T1")
-        #expect(segmentos.last?.nombre == "Otras")
+        // Contra la traducción y no el literal: los tests corren en
+        // inglés, donde el renglón dice "Others".
+        #expect(segmentos.last?.nombre == String(localized: "Otras"))
         // "Otras" junta las tres más chicas: 300 + 200 + 100.
         #expect(segmentos.last?.monto == 600)
     }
@@ -84,7 +86,7 @@ struct CarteraTests {
         let pocas = (1...4).map { accion("T\($0)", cantidad: 1, precio: Double($0) * 100) }
         let segmentos = Cartera(pocas, dolaresPorPeso: tasa).segmentos
         #expect(segmentos.count == 4)
-        #expect(!segmentos.contains { $0.nombre == "Otras" })
+        #expect(!segmentos.contains { $0.nombre == String(localized: "Otras") })
     }
 
     @Test func avisaLosPlazosFijosQueVencenEnLaSemana() {
