@@ -8,6 +8,7 @@ struct CategoriasView: View {
     @State private var categorias = CustomCategoryStore.todas()
     @State private var formulario: FormularioCategoria?
     @State private var fabricaEnEdicion: SeleccionFabrica?
+    @State private var grupo: Grupo = .gasto
     @State private var modoEdicion: EditMode = .inactive
     /// Se incrementa al reordenar o ajustar una de fábrica, para refrescar.
     @State private var versionOrden = 0
@@ -19,10 +20,40 @@ struct CategoriasView: View {
         var id: String { "\(espacio)-\(base.rawValue)" }
     }
 
+    /// Grupo que se está viendo. La lista completa era de más de veinte
+    /// renglones —Gastos sola tiene catorce— y las otras tres secciones
+    /// quedaban tan abajo que parecía que no existían.
+    private enum Grupo: String, CaseIterable, Identifiable {
+        case gasto, ingreso, cashback, inversion
+
+        var id: String { rawValue }
+
+        var tipoMovimiento: TipoMovimiento? {
+            TipoMovimiento(rawValue: rawValue)
+        }
+
+        var titulo: String {
+            tipoMovimiento?.nombrePlural ?? String(localized: "Inversiones")
+        }
+    }
+
     var body: some View {
         List {
-            ForEach(TipoMovimiento.allCases) { tipo in
-                Section(tipo.nombrePlural) {
+            Section {
+                Picker("Grupo", selection: $grupo) {
+                    ForEach(Grupo.allCases) { grupo in
+                        Text(grupo.titulo).tag(grupo)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .labelsHidden()
+                .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
+            }
+
+            ForEach(TipoMovimiento.allCases.filter { $0 == grupo.tipoMovimiento }) { tipo in
+                Section {
                     ForEach(ordenadas(para: tipo)) { item in
                         if let personalizada = item.base as? CategoriaPersonalizada {
                             Button {
@@ -30,6 +61,9 @@ struct CategoriasView: View {
                             } label: {
                                 fila(item.base, esPersonalizada: true)
                             }
+                            // Sin esto el Button pinta su etiqueta con el
+                            // verde de acento y tapa el .primary de la fila.
+                            .buttonStyle(.plain)
                             .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                                 Button(role: .destructive) {
                                     CustomCategoryStore.eliminar(id: personalizada.id)
@@ -51,6 +85,7 @@ struct CategoriasView: View {
                                     oculta: oculta
                                 )
                             }
+                            .buttonStyle(.plain)
                             .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                                 if oculta {
                                     Button {
@@ -79,9 +114,13 @@ struct CategoriasView: View {
                         mover(origen, a: destino, tipo: tipo)
                     }
                 }
+                // Sin encabezado: el selector de arriba ya dice qué grupo
+                // se está viendo y repetirlo era decir dos veces lo mismo.
             }
 
-            seccionInversiones
+            if grupo == .inversion {
+                seccionInversiones
+            }
 
             Section {
             } footer: {
@@ -130,7 +169,7 @@ struct CategoriasView: View {
     /// cinco —dos se cargan con cantidad y cotización y tres con capital—
     /// y agregar uno sin decidir cómo se carga no significaría nada.
     private var seccionInversiones: some View {
-        Section("Inversiones") {
+        Section {
             ForEach(TipoInversion.allCases) { tipo in
                 Button {
                     fabricaEnEdicion = SeleccionFabrica(
@@ -147,6 +186,7 @@ struct CategoriasView: View {
                         )
                     )
                 }
+                .buttonStyle(.plain)
             }
         }
     }
