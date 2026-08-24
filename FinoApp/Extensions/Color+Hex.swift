@@ -35,6 +35,27 @@ extension Color {
         Color(uiColor: .secondarySystemGroupedBackground)
     }
 
+    /// Rojo de los gastos. El `.red` del sistema es muy saturado y sobre
+    /// el verde de la app quedaba estridente; este es un ladrillo apagado
+    /// que se lee igual de claro como "salió plata" sin gritar.
+    static var rojoGasto: Color {
+        Color(uiColor: UIColor { traits in
+            traits.userInterfaceStyle == .dark
+                ? UIColor(red: 0xE0 / 255, green: 0x7A / 255, blue: 0x74 / 255, alpha: 1)
+                : UIColor(red: 0xC4 / 255, green: 0x5B / 255, blue: 0x54 / 255, alpha: 1)
+        })
+    }
+
+    /// Verde de los ingresos, en la misma familia que el de marca en vez
+    /// del `.green` del sistema, que tira a neón.
+    static var verdeIngreso: Color {
+        Color(uiColor: UIColor { traits in
+            traits.userInterfaceStyle == .dark
+                ? UIColor(red: 0x5F / 255, green: 0xA9 / 255, blue: 0x8A / 255, alpha: 1)
+                : UIColor(red: 0x3D / 255, green: 0x7D / 255, blue: 0x63 / 255, alpha: 1)
+        })
+    }
+
     /// Verde de marca de la app (el mismo del botón +).
     static var verdeMarca: Color {
         Color(hex: "366759")

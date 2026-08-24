@@ -37,7 +37,7 @@ struct DeudasView: View {
                                 Text(totalPendiente.enMoneda)
                                     .font(.title3.bold())
                                     .monospacedDigit()
-                                    .foregroundStyle(.green)
+                                    .foregroundStyle(Color.verdeIngreso)
                             } label: {
                                 Text("Te deben en total")
                                     .font(.subheadline)
@@ -55,7 +55,7 @@ struct DeudasView: View {
                                         } label: {
                                             Label("Saldar", systemImage: "checkmark.circle.fill")
                                         }
-                                        .tint(.green)
+                                        .tint(Color.verdeIngreso)
                                     }
                             }
                         } header: {

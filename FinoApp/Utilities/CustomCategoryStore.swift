@@ -84,9 +84,14 @@ enum CustomCategoryStore {
     private static var cacheAjustes: [String: AjusteCategoria]?
 
     private static func claveDe(_ raw: String, _ tipo: TipoMovimiento) -> String {
-        // El tipo forma parte de la clave porque hay rawValues repetidos
-        // entre tipos (ej: "otros" existe en gastos e ingresos).
-        "\(tipo.rawValue)-\(raw)"
+        claveDe(raw, espacio: tipo.rawValue)
+    }
+
+    /// El espacio forma parte de la clave porque hay rawValues repetidos
+    /// entre familias: "otros" existe en gastos, en ingresos y en los
+    /// tipos de inversión.
+    private static func claveDe(_ raw: String, espacio: String) -> String {
+        "\(espacio)-\(raw)"
     }
 
     private static func ajustes() -> [String: AjusteCategoria] {
@@ -104,6 +109,28 @@ enum CustomCategoryStore {
 
     static func ajuste(para raw: String, tipo: TipoMovimiento) -> AjusteCategoria? {
         ajustes()[claveDe(raw, tipo)]
+    }
+
+    /// Variantes por espacio de nombres, para familias que no son tipos
+    /// de movimiento (hoy, los tipos de inversión).
+    static func ajuste(para raw: String, espacio: String) -> AjusteCategoria? {
+        ajustes()[claveDe(raw, espacio: espacio)]
+    }
+
+    static func tieneAjuste(para raw: String, espacio: String) -> Bool {
+        ajuste(para: raw, espacio: espacio) != nil
+    }
+
+    static func guardarAjuste(_ ajuste: AjusteCategoria, para raw: String, espacio: String) {
+        var actuales = ajustes()
+        actuales[claveDe(raw, espacio: espacio)] = ajuste
+        persistirAjustes(actuales)
+    }
+
+    static func restaurarAjuste(para raw: String, espacio: String) {
+        var actuales = ajustes()
+        actuales.removeValue(forKey: claveDe(raw, espacio: espacio))
+        persistirAjustes(actuales)
     }
 
     static func tieneAjuste(para raw: String, tipo: TipoMovimiento) -> Bool {

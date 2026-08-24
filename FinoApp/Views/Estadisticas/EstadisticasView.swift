@@ -453,10 +453,10 @@ struct EstadisticasView: View {
                                     .foregroundStyle(.secondary)
                                 Text("Ingresos: \(punto.ingresos.enMonedaCompacta)")
                                     .font(.caption2.bold())
-                                    .foregroundStyle(.green)
+                                    .foregroundStyle(Color.verdeIngreso)
                                 Text("Gastos: \(punto.gastos.enMonedaCompacta)")
                                     .font(.caption2.bold())
-                                    .foregroundStyle(.red)
+                                    .foregroundStyle(Color.rojoGasto)
                             }
                             .padding(8)
                             .background(

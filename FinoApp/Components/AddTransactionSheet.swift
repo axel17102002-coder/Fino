@@ -641,7 +641,7 @@ struct AddTransactionSheet: View {
                         // producto sin tener que leer el signo.
                         Text(item.monto.enMoneda)
                             .monospacedDigit()
-                            .foregroundStyle(item.monto < 0 ? Color.green.legible() : .secondary)
+                            .foregroundStyle(item.monto < 0 ? Color.verdeIngreso : .secondary)
                     }
                     .swipeActions(edge: .trailing) {
                         Button(role: .destructive) {

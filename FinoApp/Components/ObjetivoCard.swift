@@ -16,7 +16,7 @@ struct ObjetivoCard: View {
                 Spacer()
                 if objetivo.completado {
                     Image(systemName: "checkmark.seal.fill")
-                        .foregroundStyle(.green)
+                        .foregroundStyle(Color.verdeIngreso)
                 }
             }
 

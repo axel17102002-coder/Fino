@@ -15,8 +15,8 @@ struct CategoriasView: View {
     /// Categoría de fábrica elegida para editar.
     private struct SeleccionFabrica: Identifiable {
         let base: any CategoriaInfo
-        let tipo: TipoMovimiento
-        var id: String { "\(tipo.rawValue)-\(base.rawValue)" }
+        let espacio: String
+        var id: String { "\(espacio)-\(base.rawValue)" }
     }
 
     var body: some View {
@@ -42,7 +42,7 @@ struct CategoriasView: View {
                         } else {
                             let oculta = CustomCategoryStore.estaOculta(item.base.rawValue, tipo: tipo)
                             Button {
-                                fabricaEnEdicion = SeleccionFabrica(base: item.base, tipo: tipo)
+                                fabricaEnEdicion = SeleccionFabrica(base: item.base, espacio: tipo.rawValue)
                             } label: {
                                 fila(
                                     item.base,
@@ -60,7 +60,7 @@ struct CategoriasView: View {
                                     } label: {
                                         Label("Mostrar", systemImage: "eye.fill")
                                     }
-                                    .tint(.green)
+                                    .tint(Color.verdeIngreso)
                                 } else if item.base.rawValue != tipo.categoriaPorDefecto.rawValue {
                                     // "Otros" (y "Cashback") no se pueden ocultar:
                                     // siempre tiene que quedar una categoría comodín.
@@ -80,6 +80,8 @@ struct CategoriasView: View {
                     }
                 }
             }
+
+            seccionInversiones
 
             Section {
             } footer: {
@@ -116,8 +118,35 @@ struct CategoriasView: View {
             }
         }
         .sheet(item: $fabricaEnEdicion) { seleccion in
-            AjusteFabricaSheet(categoria: seleccion.base, tipo: seleccion.tipo) {
+            AjusteFabricaSheet(categoria: seleccion.base, espacio: seleccion.espacio) {
                 versionOrden += 1
+            }
+        }
+    }
+
+    /// Los tipos de tenencia se pueden renombrar y recolorear como
+    /// cualquier categoría, pero no se pueden ocultar, reordenar ni crear
+    /// nuevos: el modelo de inversiones depende de que existan estos
+    /// cinco —dos se cargan con cantidad y cotización y tres con capital—
+    /// y agregar uno sin decidir cómo se carga no significaría nada.
+    private var seccionInversiones: some View {
+        Section("Inversiones") {
+            ForEach(TipoInversion.allCases) { tipo in
+                Button {
+                    fabricaEnEdicion = SeleccionFabrica(
+                        base: CategoriaDeInversion(tipo: tipo),
+                        espacio: TipoInversion.espacioDeAjustes
+                    )
+                } label: {
+                    fila(
+                        CategoriaDeInversion(tipo: tipo),
+                        esPersonalizada: true,
+                        editada: CustomCategoryStore.tieneAjuste(
+                            para: tipo.rawValue,
+                            espacio: TipoInversion.espacioDeAjustes
+                        )
+                    )
+                }
             }
         }
     }
@@ -375,7 +404,9 @@ struct CategoriaFormSheet: View {
 struct AjusteFabricaSheet: View {
 
     let categoria: any CategoriaInfo
-    let tipo: TipoMovimiento
+    /// Espacio de nombres del ajuste: el tipo de movimiento para las
+    /// categorías, "inversion" para los tipos de tenencia.
+    let espacio: String
     let alGuardar: () -> Void
 
     @Environment(\.dismiss) private var dismiss
@@ -385,11 +416,11 @@ struct AjusteFabricaSheet: View {
     /// Vacío significa "mantener el color actual".
     @State private var colorHex: String
 
-    init(categoria: any CategoriaInfo, tipo: TipoMovimiento, alGuardar: @escaping () -> Void) {
+    init(categoria: any CategoriaInfo, espacio: String, alGuardar: @escaping () -> Void) {
         self.categoria = categoria
-        self.tipo = tipo
+        self.espacio = espacio
         self.alGuardar = alGuardar
-        let ajuste = CustomCategoryStore.ajuste(para: categoria.rawValue, tipo: tipo)
+        let ajuste = CustomCategoryStore.ajuste(para: categoria.rawValue, espacio: espacio)
         _nombre = State(initialValue: ajuste?.nombre ?? categoria.nombre)
         _icono = State(initialValue: ajuste?.icono ?? categoria.icono)
         _colorHex = State(initialValue: ajuste?.colorHex ?? "")
@@ -457,10 +488,10 @@ struct AjusteFabricaSheet: View {
                     .padding(.vertical, 4)
                 }
 
-                if CustomCategoryStore.tieneAjuste(para: categoria.rawValue, tipo: tipo) {
+                if CustomCategoryStore.tieneAjuste(para: categoria.rawValue, espacio: espacio) {
                     Section {
                         Button("Restaurar original", role: .destructive) {
-                            CustomCategoryStore.restaurarAjuste(para: categoria.rawValue, tipo: tipo)
+                            CustomCategoryStore.restaurarAjuste(para: categoria.rawValue, espacio: espacio)
                             alGuardar()
                             Haptics.exito()
                             dismiss()
@@ -491,7 +522,7 @@ struct AjusteFabricaSheet: View {
                 colorHex: colorHex.isEmpty ? nil : colorHex
             ),
             para: categoria.rawValue,
-            tipo: tipo
+            espacio: espacio
         )
         alGuardar()
         Haptics.exito()

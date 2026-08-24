@@ -98,10 +98,10 @@ struct TransactionRow: View {
                 if movimiento.esCompartido {
                     Text("Compartido · Tu parte: \(movimiento.montoPropio.enMoneda)")
                         .font(.caption2.weight(.medium))
-                        .foregroundStyle(Color.green.legible())
+                        .foregroundStyle(Color.verdeIngreso)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 3)
-                        .background(Capsule().fill(Color.green.legible().opacity(0.14)))
+                        .background(Capsule().fill(Color.verdeIngreso.opacity(0.14)))
                 }
             }
 

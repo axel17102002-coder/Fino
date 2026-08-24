@@ -95,7 +95,7 @@ struct AportarObjetivoSheet: View {
                         if objetivo.completado {
                             Label("Meta alcanzada", systemImage: "checkmark.seal.fill")
                                 .font(.caption)
-                                .foregroundStyle(.green)
+                                .foregroundStyle(Color.verdeIngreso)
                         } else {
                             Text("Faltan \(Formatters.moneda(objetivo.restante, moneda: objetivo.moneda))")
                                 .font(.caption)

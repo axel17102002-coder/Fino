@@ -179,7 +179,7 @@ struct DatosView: View {
                 confirmandoBorrado = true
             } label: {
                 Label("Eliminar toda la base de datos", systemImage: "trash")
-                    .foregroundStyle(.red)
+                    .foregroundStyle(Color.rojoGasto)
             }
         } header: {
             textoSobreFondo("Zona de riesgo")

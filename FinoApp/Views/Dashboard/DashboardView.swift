@@ -46,8 +46,6 @@ struct DashboardView: View {
                         carruselPrincipal
                         bannerDeudas
                         seccionTarjetas
-
-                        seccionInversiones
                     }
                     .padding(.horizontal)
                     .padding(.top, 16)
@@ -147,9 +145,9 @@ struct DashboardView: View {
                 HStack(spacing: 12) {
                     Image(systemName: "person.2.fill")
                         .font(.subheadline)
-                        .foregroundStyle(Color.green.legible())
+                        .foregroundStyle(Color.verdeIngreso)
                         .frame(width: 34, height: 34)
-                        .background(Circle().fill(Color.green.legible().opacity(0.18)))
+                        .background(Circle().fill(Color.verdeIngreso.opacity(0.18)))
 
                     VStack(alignment: .leading, spacing: 2) {
                         Text("Te deben")
@@ -164,7 +162,7 @@ struct DashboardView: View {
                     Text(deudasPendientes.reduce(0) { $0 + $1.monto }.enMoneda)
                         .font(.callout.bold())
                         .monospacedDigit()
-                        .foregroundStyle(Color.green.legible())
+                        .foregroundStyle(Color.verdeIngreso)
                     Image(systemName: "chevron.right")
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(.tertiary)
@@ -188,7 +186,7 @@ struct DashboardView: View {
                     seccionResumenYAnalisis
                         .containerRelativeFrame(.horizontal)
                         .id(0)
-                    paginaPresupuestos
+                    paginaMetas
                         .containerRelativeFrame(.horizontal)
                         .id(1)
                     paginaInversiones
@@ -197,9 +195,6 @@ struct DashboardView: View {
                         // sepa cuántos renglones le entran.
                         .frame(maxHeight: .infinity, alignment: .top)
                         .id(2)
-                    paginaObjetivos
-                        .containerRelativeFrame(.horizontal)
-                        .id(3)
                 }
                 .scrollTargetLayout()
             }
@@ -213,13 +208,24 @@ struct DashboardView: View {
 
     private var indicadorPaginas: some View {
         HStack(spacing: 7) {
-            ForEach(0..<4, id: \.self) { indice in
+            ForEach(0..<3, id: \.self) { indice in
                 Capsule()
                     .fill(.white.opacity(paginaCarrusel == indice ? 0.95 : 0.35))
                     .frame(width: paginaCarrusel == indice ? 18 : 7, height: 7)
             }
         }
         .animation(.spring(duration: 0.25), value: paginaCarrusel)
+    }
+
+    /// Presupuestos y metas juntos en una página: son la misma idea
+    /// mirada de los dos lados —cuánto te propusiste no gastar y cuánto
+    /// te propusiste juntar— y tenerlos separados obligaba a pasar por
+    /// dos páginas para ver los objetivos del mes.
+    private var paginaMetas: some View {
+        VStack(spacing: 18) {
+            paginaPresupuestos
+            paginaObjetivos
+        }
     }
 
     /// Página del carrusel: el donut con el reparto y las tres más
@@ -555,7 +561,7 @@ struct DashboardView: View {
                     if objetivo.completado {
                         Image(systemName: "checkmark.seal.fill")
                             .font(.caption)
-                            .foregroundStyle(.green)
+                            .foregroundStyle(Color.verdeIngreso)
                     }
                     Spacer(minLength: 8)
                     Text(objetivo.ahorradoFormateado)

@@ -5,6 +5,12 @@ import SwiftUI
 /// En qué está puesta la plata. Define cómo se carga y de qué gama de
 /// color es en el donut.
 enum TipoInversion: String, CaseIterable, Codable, Identifiable {
+
+    /// Espacio de nombres para los ajustes: el nombre, el ícono y el
+    /// color se pueden cambiar desde Configuración igual que las
+    /// categorías de gasto.
+    static let espacioDeAjustes = "inversion"
+
     case accion
     case cripto
     case plazoFijo
@@ -13,8 +19,13 @@ enum TipoInversion: String, CaseIterable, Codable, Identifiable {
 
     var id: String { rawValue }
 
+    private var ajuste: CustomCategoryStore.AjusteCategoria? {
+        CustomCategoryStore.ajuste(para: rawValue, espacio: Self.espacioDeAjustes)
+    }
+
     var nombre: String {
-        switch self {
+        if let propio = ajuste?.nombre, !propio.isEmpty { return propio }
+        return switch self {
         case .accion: String(localized: "Acciones")
         case .cripto: String(localized: "Cripto")
         case .plazoFijo: String(localized: "Plazo fijo")
@@ -24,7 +35,8 @@ enum TipoInversion: String, CaseIterable, Codable, Identifiable {
     }
 
     var icono: String {
-        switch self {
+        if let propio = ajuste?.icono, !propio.isEmpty { return propio }
+        return switch self {
         case .accion: "chart.line.uptrend.xyaxis"
         case .cripto: "bitcoinsign.circle.fill"
         case .plazoFijo: "lock.circle.fill"
@@ -44,7 +56,8 @@ enum TipoInversion: String, CaseIterable, Codable, Identifiable {
     /// doce porciones: un arco azul para las acciones, uno naranja para
     /// las criptos.
     var color: Color {
-        switch self {
+        if let hex = ajuste?.colorHex, !hex.isEmpty { return Color(hex: hex) }
+        return switch self {
         case .accion: .blue
         case .cripto: .orange
         case .plazoFijo: .green
@@ -134,4 +147,18 @@ final class Inversion {
         guard let dias, dias >= 0 else { return nil }
         return dias
     }
+}
+
+/// Adaptador para que un tipo de tenencia entre en las pantallas que
+/// trabajan con categorías (el editor de Configuración, la fila con
+/// ícono y color). No es una categoría de movimiento y no aparece al
+/// cargar un gasto.
+struct CategoriaDeInversion: CategoriaInfo {
+
+    let tipo: TipoInversion
+
+    var rawValue: String { tipo.rawValue }
+    var nombre: String { tipo.nombre }
+    var icono: String { tipo.icono }
+    var color: Color { tipo.color }
 }

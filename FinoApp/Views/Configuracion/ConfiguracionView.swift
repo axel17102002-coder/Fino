@@ -152,7 +152,7 @@ struct ConfiguracionView: View {
                         .monospacedDigit()
                 } label: {
                     Label("Avisos activados", systemImage: "bell.badge.fill")
-                        .foregroundStyle(Color.green.legible())
+                        .foregroundStyle(Color.verdeIngreso)
                 }
             case .denied:
                 Button {

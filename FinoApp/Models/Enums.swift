@@ -35,8 +35,8 @@ enum TipoMovimiento: String, CaseIterable, Codable, Identifiable {
 
     var color: Color {
         switch self {
-        case .gasto: .red
-        case .ingreso: .green
+        case .gasto: .rojoGasto
+        case .ingreso: .verdeIngreso
         case .cashback: .orange
         }
     }

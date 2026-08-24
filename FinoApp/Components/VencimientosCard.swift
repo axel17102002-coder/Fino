@@ -151,8 +151,8 @@ struct VencimientosCard: View {
                 .font(.caption2.weight(.semibold))
                 .padding(.horizontal, 8)
                 .padding(.vertical, 3)
-                .background(Capsule().fill(Color.green.legible().opacity(0.16)))
-                .foregroundStyle(Color.green.legible())
+                .background(Capsule().fill(Color.verdeIngreso.opacity(0.16)))
+                .foregroundStyle(Color.verdeIngreso)
         }
         .buttonStyle(.plain)
     }

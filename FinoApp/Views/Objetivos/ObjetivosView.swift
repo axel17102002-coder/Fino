@@ -78,7 +78,7 @@ struct ObjetivosView: View {
                     if objetivo.completado {
                         Image(systemName: "checkmark.seal.fill")
                             .font(.caption)
-                            .foregroundStyle(.green)
+                            .foregroundStyle(Color.verdeIngreso)
                     }
                     Spacer()
                     Text(Formatters.porcentaje(objetivo.progreso))
