@@ -4,7 +4,7 @@ import Charts
 
 /// Serie que se muestra en el gráfico de evolución unificado.
 enum SerieEvolucion: String, CaseIterable, Identifiable {
-    case gastos, ingresos, balance, cashback
+    case gastos, ingresos, balance, cashback, acumulado
 
     var id: String { rawValue }
 
@@ -14,6 +14,7 @@ enum SerieEvolucion: String, CaseIterable, Identifiable {
         case .ingresos: String(localized: "Ingresos")
         case .balance: String(localized: "Balance")
         case .cashback: String(localized: "Cashback")
+        case .acumulado: String(localized: "Acumulado")
         }
     }
 
@@ -23,7 +24,13 @@ enum SerieEvolucion: String, CaseIterable, Identifiable {
         case .ingresos: .green
         case .balance: .indigo
         case .cashback: .orange
+        case .acumulado: .teal
         }
+    }
+
+    /// Se cruza contra cero: puede haber meses en rojo.
+    var muestraLineaDeCero: Bool {
+        self == .balance || self == .acumulado
     }
 
     func valor(de punto: PuntoMensual) -> Double {
@@ -32,6 +39,7 @@ enum SerieEvolucion: String, CaseIterable, Identifiable {
         case .ingresos: punto.ingresos
         case .balance: punto.balance
         case .cashback: punto.cashback
+        case .acumulado: punto.acumulado
         }
     }
 }
@@ -157,6 +165,10 @@ struct EstadisticasView: View {
     private var paginaResumen: some View {
         VStack(spacing: 16) {
             tarjetaTopCategorias
+            MediosDePagoCard(
+                gastos: viewModel.gastosPorMedioDePago,
+                cashback: viewModel.cashbackPorMedioDePago
+            )
             seccionInsights
             Spacer(minLength: 0)
         }
@@ -249,7 +261,7 @@ struct EstadisticasView: View {
             contenido()
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .estiloTarjeta(padding: 12)
+        .estiloTarjetaVidrio(padding: 12)
     }
 
     private func contenidoIndicador(titulo: String, valor: String, icono: String, color: Color) -> some View {
@@ -288,10 +300,6 @@ struct EstadisticasView: View {
                 sinDatos
             } else {
                 Chart(items) { item in
-                    // Barras muy largas no dejan lugar para el monto afuera:
-                    // en ese caso el número se dibuja adentro, en blanco.
-                    let montoAdentro = maximo > 0 && item.total / maximo > 0.6
-
                     BarMark(
                         x: .value("Monto", item.total),
                         y: .value("Categoría", item.categoria.nombre)
@@ -302,22 +310,30 @@ struct EstadisticasView: View {
                         categoriaTocada == nil || categoriaTocada == item.categoria.nombre
                             ? 1 : 0.35
                     )
+                    // El monto siempre va afuera, a la derecha de la
+                    // barra. Antes, las barras largas lo dibujaban adentro
+                    // y las cortas afuera; la de la categoría más grande
+                    // llegaba al borde y el número quedaba cortado contra
+                    // el canto de la tarjeta.
                     .annotation(
-                        position: montoAdentro ? .overlay : .trailing,
-                        alignment: montoAdentro ? .trailing : .center,
-                        spacing: 4,
+                        position: .trailing,
+                        alignment: .center,
+                        spacing: 6,
                         overflowResolution: .init(x: .fit(to: .chart), y: .disabled)
                     ) {
                         if categoriaTocada == item.categoria.nombre {
                             Text(item.total.enMoneda)
                                 .font(.caption2.bold())
                                 .monospacedDigit()
-                                .foregroundStyle(montoAdentro ? .white : item.categoria.color)
-                                .padding(.trailing, montoAdentro ? 8 : 0)
+                                .foregroundStyle(item.categoria.color)
                         }
                     }
                 }
                 .chartYSelection(value: $categoriaTocada)
+                // Un cuarto de aire a la derecha para que ni la barra más
+                // larga toque el borde: sin esto no hay lugar donde poner
+                // el monto de la categoría mayor.
+                .chartXScale(domain: 0...(maximo > 0 ? maximo * 1.25 : 1))
                 .chartXAxis { ejeMonetario }
                 .frame(height: CGFloat(items.count) * 34 + 30)
                 .animation(.snappy(duration: 0.2), value: categoriaTocada)
@@ -336,7 +352,7 @@ struct EstadisticasView: View {
                 .pickerStyle(.segmented)
 
                 Chart {
-                    if serieSeleccionada == .balance {
+                    if serieSeleccionada.muestraLineaDeCero {
                         RuleMark(y: .value("Cero", 0))
                             .foregroundStyle(.secondary.opacity(0.3))
                             .lineStyle(StrokeStyle(lineWidth: 1, dash: [4]))
@@ -560,7 +576,7 @@ struct EstadisticasView: View {
                         }
                     }
                 }
-                .estiloTarjeta(padding: 14)
+                .estiloTarjetaVidrio(padding: 14)
             }
         }
     }

@@ -4,9 +4,24 @@ import SwiftUI
 struct TransactionRow: View {
 
     let movimiento: Movimiento
+    /// En Movimientos la fecha está en el encabezado del día y repetirla
+    /// en cada renglón solo hace ruido. En el detalle de una cuenta, donde
+    /// la lista no está agrupada, sigue haciendo falta.
+    var mostrarFecha: Bool = true
 
     private var colorCategoria: Color {
         movimiento.categoria?.color ?? .gray
+    }
+
+    private var tieneTicket: Bool {
+        movimiento.itemsTicket?.isEmpty == false
+    }
+
+    private var subtitulo: String {
+        var partes = [movimiento.nombreCategoria]
+        if mostrarFecha { partes.append(movimiento.fecha.diaYMes) }
+        if let cuenta = movimiento.cuenta { partes.append(cuenta.nombre) }
+        return partes.joined(separator: " · ")
     }
 
     var body: some View {
@@ -18,21 +33,32 @@ struct TransactionRow: View {
                 .background(Circle().fill(colorCategoria.opacity(0.15)))
 
             VStack(alignment: .leading, spacing: 3) {
-                Text(movimiento.nombre)
-                    .font(.subheadline.weight(.semibold))
-                    .lineLimit(1)
+                HStack(spacing: 5) {
+                    Text(movimiento.nombre)
+                        .font(.subheadline.weight(.semibold))
+                        .lineLimit(1)
 
-                HStack(spacing: 4) {
-                    Text(movimiento.nombreCategoria)
-                    Text("·")
-                    Text(movimiento.fecha.diaYMes)
-                    if let cuenta = movimiento.cuenta {
-                        Text("·")
-                        Text(cuenta.nombre).lineLimit(1)
+                    // Avisa que este gasto se cargó escaneando y que al
+                    // tocarlo se abre el ticket en vez del formulario:
+                    // sin la marca, el mismo toque hacía dos cosas
+                    // distintas según un dato que no se veía.
+                    if tieneTicket {
+                        Image(systemName: "doc.text")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                            .accessibilityLabel("Tiene el detalle del ticket")
                     }
                 }
-                .font(.caption)
-                .foregroundStyle(.secondary)
+
+                // Un solo Text y no varios en fila: con piezas sueltas,
+                // cuando no entraban se partía la palabra ("Gro-" /
+                // "ceries") y el punto separador quedaba descolocado.
+                // Así se corta una vez sola, al final.
+                Text(subtitulo)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                    .truncationMode(.tail)
 
                 if movimiento.esEnCuotas {
                     Text("Cuota \(movimiento.cuotaActual())/\(movimiento.cuotas) · \(movimiento.montoCuota.enMoneda)/mes")
