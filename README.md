@@ -6,6 +6,9 @@ App nativa de iOS para administrar finanzas personales, construida con **SwiftUI
 
 - **Xcode 16 o superior** (el proyecto usa carpetas sincronizadas, formato `objectVersion 77`)
 - **iOS 18.0+** (iPhone o simulador)
+- **watchOS 11.0+** para la app del reloj. El scheme `Fino` incrusta la app
+  de Apple Watch, así que la plataforma watchOS tiene que estar instalada
+  o el build falla antes de empezar: `xcodebuild -downloadPlatform watchOS`
 
 ## Cómo compilar
 
@@ -37,16 +40,58 @@ xcodebuild -project FinanzasApp.xcodeproj -scheme FinanzasApp \
 
 ```
 FinanzasApp/
-├── Models/          Movimiento, Cuenta, Presupuesto, ObjetivoAhorro, enums de dominio
-├── ViewModels/      Dashboard, Movimientos, Estadísticas, formulario de movimiento
-├── Views/           Pantallas (Dashboard, Movimientos, Estadísticas, Configuración, Cuentas…)
-├── Components/      SummaryCard, BalanceCard, DonutChart, TransactionRow, FilterSheet…
-├── Services/        PersistenceService, CalculosService, InsightsService, Export/Import, DatosDemo
-├── Extensions/      Color, Date, Double, View
-└── Utilities/       Formatters, Haptics, Preferencias, ShareSheet
+├── FinoApp/           App de iPhone
+│   ├── Models/        Movimiento, Cuenta, Presupuesto, ObjetivoAhorro, enums de dominio
+│   ├── ViewModels/    Dashboard, Movimientos, Estadísticas, formulario de movimiento
+│   ├── Views/         Pantallas (Dashboard, Movimientos, Estadísticas, Configuración, Cuentas…)
+│   ├── Components/    SummaryCard, BalanceCard, DonutChart, TransactionRow, FilterSheet…
+│   ├── Services/      PersistenceService, CalculosService, InsightsService, Export/Import, DatosDemo
+│   ├── Extensions/    Color, Date, Double, View
+│   └── Utilities/     Formatters, Haptics, Preferencias, ShareSheet
+├── FinoWidget/        Widgets de pantalla de inicio y bloqueo
+├── FinoWatch/         App de Apple Watch
+└── FinoCompartido/    Contrato iPhone ↔ reloj (lo compilan los dos targets)
 ```
 
 Toda la lógica de negocio vive en `Services/` y `ViewModels/`; las vistas solo presentan.
+
+## Apple Watch
+
+Versión recortada de la app, con tres pantallas y nada más:
+
+- **Resumen**: balance del mes y la dona de gastos por categoría. Tocando
+  un renglón se resalta esa porción.
+- **Nuevo gasto**: monto (corona digital o tecleado) y categoría. Sin
+  cuenta, sin cuotas y sin notas: el movimiento llega al iPhone sin cuenta
+  asignada y se termina de completar ahí.
+- **Últimos**: los últimos movimientos, solo lectura.
+
+Cuentas, tarjetas de crédito, cuotas, presupuestos, objetivos,
+estadísticas y escaneo de tickets se quedan en el iPhone.
+
+### Cómo se sincroniza
+
+Por **WatchConnectivity**, no por App Group: el App Group
+(`group.com.axelmorano.FinoApp`) comparte datos entre la app y el widget
+en el mismo teléfono, y el reloj es otro dispositivo.
+
+- **iPhone → reloj**: `SincronizacionWatchService` publica un
+  `SnapshotWatch` completo con `updateApplicationContext`. El sistema
+  guarda uno solo, así que cada envío pisa al anterior y el reloj siempre
+  lee lo último. Va colgado de `WidgetDataService.publicar`, así que todo
+  lo que ya refresca el widget refresca también la muñeca.
+- **reloj → iPhone**: los gastos viajan de a uno con `transferUserInfo`,
+  que encola y entrega aunque la app esté cerrada (iOS la despierta en
+  segundo plano). Cada gasto lleva su `id` para que un reintento del
+  sistema no duplique el movimiento.
+
+El reloj guarda el último snapshot en `UserDefaults`, así abre con datos
+aunque el iPhone esté lejos, y suma el gasto recién cargado en local
+mientras espera la confirmación.
+
+La forma de los mensajes vive en `FinoCompartido/PayloadWatch.swift`, que
+compilan los dos targets: si una punta queda vieja el JSON deja de
+decodificar y el reloj se queda mudo sin avisar.
 
 ## Formato CSV
 
