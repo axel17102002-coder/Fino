@@ -193,6 +193,9 @@ struct DashboardView: View {
                         .id(1)
                     paginaInversiones
                         .containerRelativeFrame(.horizontal)
+                        // Se estira al alto del carrusel para que la lista
+                        // sepa cuántos renglones le entran.
+                        .frame(maxHeight: .infinity, alignment: .top)
                         .id(2)
                     paginaObjetivos
                         .containerRelativeFrame(.horizontal)
@@ -231,7 +234,14 @@ struct DashboardView: View {
         } else {
             InversionesCard(
                 cartera: Cartera(inversiones, dolaresPorPeso: dolaresPorPeso),
-                maximoEnLista: 4
+                // Cinco es lo que entra en el alto del carrusel en un
+                // iPhone con el tamaño de letra por defecto. Intenté
+                // calcularlo midiendo el alto disponible y no converge:
+                // la medición depende del contenido y el contenido de la
+                // medición. Un número fijo es peor en teoría y mejor en
+                // la práctica.
+                maximoEnLista: 5,
+                estiraAlPie: true
             ) {
                 HStack(spacing: 10) {
                     NavigationLink {

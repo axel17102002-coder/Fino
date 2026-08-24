@@ -13,11 +13,10 @@ struct InversionesCard<Pie: View>: View {
     /// lista, para el bloque de abajo que las junta todas.
     var conDonut: Bool = true
     /// Cuántas tenencias listar. `nil` las lista todas.
-    ///
-    /// En el carrusel se muestran las tres más grandes: la página tiene
-    /// que entrar en el alto de las otras, y nueve renglones la harían
-    /// tres veces más larga.
     var maximoEnLista: Int?
+    /// Empuja los botones al pie con lo que sobre, para que la página del
+    /// carrusel llegue abajo en vez de cortarse a media altura.
+    var estiraAlPie: Bool = false
     /// Fila de acciones al pie. Va abajo de todo a propósito: llena el
     /// alto que sobra en la página del carrusel y deja "ver todas" y
     /// "agregar" juntos, que es donde uno los busca después de mirar la
@@ -31,9 +30,7 @@ struct InversionesCard<Pie: View>: View {
         return Array(cartera.ordenadas.prefix(maximoEnLista))
     }
 
-    private var ocultas: Int {
-        cartera.ordenadas.count - listadas.count
-    }
+
 
     var body: some View {
         if cartera.ordenadas.isEmpty {
@@ -71,14 +68,10 @@ struct InversionesCard<Pie: View>: View {
                     }
                 }
 
-                if ocultas > 0 {
-                    Text("y \(ocultas) más")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .frame(maxWidth: .infinity, alignment: .center)
+                if estiraAlPie {
+                    Spacer(minLength: 0)
                 }
 
-                Spacer(minLength: 0)
                 pie()
             }
             .estiloTarjetaVidrio()
@@ -207,6 +200,7 @@ extension InversionesCard where Pie == EmptyView {
             cartera: cartera,
             conDonut: conDonut,
             maximoEnLista: maximoEnLista,
+            estiraAlPie: false,
             pie: { EmptyView() }
         )
     }
