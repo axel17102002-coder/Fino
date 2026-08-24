@@ -147,9 +147,6 @@
         }
       }
     },
-    "·" : {
-
-    },
     "%@" : {
 
     },
@@ -278,6 +275,16 @@
         }
       }
     },
+    "%lld ítems" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld items"
+          }
+        }
+      }
+    },
     "%lld movimientos" : {
       "localizations" : {
         "en" : {
@@ -318,6 +325,32 @@
         }
       }
     },
+    "%lld movimientos · %lld%%" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld movimientos · %2$lld%%"
+          }
+        }
+      }
+    },
+    "%lld productos · %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld items · %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld productos · %2$@"
+          }
+        }
+      }
+    },
     "•••• %@" : {
 
     },
@@ -347,6 +380,16 @@
     "1 %@ =" : {
 
     },
+    "1 producto · %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 item · %@"
+          }
+        }
+      }
+    },
     "76% de tus ingresos" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -363,6 +406,9 @@
           }
         }
       }
+    },
+    "A pagar el %@" : {
+
     },
     "Abre Fino directo en el formulario para cargar un movimiento." : {
       "localizations" : {
@@ -437,6 +483,9 @@
           }
         }
       }
+    },
+    "Acumulado" : {
+
     },
     "Agregá tu primer movimiento con el botón + o explorá con datos de ejemplo." : {
       "localizations" : {
@@ -657,6 +706,17 @@
         }
       }
     },
+    "Ayer" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Yesterday"
+          }
+        }
+      }
+    },
     "Backup" : {
       "localizations" : {
         "en" : {
@@ -860,6 +920,12 @@
         }
       }
     },
+    "Cashback %@" : {
+
+    },
+    "Cashback por tarjeta" : {
+
+    },
     "Categoría" : {
       "localizations" : {
         "en" : {
@@ -886,6 +952,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Zero"
+          }
+        }
+      }
+    },
+    "Cerrar" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Close"
           }
         }
       }
@@ -950,6 +1026,9 @@
         }
       }
     },
+    "Cómo" : {
+
+    },
     "Compartido · Tu parte: %@" : {
       "localizations" : {
         "en" : {
@@ -959,6 +1038,9 @@
           }
         }
       }
+    },
+    "Compartido, tocá para marcarlo como solo mío" : {
+
     },
     "Compras Online" : {
       "localizations" : {
@@ -1260,6 +1342,26 @@
         }
       }
     },
+    "Descuentos" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Discounts"
+          }
+        }
+      }
+    },
+    "Detalle del ticket" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Receipt detail"
+          }
+        }
+      }
+    },
     "Devolución de %@" : {
       "localizations" : {
         "en" : {
@@ -1493,6 +1595,22 @@
         }
       }
     },
+    "El monto queda fijo en %@. Cada mes se convierte con la cotización de ese día, así que el gasto en %@ va a variar." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The amount stays fixed in %@. It's converted each month at that day's rate, so the expense in %@ will vary."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "El monto queda fijo en %1$@. Cada mes se convierte con la cotización de ese día, así que el gasto en %2$@ va a variar."
+          }
+        }
+      }
+    },
     "El monto tiene que ser mayor a cero." : {
       "localizations" : {
         "en" : {
@@ -1512,6 +1630,12 @@
           }
         }
       }
+    },
+    "El que más usás" : {
+
+    },
+    "El reparto sale del detalle del ticket: los renglones marcados como tuyos van enteros a tu parte y el resto se divide. Los descuentos se reparten en la misma proporción." : {
+
     },
     "Elegí la categoría" : {
       "localizations" : {
@@ -1870,6 +1994,9 @@
         }
       }
     },
+    "Gastos por medio de pago" : {
+
+    },
     "Gastos: %@" : {
       "localizations" : {
         "en" : {
@@ -1879,6 +2006,9 @@
           }
         }
       }
+    },
+    "Generado automáticamente" : {
+
     },
     "General" : {
       "localizations" : {
@@ -1942,6 +2072,9 @@
           }
         }
       }
+    },
+    "Hubo cashback" : {
+
     },
     "Ícono" : {
       "localizations" : {
@@ -2062,6 +2195,9 @@
           }
         }
       }
+    },
+    "La que más te devuelve" : {
+
     },
     "Las partes suman más que el gasto." : {
       "localizations" : {
@@ -2199,6 +2335,16 @@
         }
       }
     },
+    "Los renglones suman %@ y el total cargado es otro. Puede que falte algún producto o que se haya colado una línea que no lo es." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The lines add up to %@, which isn't the total entered. A product may be missing, or a line that isn't one slipped in."
+          }
+        }
+      }
+    },
     "Mañana" : {
       "localizations" : {
         "en" : {
@@ -2218,6 +2364,12 @@
           }
         }
       }
+    },
+    "Marcar como no pagada" : {
+
+    },
+    "Marcar como pagada" : {
+
     },
     "Mascotas" : {
       "localizations" : {
@@ -2691,6 +2843,9 @@
         }
       }
     },
+    "Pagada" : {
+
+    },
     "Pagaste vos: el gasto queda completo y Fino anota lo que te debe cada uno en \"Me deben\"." : {
       "localizations" : {
         "en" : {
@@ -2764,6 +2919,9 @@
         }
       }
     },
+    "Porcentaje" : {
+
+    },
     "Presupuesto de %@ al %@ 🟡" : {
       "localizations" : {
         "en" : {
@@ -2810,6 +2968,19 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Try again with more light or a flatter receipt. You can also enter the expense manually."
+          }
+        }
+      }
+    },
+    "Queda como un movimiento de cashback aparte, con la misma fecha y la misma cuenta que el gasto." : {
+
+    },
+    "Quitar" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove"
           }
         }
       }
@@ -3164,6 +3335,16 @@
         }
       }
     },
+    "Sin descuentos" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Before discounts"
+          }
+        }
+      }
+    },
     "Sin estadísticas" : {
       "localizations" : {
         "en" : {
@@ -3234,12 +3415,25 @@
         }
       }
     },
+    "Solo mío, tocá para compartir" : {
+
+    },
     "Sueldo" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Salary"
+          }
+        }
+      }
+    },
+    "Suman %@. Deslizá para quitar un renglón." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "They add up to %@. Swipe to remove a line."
           }
         }
       }
@@ -3334,12 +3528,35 @@
         }
       }
     },
+    "Te devuelven" : {
+
+    },
     "Tema" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Theme"
+          }
+        }
+      }
+    },
+    "Ticket" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Receipt"
+          }
+        }
+      }
+    },
+    "Tiene el detalle del ticket" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Has the receipt detail"
           }
         }
       }
@@ -3363,6 +3580,9 @@
           }
         }
       }
+    },
+    "Tocá el ícono de cada renglón para marcarlo como solo tuyo. Los tuyos van enteros a tu parte y el resto se divide." : {
+
     },
     "Todas" : {
       "localizations" : {
@@ -3430,6 +3650,9 @@
           }
         }
       }
+    },
+    "TOTAL" : {
+
     },
     "Transporte" : {
       "localizations" : {

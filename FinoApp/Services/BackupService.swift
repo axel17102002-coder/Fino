@@ -30,6 +30,9 @@ struct RecurrenteBackup: Codable {
     let creado: Date
     let ultimaGenerada: Date?
     let cuentaID: UUID?
+    /// Moneda de la plantilla cuando no es la global. Opcional: los
+    /// backups anteriores no la traen y se leen igual.
+    var monedaOriginalRaw: String?
 }
 
 struct DeudaBackup: Codable {
@@ -39,6 +42,11 @@ struct DeudaBackup: Codable {
     let monto: Double
     let fecha: Date
     let saldada: Bool
+    /// Moneda del gasto que la originó, cuando no es la global.
+    /// Opcionales: los backups anteriores no las traen.
+    var monedaOriginalRaw: String?
+    var montoOriginal: Double?
+    var tasaCambio: Double?
 }
 
 /// Personalización que vive fuera de la base: preferencias del usuario,
@@ -68,6 +76,9 @@ struct CuentaBackup: Codable {
     let saldoInicial: Double
     /// Posición elegida al reordenar (desde la versión 2).
     let orden: Int?
+    /// Cierre del último resumen marcado como pagado. Opcional: los
+    /// backups anteriores no lo traen.
+    var resumenPagadoAlCierre: Date?
 }
 
 struct MovimientoBackup: Codable {
@@ -86,6 +97,9 @@ struct MovimientoBackup: Codable {
     var monedaOriginalRaw: String?
     var montoOriginal: Double?
     var tasaCambio: Double?
+    /// Renglones del ticket escaneado. Opcional: los backups hechos
+    /// antes de que existiera el detalle se siguen leyendo igual.
+    var itemsTicket: [ItemTicket]?
 }
 
 struct PresupuestoBackup: Codable {
@@ -128,7 +142,8 @@ enum BackupService {
                     icono: $0.icono, colorHex: $0.colorHex, ultimosDigitos: $0.ultimosDigitos,
                     limite: $0.limite, diaCierre: $0.diaCierre,
                     diaVencimiento: $0.diaVencimiento, saldoInicial: $0.saldoInicial,
-                    orden: $0.orden
+                    orden: $0.orden,
+                    resumenPagadoAlCierre: $0.resumenPagadoAlCierre
                 )
             },
             movimientos: movimientos.map {
@@ -139,7 +154,8 @@ enum BackupService {
                     montoAjeno: $0.montoAjeno,
                     monedaOriginalRaw: $0.monedaOriginalRaw,
                     montoOriginal: $0.montoOriginal,
-                    tasaCambio: $0.tasaCambio
+                    tasaCambio: $0.tasaCambio,
+                    itemsTicket: $0.itemsTicket
                 )
             },
             presupuestos: presupuestos.map {
@@ -167,7 +183,10 @@ enum BackupService {
             deudas: deudas.map {
                 DeudaBackup(
                     id: $0.id, persona: $0.persona, detalle: $0.detalle,
-                    monto: $0.monto, fecha: $0.fecha, saldada: $0.saldada
+                    monto: $0.monto, fecha: $0.fecha, saldada: $0.saldada,
+                    monedaOriginalRaw: $0.monedaOriginalRaw,
+                    montoOriginal: $0.montoOriginal,
+                    tasaCambio: $0.tasaCambio
                 )
             },
             recurrentes: recurrentes.map {
@@ -175,7 +194,8 @@ enum BackupService {
                     id: $0.id, nombre: $0.nombre, tipoRaw: $0.tipoRaw,
                     categoriaRaw: $0.categoriaRaw, monto: $0.monto,
                     diaDelMes: $0.diaDelMes, activo: $0.activo, creado: $0.creado,
-                    ultimaGenerada: $0.ultimaGenerada, cuentaID: $0.cuenta?.id
+                    ultimaGenerada: $0.ultimaGenerada, cuentaID: $0.cuenta?.id,
+                    monedaOriginalRaw: $0.monedaOriginalRaw
                 )
             }
         )
@@ -228,6 +248,7 @@ enum BackupService {
                 saldoInicial: dto.saldoInicial
             )
             cuenta.id = dto.id
+            cuenta.resumenPagadoAlCierre = dto.resumenPagadoAlCierre
             cuenta.orden = dto.orden ?? 0
             contexto.insert(cuenta)
             cuentasPorID[dto.id] = cuenta
@@ -249,6 +270,7 @@ enum BackupService {
             movimiento.monedaOriginalRaw = dto.monedaOriginalRaw
             movimiento.montoOriginal = dto.montoOriginal
             movimiento.tasaCambio = dto.tasaCambio
+            movimiento.itemsTicket = dto.itemsTicket
             contexto.insert(movimiento)
         }
 
@@ -285,6 +307,9 @@ enum BackupService {
                 saldada: dto.saldada
             )
             deuda.id = dto.id
+            deuda.monedaOriginalRaw = dto.monedaOriginalRaw
+            deuda.montoOriginal = dto.montoOriginal
+            deuda.tasaCambio = dto.tasaCambio
             contexto.insert(deuda)
         }
 
@@ -301,6 +326,7 @@ enum BackupService {
             recurrente.activo = dto.activo
             recurrente.creado = dto.creado
             recurrente.ultimaGenerada = dto.ultimaGenerada
+            recurrente.monedaOriginalRaw = dto.monedaOriginalRaw
             contexto.insert(recurrente)
         }
 
