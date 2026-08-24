@@ -94,7 +94,7 @@ struct RootTabView: View {
             OnboardingView()
         }
         .task {
-            RecurrentesService.generarPendientes(en: contexto)
+            await RecurrentesService.generarPendientes(en: contexto)
             WidgetDataService.publicar(movimientos: movimientos)
             NotificacionesService.programarVencimientosTarjetas(en: contexto)
             NotificacionesService.programarRecordatorioDiario()

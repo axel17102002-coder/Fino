@@ -209,7 +209,9 @@ struct BarraInferiorView: View {
         if let marco = marcos[seleccion] {
             Image(systemName: icono(de: seleccion))
                 .font(.system(size: 23, weight: .medium))
-                .foregroundStyle(Color.accentColor)
+                // El mismo verde del (+), no el acento general: así los
+                // dos glifos verdes de la barra son idénticos.
+                .foregroundStyle(Color.verdeBarra)
                 .position(x: marco.midX, y: alturaBarra / 2)
                 .allowsHitTesting(false)
                 // Sin animación de posición a propósito: con el spring, al

@@ -29,13 +29,16 @@ struct ConfiguracionView: View {
                 BarraSuperior("Configuración")
 
                 Form {
-                    seccionGeneral
-                    seccionFinanzas
-                    seccionRedondeo
-                    seccionNotificaciones
-                    seccionDatos
-                    seccionSeguridad
-                    seccionAcercaDe
+                    // El vidrio va sección por sección: `filaDeVidrio` es
+                    // un fondo de fila, y puesto sobre la Section lo
+                    // heredan todas las suyas.
+                    seccionGeneral.filaDeVidrio()
+                    seccionFinanzas.filaDeVidrio()
+                    seccionRedondeo.filaDeVidrio()
+                    seccionNotificaciones.filaDeVidrio()
+                    seccionDatos.filaDeVidrio()
+                    seccionSeguridad.filaDeVidrio()
+                    seccionAcercaDe.filaDeVidrio()
                 }
                 .scrollContentBackground(.hidden)
                 // Deja pasar el último renglón por encima de la barra

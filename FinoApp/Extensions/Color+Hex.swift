@@ -43,6 +43,19 @@ extension Color {
     // "Crema" (#FFE7C2) y "VerdeOscuro" (#305E51) viven en Assets:
     // Xcode genera solo los accesos Color.crema y Color.verdeOscuro.
 
+    /// Verde de los glifos de la barra inferior: lo comparten el (+) y el
+    /// ícono de la pestaña activa, así los dos son exactamente el mismo
+    /// verde. En claro es el de marca; en oscuro se levanta apenas porque
+    /// el vidrio de la píldora aclara el fondo a ~#393939 y contra eso el
+    /// verde de marca queda casi invisible.
+    static var verdeBarra: Color {
+        Color(uiColor: UIColor { traits in
+            traits.userInterfaceStyle == .dark
+                ? UIColor(red: 0x4A / 255, green: 0x90 / 255, blue: 0x77 / 255, alpha: 1)
+                : UIColor(verdeMarca)
+        })
+    }
+
     /// Fondo general de las pantallas. En Claro y Automático es el verde
     /// de marca; con el tema Oscuro se apaga a casi negro y el verde
     /// queda solo en la franja superior del logo.

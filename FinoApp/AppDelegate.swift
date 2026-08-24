@@ -36,6 +36,11 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
         // Puesto acá (y no en la escena) para capturar también el toque
         // en una notificación que arranca la app desde cero.
         UNUserNotificationCenter.current().delegate = self
+        // Igual que arriba: un gasto cargado en el reloj puede despertar la
+        // app en segundo plano, sin escena ni vistas montadas.
+        MainActor.assumeIsolated {
+            SincronizacionWatchService.shared.activar()
+        }
         return true
     }
 

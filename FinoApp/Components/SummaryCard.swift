@@ -34,7 +34,7 @@ struct SummaryCard: View {
                 .lineLimit(1)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .estiloTarjeta()
+        .estiloTarjetaVidrio()
         .accessibilityElement(children: .combine)
     }
 }

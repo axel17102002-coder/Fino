@@ -65,17 +65,7 @@ struct CuentaResumenCard: View {
         .padding(18)
         .frame(width: expandida ? nil : 230, height: expandida ? nil : 120, alignment: .leading)
         .frame(maxWidth: expandida ? .infinity : nil, alignment: .leading)
-        .background {
-            RoundedRectangle(cornerRadius: 22, style: .continuous)
-                .fill(
-                    LinearGradient(
-                        colors: [cuenta.color, cuenta.color.opacity(0.65)],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-                .shadow(color: cuenta.color.opacity(0.35), radius: 10, y: 5)
-        }
+        .vidrioTenido(cuenta.color)
         .accessibilityElement(children: .combine)
     }
 }

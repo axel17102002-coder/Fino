@@ -14,8 +14,6 @@ struct DashboardView: View {
     @State private var mostrandoAlta = false
     @State private var mostrandoEscanerTicket = false
     @State private var paginaCarrusel: Int? = 0
-    /// Dispara la aparición escalonada de las secciones.
-    @State private var aparecio = false
 
     private var viewModel: DashboardViewModel {
         DashboardViewModel(movimientos: movimientos)
@@ -39,13 +37,9 @@ struct DashboardView: View {
                 ScrollView {
                     VStack(spacing: 25) {
                         DashboardHeader()
-                            .entradaEscalonada(0, visible: aparecio)
                         carruselPrincipal
-                            .entradaEscalonada(1, visible: aparecio)
                         bannerDeudas
-                            .entradaEscalonada(2, visible: aparecio)
                         seccionTarjetas
-                            .entradaEscalonada(3, visible: aparecio)
                     }
                     .padding(.horizontal)
                     .padding(.top, 16)
@@ -75,7 +69,6 @@ struct DashboardView: View {
             }
             .background(Color.fondoPantalla.ignoresSafeArea())
             .toolbar(.hidden, for: .navigationBar)
-            .onAppear { aparecio = true }
             .sheet(isPresented: $mostrandoAlta) {
                 AddTransactionSheet()
             }
@@ -160,7 +153,7 @@ struct DashboardView: View {
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(.tertiary)
                 }
-                .estiloTarjeta(padding: 14)
+                .estiloTarjetaVidrio(padding: 14)
             }
             .buttonStyle(.plain)
         }
@@ -209,20 +202,27 @@ struct DashboardView: View {
 
     // MARK: - Secciones
 
+    /// Orden de la card: primero el balance con sus métricas, en el medio
+    /// el donut con el desglose por categoría, y al final la lista de
+    /// últimos movimientos.
     private var seccionResumenYAnalisis: some View {
         VStack(alignment: .leading, spacing: 18) {
             BalanceCard(
                 balance: viewModel.balance,
                 ingresos: viewModel.totalIngresos,
                 gastos: viewModel.totalGastos,
-                cashback: viewModel.totalCashback,
-                ultimosMovimientos: viewModel.ultimosMovimientos
+                cashback: viewModel.totalCashback
             )
 
             Divider()
 
             if viewModel.hayDatosEnElMes {
                 analisisDelMes
+
+                if !viewModel.ultimosMovimientos.isEmpty {
+                    Divider()
+                    UltimosMovimientos(movimientos: viewModel.ultimosMovimientos)
+                }
             } else {
                 EmptyState(
                     icono: "chart.pie",
@@ -234,7 +234,7 @@ struct DashboardView: View {
                 }
             }
         }
-        .estiloTarjeta(padding: 18)
+        .estiloTarjetaVidrio(padding: 18)
     }
 
     private var analisisDelMes: some View {
@@ -402,7 +402,7 @@ struct DashboardView: View {
                         )
                     }
                 }
-                .estiloTarjeta()
+                .estiloTarjetaVidrio()
             } else {
                 accesoVacio(String(localized: "Crear presupuestos"), icono: "chart.pie.fill") {
                     PresupuestosView()
@@ -422,7 +422,7 @@ struct DashboardView: View {
                         filaObjetivo(objetivo)
                     }
                 }
-                .estiloTarjeta()
+                .estiloTarjetaVidrio()
             } else {
                 accesoVacio(String(localized: "Crear objetivos de ahorro"), icono: "flag.fill") {
                     ObjetivosView()
@@ -493,7 +493,7 @@ struct DashboardView: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
-            .estiloTarjeta()
+            .estiloTarjetaVidrio()
         }
         .buttonStyle(.plain)
     }

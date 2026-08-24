@@ -13,7 +13,7 @@ struct FloatingActionButton: View {
         } label: {
             Image(systemName: "plus")
                 .font(.system(size: 26, weight: .semibold))
-                .foregroundStyle(Color(hex: "366759"))
+                .foregroundStyle(Color.verdeBarra)
                 .frame(width: 58, height: 58)
                 .contentShape(Circle())
         }

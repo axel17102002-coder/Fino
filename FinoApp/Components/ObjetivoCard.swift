@@ -44,7 +44,7 @@ struct ObjetivoCard: View {
             }
         }
         .frame(width: 190, alignment: .leading)
-        .estiloTarjeta()
+        .estiloTarjetaVidrio()
         .accessibilityElement(children: .combine)
     }
 }

@@ -1,21 +1,18 @@
 import SwiftUI
 
-/// Panel principal del Dashboard: balance, métricas clave y últimos movimientos.
+/// Encabezado de la card principal del Dashboard: el balance del mes con
+/// sus métricas clave. La lista de últimos movimientos y el análisis por
+/// categoría son bloques aparte, y el Dashboard los ordena debajo.
 struct BalanceCard: View {
 
     let balance: Double
     let ingresos: Double
     let gastos: Double
     let cashback: Double
-    let ultimosMovimientos: [Movimiento]
 
     /// Valor que se muestra: arranca en cero y sube hasta el balance real.
     @State private var balanceMostrado: Double = 0
     @Environment(\.accessibilityReduceMotion) private var reducirMovimiento
-
-    private var movimientosMostrados: [Movimiento] {
-        Array(ultimosMovimientos.prefix(3))
-    }
 
     private func animarBalance(hasta valor: Double) {
         guard !reducirMovimiento else {
@@ -25,43 +22,22 @@ struct BalanceCard: View {
         withAnimation(.easeOut(duration: 0.7)) { balanceMostrado = valor }
     }
 
+    /// Balance a la izquierda y métricas en una columna a la derecha.
+    ///
+    /// Sin `ViewThatFits` a propósito: el ancho ideal del balance en 46pt
+    /// es mayor que cualquier pantalla, así que esta fila "no entraba"
+    /// nunca y se elegía siempre la alternativa apilada. Lo que resuelve
+    /// los anchos chicos es el `minimumScaleFactor` del número.
     var body: some View {
-        ViewThatFits(in: .horizontal) {
-            contenidoHorizontal
-            contenidoVertical
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .accessibilityElement(children: .contain)
-    }
-
-    private var contenidoHorizontal: some View {
         HStack(alignment: .top, spacing: 18) {
             bloqueBalance
-                .frame(minWidth: 132, maxWidth: .infinity, alignment: .leading)
+                .frame(maxWidth: .infinity, alignment: .leading)
 
             bloqueMetricas
                 .frame(width: 138, alignment: .leading)
-
-            bloqueMovimientos
-                .frame(width: 150, alignment: .leading)
         }
-    }
-
-    private var contenidoVertical: some View {
-        VStack(alignment: .leading, spacing: 18) {
-            HStack(alignment: .top, spacing: 18) {
-                bloqueBalance
-                    .frame(maxWidth: .infinity, alignment: .leading)
-
-                bloqueMetricas
-                    .frame(width: 138, alignment: .leading)
-            }
-
-            if !movimientosMostrados.isEmpty {
-                Divider()
-                bloqueMovimientos
-            }
-        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .accessibilityElement(children: .contain)
     }
 
     private var bloqueBalance: some View {
@@ -75,13 +51,12 @@ struct BalanceCard: View {
                     .foregroundStyle(.indigo)
             }
 
-            // Cuenta desde cero al abrir y rueda al cambiar de valor.
-            Text(balanceMostrado.enMoneda)
+            // Cuenta desde cero al abrir y vuelve a contar al cambiar.
+            ContadorMoneda(valor: balanceMostrado)
                 .font(.system(size: 46, weight: .heavy, design: .rounded))
                 .monospacedDigit()
                 .lineLimit(1)
                 .minimumScaleFactor(0.4)
-                .contentTransition(.numericText())
                 .onAppear { animarBalance(hasta: balance) }
                 .onChange(of: balance) { _, nuevo in animarBalance(hasta: nuevo) }
 
@@ -112,23 +87,6 @@ struct BalanceCard: View {
         }
     }
 
-    @ViewBuilder
-    private var bloqueMovimientos: some View {
-        if !movimientosMostrados.isEmpty {
-            VStack(alignment: .leading, spacing: 10) {
-                Text("Últimos movimientos")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.secondary)
-
-                VStack(spacing: 8) {
-                    ForEach(movimientosMostrados) { movimiento in
-                        movimientoCompacto(movimiento)
-                    }
-                }
-            }
-        }
-    }
-
     private func indicador(_ titulo: String, valor: Double, icono: String, color: Color) -> some View {
         HStack(spacing: 9) {
             Image(systemName: icono)
@@ -150,32 +108,26 @@ struct BalanceCard: View {
         }
     }
 
-    private func movimientoCompacto(_ movimiento: Movimiento) -> some View {
-        HStack(spacing: 8) {
-            Image(systemName: movimiento.iconoCategoria)
-                .font(.caption.weight(.semibold))
-                .foregroundStyle((movimiento.categoria?.color ?? .gray).legible())
-                .frame(width: 24, height: 24)
-                .background(Circle().fill((movimiento.categoria?.color ?? .gray).legible().opacity(0.18)))
+}
 
-            Text(movimiento.nombre)
-                .font(.caption.weight(.medium))
-                .lineLimit(1)
+/// Monto que sube contando.
+///
+/// `contentTransition(.numericText())` no servía acá: entre "$ 0" y el
+/// balance final solo emparejaba el último dígito, que subía desde abajo
+/// mientras el resto aparecía de golpe. Al ser `Animatable`, SwiftUI
+/// interpola el valor y redibuja el cuerpo en cada cuadro, así que se
+/// mueven todos los dígitos a la vez.
+private struct ContadorMoneda: View, Animatable {
 
-            Spacer(minLength: 6)
+    var valor: Double
 
-            Text(textoMonto(movimiento))
-                .font(.caption.weight(.bold))
-                .monospacedDigit()
-                .foregroundStyle(movimiento.tipo.color)
-                .lineLimit(1)
-                .minimumScaleFactor(0.7)
-        }
+    var animatableData: Double {
+        get { valor }
+        set { valor = newValue }
     }
 
-    private func textoMonto(_ movimiento: Movimiento) -> String {
-        let signo = movimiento.tipo == .gasto ? "-" : "+"
-        return "\(signo)\(movimiento.monto.enMoneda)"
+    var body: some View {
+        Text(valor.enMoneda)
     }
 }
 
@@ -184,8 +136,7 @@ struct BalanceCard: View {
         balance: 647_800,
         ingresos: 2_500_000,
         gastos: 1_900_000,
-        cashback: 47_800,
-        ultimosMovimientos: []
+        cashback: 47_800
     )
     .padding()
 }

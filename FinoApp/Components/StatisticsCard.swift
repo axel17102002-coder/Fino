@@ -27,6 +27,6 @@ struct StatisticsCard<Contenido: View>: View {
             contenido
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .estiloTarjeta()
+        .estiloTarjetaVidrio()
     }
 }
