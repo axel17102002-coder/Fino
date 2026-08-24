@@ -1,5 +1,9 @@
 import SwiftUI
 
+// Formato y colores del reloj. Vive en `FinoCompartido` porque lo usan
+// los dos targets de watchOS: la app y la complicación de la esfera.
+// La app de iPhone NO lo compila — ya tiene su propio `Color+Hex`.
+
 // MARK: - Colores
 
 extension Color {

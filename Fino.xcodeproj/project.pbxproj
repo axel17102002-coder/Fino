@@ -18,6 +18,12 @@
 		24BA000D2FFF00000000000D /* FinoWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 24BA00032FFF000000000003 /* FinoWatch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		24BA00102FFF000000000010 /* PayloadWatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24BA000F2FFF00000000000F /* PayloadWatch.swift */; };
 		24BA00112FFF000000000011 /* PayloadWatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24BA000F2FFF00000000000F /* PayloadWatch.swift */; };
+		25CA000D2FFF00000000000D /* FinoWatchWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 25CA00032FFF000000000003 /* FinoWatchWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		25CA00112FFF000000000011 /* ComplicacionesWatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25CA000E2FFF00000000000E /* ComplicacionesWatch.swift */; };
+		25CA00122FFF000000000012 /* FinoWatchWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25CA000F2FFF00000000000F /* FinoWatchWidgetBundle.swift */; };
+		25CA00132FFF000000000013 /* PayloadWatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24BA000F2FFF00000000000F /* PayloadWatch.swift */; };
+		25CA00152FFF000000000015 /* FormatoWatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25CA00142FFF000000000014 /* FormatoWatch.swift */; };
+		25CA00162FFF000000000016 /* FormatoWatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25CA00142FFF000000000014 /* FormatoWatch.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -41,6 +47,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = 24BA00022FFF000000000002;
 			remoteInfo = FinoWatch;
+		};
+		25CA000B2FFF00000000000B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A10000060000000000000006 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 25CA00022FFF000000000002;
+			remoteInfo = FinoWatchWidget;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -67,6 +80,17 @@
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		25CA000C2FFF00000000000C /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				25CA000D2FFF00000000000D /* FinoWatchWidget.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
@@ -83,6 +107,11 @@
 		24BA00032FFF000000000003 /* FinoWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FinoWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		24BA000F2FFF00000000000F /* PayloadWatch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PayloadWatch.swift; sourceTree = "<group>"; };
 		A10000040000000000000004 /* Fino.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Fino.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		25CA00032FFF000000000003 /* FinoWatchWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = FinoWatchWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		25CA000E2FFF00000000000E /* ComplicacionesWatch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComplicacionesWatch.swift; sourceTree = "<group>"; };
+		25CA000F2FFF00000000000F /* FinoWatchWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinoWatchWidgetBundle.swift; sourceTree = "<group>"; };
+		25CA00102FFF000000000010 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		25CA00142FFF000000000014 /* FormatoWatch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormatoWatch.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -134,6 +163,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		25CA00052FFF000000000005 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -162,6 +198,7 @@
 		24BA000E2FFF00000000000E /* FinoCompartido */ = {
 			isa = PBXGroup;
 			children = (
+				25CA00142FFF000000000014 /* FormatoWatch.swift */,
 				24BA000F2FFF00000000000F /* PayloadWatch.swift */,
 			);
 			path = FinoCompartido;
@@ -174,6 +211,7 @@
 				23AB00012FFE300000000001 /* FinoTests */,
 				23ED9E8C2FFDF82B00839B54 /* FinoWidget */,
 				24BA00012FFF000000000001 /* FinoWatch */,
+				25CA00012FFF000000000001 /* FinoWatchWidget */,
 				24BA000E2FFF00000000000E /* FinoCompartido */,
 				23ED9E5C2FFDF69F00839B54 /* Frameworks */,
 				A10000030000000000000003 /* Products */,
@@ -187,8 +225,19 @@
 				A10000040000000000000004 /* Fino.app */,
 				23ED9E5B2FFDF69F00839B54 /* FinoWidgetExtension.appex */,
 				24BA00032FFF000000000003 /* FinoWatch.app */,
+				25CA00032FFF000000000003 /* FinoWatchWidget.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		25CA00012FFF000000000001 /* FinoWatchWidget */ = {
+			isa = PBXGroup;
+			children = (
+				25CA00102FFF000000000010 /* Info.plist */,
+				25CA000E2FFF00000000000E /* ComplicacionesWatch.swift */,
+				25CA000F2FFF00000000000F /* FinoWatchWidgetBundle.swift */,
+			);
+			path = FinoWatchWidget;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -243,10 +292,12 @@
 				24BA00042FFF000000000004 /* Sources */,
 				24BA00052FFF000000000005 /* Frameworks */,
 				24BA00062FFF000000000006 /* Resources */,
+				25CA000C2FFF00000000000C /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				25CA000A2FFF00000000000A /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				24BA00012FFF000000000001 /* FinoWatch */,
@@ -284,6 +335,25 @@
 			productReference = A10000040000000000000004 /* Fino.app */;
 			productType = "com.apple.product-type.application";
 		};
+		25CA00022FFF000000000002 /* FinoWatchWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 25CA00072FFF000000000007 /* Build configuration list for PBXNativeTarget "FinoWatchWidget" */;
+			buildPhases = (
+				25CA00042FFF000000000004 /* Sources */,
+				25CA00052FFF000000000005 /* Frameworks */,
+				25CA00062FFF000000000006 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = FinoWatchWidget;
+			packageProductDependencies = (
+			);
+			productName = FinoWatchWidget;
+			productReference = 25CA00032FFF000000000003 /* FinoWatchWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -302,6 +372,9 @@
 						CreatedOnToolsVersion = 26.6;
 					};
 					24BA00022FFF000000000002 = {
+						CreatedOnToolsVersion = 26.6;
+					};
+					25CA00022FFF000000000002 = {
 						CreatedOnToolsVersion = 26.6;
 					};
 					A10000050000000000000005 = {
@@ -328,6 +401,7 @@
 				A10000050000000000000005 /* Fino */,
 				23ED9E5A2FFDF69F00839B54 /* FinoWidgetExtension */,
 				24BA00022FFF000000000002 /* FinoWatch */,
+				25CA00022FFF000000000002 /* FinoWatchWidget */,
 			);
 		};
 /* End PBXProject section */
@@ -362,6 +436,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		25CA00062FFF000000000006 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -387,6 +468,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				24BA00112FFF000000000011 /* PayloadWatch.swift in Sources */,
+				25CA00152FFF000000000015 /* FormatoWatch.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -396,6 +478,17 @@
 			files = (
 				23BEC9702FFE0065005DE436 /* WidgetModels.swift in Sources */,
 				24BA00102FFF000000000010 /* PayloadWatch.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		25CA00042FFF000000000004 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				25CA00112FFF000000000011 /* ComplicacionesWatch.swift in Sources */,
+				25CA00122FFF000000000012 /* FinoWatchWidgetBundle.swift in Sources */,
+				25CA00132FFF000000000013 /* PayloadWatch.swift in Sources */,
+				25CA00162FFF000000000016 /* FormatoWatch.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -416,6 +509,11 @@
 			isa = PBXTargetDependency;
 			target = 24BA00022FFF000000000002 /* FinoWatch */;
 			targetProxy = 24BA000B2FFF00000000000B /* PBXContainerItemProxy */;
+		};
+		25CA000A2FFF00000000000A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 25CA00022FFF000000000002 /* FinoWatchWidget */;
+			targetProxy = 25CA000B2FFF00000000000B /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -529,6 +627,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = FinoWatch.entitlements;
+				INFOPLIST_FILE = "FinoWatch-Info.plist";
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -559,6 +659,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = FinoWatch.entitlements;
+				INFOPLIST_FILE = "FinoWatch-Info.plist";
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -777,6 +879,65 @@
 			};
 			name = Release;
 		};
+		25CA00082FFF000000000008 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = FinoWatchWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = PRS2QB447G;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FinoWatchWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Fino;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.axelmorano.FinoApp.watchkitapp.complicacion;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 11.0;
+			};
+			name = Debug;
+		};
+		25CA00092FFF000000000009 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = FinoWatchWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = PRS2QB447G;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = FinoWatchWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Fino;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.axelmorano.FinoApp.watchkitapp.complicacion;
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=*]" = com.axelmorano.FinoApp.watchkitapp.complicacion;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 11.0;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -821,6 +982,15 @@
 			buildConfigurations = (
 				A100000E000000000000000E /* Debug */,
 				A100000F000000000000000F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		25CA00072FFF000000000007 /* Build configuration list for PBXNativeTarget "FinoWatchWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				25CA00082FFF000000000008 /* Debug */,
+				25CA00092FFF000000000009 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

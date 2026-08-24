@@ -10,20 +10,39 @@ import SwiftUI
 struct FinoWatchApp: App {
 
     @State private var conexion = ConexionWatch.shared
+    @State private var pestania: Pestania = .resumen
+
+    /// Las tres pantallas. Tienen identidad propia para que la
+    /// complicación de la esfera pueda abrir directo la que corresponde.
+    enum Pestania: Hashable {
+        case resumen, agregar, ultimos
+    }
 
     var body: some Scene {
         WindowGroup {
-            TabView {
+            TabView(selection: $pestania) {
                 // El alta trae su propio NavigationStack (monto →
                 // categoría → confirmación); las otras dos lo necesitan
                 // solo para que se vea el título arriba.
                 NavigationStack { ResumenWatchView() }
+                    .tag(Pestania.resumen)
                 AgregarGastoWatchView()
+                    .tag(Pestania.agregar)
                 NavigationStack { UltimosWatchView() }
+                    .tag(Pestania.ultimos)
             }
             .tabViewStyle(.page)
             .environment(conexion)
             .task { conexion.activar() }
+            // Toque en la complicación: `fino://nueva` abre el alta,
+            // `fino://resumen` la dona.
+            .onOpenURL { url in
+                switch url.host {
+                case "nueva": pestania = .agregar
+                case "resumen": pestania = .resumen
+                default: break
+                }
+            }
         }
     }
 }

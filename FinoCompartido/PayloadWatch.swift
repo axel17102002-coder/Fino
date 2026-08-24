@@ -20,6 +20,22 @@ enum PayloadWatch {
 
     /// Clave del diccionario que viaja en `transferUserInfo`.
     static let claveGasto = "gastoNuevo"
+
+    /// App Group del reloj: lo comparten la app y su complicación, que
+    /// corren en el mismo dispositivo pero en contenedores distintos.
+    /// Es el mismo grupo que usa el widget del iPhone; los App Groups son
+    /// por equipo, no por plataforma.
+    static let grupo = "group.com.axelmorano.FinoApp"
+
+    /// Clave del snapshot guardado en el App Group del reloj.
+    static let claveSnapshotGuardado = "snapshotDelIPhone"
+
+    /// Enlaces profundos que la complicación usa para abrir la app.
+    enum Enlace {
+        static let esquema = "fino"
+        static let nuevoGasto = URL(string: "fino://nueva")!
+        static let resumen = URL(string: "fino://resumen")!
+    }
 }
 
 // MARK: - iPhone → reloj

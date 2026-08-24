@@ -2,6 +2,7 @@ import Foundation
 import Observation
 import WatchConnectivity
 import WatchKit
+import WidgetKit
 
 /// Estado del reloj: el último snapshot que mandó el iPhone y los gastos
 /// que salieron de la muñeca.
@@ -15,7 +16,12 @@ final class ConexionWatch: NSObject {
 
     static let shared = ConexionWatch()
 
-    private static let claveSnapshot = "snapshotDelIPhone"
+    /// El snapshot se guarda en el App Group y no en `UserDefaults.standard`
+    /// porque la complicación de la esfera corre en su propio contenedor y
+    /// tiene que poder leerlo.
+    private static var compartido: UserDefaults {
+        UserDefaults(suiteName: PayloadWatch.grupo) ?? .standard
+    }
 
     /// Última foto recibida. `nil` = el reloj todavía no vio nunca al iPhone.
     private(set) var snapshot: SnapshotWatch?
@@ -122,13 +128,22 @@ final class ConexionWatch: NSObject {
     // MARK: - Persistencia local
 
     private static func leerGuardado() -> SnapshotWatch? {
-        guard let data = UserDefaults.standard.data(forKey: claveSnapshot) else { return nil }
+        let clave = PayloadWatch.claveSnapshotGuardado
+        // Las versiones anteriores guardaban en `standard`, antes de que
+        // existiera la complicación: se rescata para no arrancar en blanco
+        // después de actualizar.
+        let data = compartido.data(forKey: clave)
+            ?? UserDefaults.standard.data(forKey: clave)
+        guard let data else { return nil }
         return try? JSONDecoder().decode(SnapshotWatch.self, from: data)
     }
 
     private func guardar(_ snapshot: SnapshotWatch) {
         guard let data = try? JSONEncoder().encode(snapshot) else { return }
-        UserDefaults.standard.set(data, forKey: Self.claveSnapshot)
+        Self.compartido.set(data, forKey: PayloadWatch.claveSnapshotGuardado)
+        // La esfera se dibuja aparte: si no se le avisa, sigue mostrando
+        // los números viejos hasta que el sistema decida refrescarla.
+        WidgetCenter.shared.reloadAllTimelines()
     }
 
     private func aplicar(contexto: [String: Any]) {
