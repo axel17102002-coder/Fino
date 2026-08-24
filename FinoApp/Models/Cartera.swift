@@ -8,32 +8,37 @@ import SwiftUI
 /// dólar es la unidad en la que están la mayoría.
 struct Cartera {
 
-    /// Cuánto vale un peso en dólares. `nil` cuando no hay cotización ni
-    /// en red ni en caché.
-    let dolaresPorPeso: Double?
+    /// Cuántos dólares vale una unidad de cada moneda. El dólar no está:
+    /// vale uno por definición.
+    ///
+    /// Es un diccionario y no una sola cotización porque las tenencias
+    /// pueden estar en pesos, en euros o en dólares a la vez, y con un
+    /// único "pesos por dólar" las de euros quedaban afuera del total sin
+    /// que nadie lo notara.
+    let tasasADolar: [Moneda: Double]
     let tenencias: [Inversion]
 
     /// Cuántas porciones tiene el donut antes de agrupar. Más de seis y
     /// las de abajo quedan como rayitas ilegibles.
     static let porcionesVisibles = 6
 
-    init(_ tenencias: [Inversion], dolaresPorPeso: Double?) {
+    init(_ tenencias: [Inversion], tasasADolar: [Moneda: Double] = [:]) {
         self.tenencias = tenencias
-        self.dolaresPorPeso = dolaresPorPeso
+        self.tasasADolar = tasasADolar
     }
 
     /// Valor en dólares de una tenencia. Las que ya están en dólares
     /// pasan tal cual.
     func enDolares(_ inversion: Inversion) -> Double? {
         guard inversion.moneda != .usd else { return inversion.valor }
-        guard let dolaresPorPeso else { return nil }
-        return inversion.valor * dolaresPorPeso
+        guard let tasa = tasasADolar[inversion.moneda] else { return nil }
+        return inversion.valor * tasa
     }
 
     /// Hay tenencias en pesos que no se pueden convertir. La card lo dice
     /// en vez de mostrar un total al que le falta una parte sin avisar.
     var faltaCotizacion: Bool {
-        dolaresPorPeso == nil && tenencias.contains { $0.moneda != .usd }
+        tenencias.contains { enDolares($0) == nil }
     }
 
     var total: Double {
@@ -104,5 +109,21 @@ struct Cartera {
         tenencias
             .filter { ($0.diasParaVencer ?? .max) <= 7 }
             .sorted { ($0.diasParaVencer ?? 0) < ($1.diasParaVencer ?? 0) }
+    }
+}
+
+extension Cartera {
+
+    /// Pide una cotización por cada moneda que aparezca en las tenencias,
+    /// y ninguna de más: con todas las tenencias en dólares no se toca la
+    /// red. El dólar no se pide porque vale uno.
+    static func tasas(para tenencias: [Inversion]) async -> [Moneda: Double] {
+        var resultado: [Moneda: Double] = [:]
+        for moneda in Set(tenencias.map(\.moneda)) where moneda != .usd {
+            if let tasa = await ExchangeRateService.tasa(de: moneda, a: .usd) {
+                resultado[moneda] = tasa
+            }
+        }
+        return resultado
     }
 }

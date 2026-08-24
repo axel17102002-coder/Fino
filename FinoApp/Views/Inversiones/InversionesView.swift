@@ -13,10 +13,10 @@ struct InversionesView: View {
 
     @State private var mostrandoAlta = false
     @State private var enEdicion: Inversion?
-    @State private var dolaresPorPeso: Double?
+    @State private var tasasADolar: [Moneda: Double] = [:]
 
     private var cartera: Cartera {
-        Cartera(inversiones, dolaresPorPeso: dolaresPorPeso)
+        Cartera(inversiones, tasasADolar: tasasADolar)
     }
 
     var body: some View {
@@ -54,7 +54,7 @@ struct InversionesView: View {
             InversionFormSheet(inversion: inversion)
         }
         .task {
-            dolaresPorPeso = await ExchangeRateService.tasa(de: .ars, a: .usd)
+            tasasADolar = await Cartera.tasas(para: inversiones)
         }
     }
 

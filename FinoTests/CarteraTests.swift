@@ -32,14 +32,14 @@ struct CarteraTests {
 
     @Test func lasTenenciasEnPesosSeConviertenADolares() {
         // 1.500.000 pesos con el dólar a 1.000 son 1.500 dólares.
-        let cartera = Cartera([plazoFijo("Galicia", pesos: 1_500_000)], dolaresPorPeso: tasa)
+        let cartera = Cartera([plazoFijo("Galicia", pesos: 1_500_000)], tasasADolar: [.ars: tasa])
         #expect(cartera.total == 1_500)
     }
 
     @Test func elTotalMezclaLasDosMonedas() {
         let cartera = Cartera(
             [accion("AAPL", cantidad: 10, precio: 220), plazoFijo("Galicia", pesos: 1_500_000)],
-            dolaresPorPeso: tasa
+            tasasADolar: [.ars: tasa]
         )
         #expect(cartera.total == 3_700)
     }
@@ -49,17 +49,52 @@ struct CarteraTests {
         // solo lo que sí se puede, y la card lo aclara.
         let cartera = Cartera(
             [accion("AAPL", cantidad: 10, precio: 220), plazoFijo("Galicia", pesos: 1_500_000)],
-            dolaresPorPeso: nil
+            tasasADolar: [:]
         )
         #expect(cartera.total == 2_200)
         #expect(cartera.faltaCotizacion)
+    }
+
+    @Test func convierteCadaMonedaConSuPropiaCotizacion() {
+        // Una divisa en euros y un plazo fijo en pesos: cada uno con su
+        // cotización. Con una sola tasa, las de euros quedaban afuera del
+        // total sin que nadie lo notara.
+        let euros = Inversion(nombre: "Euros", tipo: .divisa, donde: "Caja",
+                              moneda: .eur, monto: 1_000)
+        let cartera = Cartera(
+            [euros, plazoFijo("Galicia", pesos: 1_500_000)],
+            tasasADolar: [.ars: tasa, .eur: 1.08]
+        )
+        #expect(cartera.total == 1_500 + 1_080)
+        #expect(!cartera.faltaCotizacion)
+    }
+
+    @Test func siFaltaLaCotizacionDeUnaMonedaLoAvisa() {
+        // Están los pesos pero no los euros: el total muestra lo que puede
+        // y la card lo aclara, en vez de sumar de menos en silencio.
+        let euros = Inversion(nombre: "Euros", tipo: .divisa, donde: "Caja",
+                              moneda: .eur, monto: 1_000)
+        let cartera = Cartera(
+            [euros, plazoFijo("Galicia", pesos: 1_500_000)],
+            tasasADolar: [.ars: tasa]
+        )
+        #expect(cartera.total == 1_500)
+        #expect(cartera.faltaCotizacion)
+    }
+
+    @Test func laDivisaEnDolaresNoNecesitaCotizacion() {
+        let dolares = Inversion(nombre: "Dólares", tipo: .divisa, donde: "Caja",
+                                moneda: .usd, monto: 2_000)
+        let cartera = Cartera([dolares])
+        #expect(cartera.total == 2_000)
+        #expect(!cartera.faltaCotizacion)
     }
 
     @Test func elRepartoPorClaseVaDeMayorAMenor() {
         let cartera = Cartera([
             accion("AAPL", cantidad: 10, precio: 220),
             cripto("BTC", cantidad: 0.01, precio: 60_000),
-        ], dolaresPorPeso: tasa)
+        ], tasasADolar: [.ars: tasa])
         let clases = cartera.porClase
         #expect(clases.first?.tipo == .accion)
         #expect(clases.first?.dolares == 2_200)
@@ -72,7 +107,7 @@ struct CarteraTests {
     @Test func conMuchasTenenciasElRestoVaAOtras() {
         // Nueve tenencias: seis con nombre propio y las otras tres juntas.
         let muchas = (1...9).map { accion("T\($0)", cantidad: 1, precio: Double(10 - $0) * 100) }
-        let segmentos = Cartera(muchas, dolaresPorPeso: tasa).segmentos
+        let segmentos = Cartera(muchas, tasasADolar: [.ars: tasa]).segmentos
         #expect(segmentos.count == 7)
         #expect(segmentos.first?.nombre == "T1")
         // Contra la traducción y no el literal: los tests corren en
@@ -84,7 +119,7 @@ struct CarteraTests {
 
     @Test func conPocasTenenciasNoApareceOtras() {
         let pocas = (1...4).map { accion("T\($0)", cantidad: 1, precio: Double($0) * 100) }
-        let segmentos = Cartera(pocas, dolaresPorPeso: tasa).segmentos
+        let segmentos = Cartera(pocas, tasasADolar: [.ars: tasa]).segmentos
         #expect(segmentos.count == 4)
         #expect(!segmentos.contains { $0.nombre == String(localized: "Otras") })
     }
@@ -95,7 +130,7 @@ struct CarteraTests {
         let lejos = plazoFijo("Nación", pesos: 1_000_000)
         lejos.vencimiento = Calendar.current.date(byAdding: .day, value: 40, to: .now)
 
-        let cartera = Cartera([pronto, lejos], dolaresPorPeso: tasa)
+        let cartera = Cartera([pronto, lejos], tasasADolar: [.ars: tasa])
         #expect(cartera.porVencer.count == 1)
         #expect(cartera.porVencer.first?.nombre == "Galicia")
     }

@@ -13,7 +13,7 @@ struct DashboardView: View {
 
     /// Cuántos dólares vale un peso, para llevar todas las tenencias a una
     /// sola moneda. Se pide al aparecer y queda cacheada por el servicio.
-    @State private var dolaresPorPeso: Double?
+    @State private var tasasADolar: [Moneda: Double] = [:]
     @State private var mostrandoAltaInversion = false
 
     @State private var categoriaSeleccionada: String?
@@ -81,7 +81,7 @@ struct DashboardView: View {
             .task {
                 // Una sola vez por aparición: el servicio cachea, así que
                 // sin red usa la última cotización conocida.
-                dolaresPorPeso = await ExchangeRateService.tasa(de: .ars, a: .usd)
+                tasasADolar = await Cartera.tasas(para: inversiones)
             }
             .sheet(isPresented: $mostrandoAlta) {
                 AddTransactionSheet()
@@ -239,7 +239,7 @@ struct DashboardView: View {
             }
         } else {
             InversionesCard(
-                cartera: Cartera(inversiones, dolaresPorPeso: dolaresPorPeso),
+                cartera: Cartera(inversiones, tasasADolar: tasasADolar),
                 // Cinco es lo que entra en el alto del carrusel en un
                 // iPhone con el tamaño de letra por defecto. Intenté
                 // calcularlo midiendo el alto disponible y no converge:
@@ -481,7 +481,7 @@ struct DashboardView: View {
                 }
             }
             InversionesCard(
-                cartera: Cartera(inversiones, dolaresPorPeso: dolaresPorPeso),
+                cartera: Cartera(inversiones, tasasADolar: tasasADolar),
                 conDonut: false
             )
         }

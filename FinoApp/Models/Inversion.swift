@@ -15,6 +15,7 @@ enum TipoInversion: String, CaseIterable, Codable, Identifiable {
     case cripto
     case plazoFijo
     case cuentaRemunerada
+    case divisa
     case otro
 
     var id: String { rawValue }
@@ -30,6 +31,7 @@ enum TipoInversion: String, CaseIterable, Codable, Identifiable {
         case .cripto: String(localized: "Cripto")
         case .plazoFijo: String(localized: "Plazo fijo")
         case .cuentaRemunerada: String(localized: "Cuenta remunerada")
+        case .divisa: String(localized: "Divisas")
         case .otro: String(localized: "Otras")
         }
     }
@@ -41,6 +43,7 @@ enum TipoInversion: String, CaseIterable, Codable, Identifiable {
         case .cripto: "bitcoinsign.circle.fill"
         case .plazoFijo: "lock.circle.fill"
         case .cuentaRemunerada: "percent"
+        case .divisa: "dollarsign.circle.fill"
         case .otro: "circle.dashed"
         }
     }
@@ -62,6 +65,7 @@ enum TipoInversion: String, CaseIterable, Codable, Identifiable {
         case .cripto: .orange
         case .plazoFijo: .green
         case .cuentaRemunerada: .purple
+        case .divisa: .teal
         case .otro: .gray
         }
     }
