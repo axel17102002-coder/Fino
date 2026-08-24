@@ -135,9 +135,24 @@ struct DeudasView: View {
                     .foregroundStyle(.secondary)
             }
             Spacer()
-            Text(deuda.monto.enMoneda)
-                .font(.callout.bold())
-                .monospacedDigit()
+            VStack(alignment: .trailing, spacing: 2) {
+                // El monto en la moneda del gasto arriba y en grande: es
+                // con lo que te lo tienen que devolver. El convertido va
+                // abajo, que es lo que suma en los totales de la app.
+                if let original = deuda.montoOriginalTexto {
+                    Text(original)
+                        .font(.callout.bold())
+                        .monospacedDigit()
+                    Text(deuda.monto.enMoneda)
+                        .font(.caption2)
+                        .monospacedDigit()
+                        .foregroundStyle(.secondary)
+                } else {
+                    Text(deuda.monto.enMoneda)
+                        .font(.callout.bold())
+                        .monospacedDigit()
+                }
+            }
         }
         .padding(.vertical, 2)
     }

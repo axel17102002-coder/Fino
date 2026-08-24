@@ -19,14 +19,24 @@ struct AddTransactionSheet: View {
     @State private var analizandoTicket = false
     @State private var falloTicket = false
 
+    // Cashback del gasto, cargado junto con él.
+    @State private var hayCashback = false
+    @State private var cashback = CashbackDelGasto()
+
     // Gasto compartido.
     @State private var esCompartido = false
     @State private var conQuienes = ""
     @State private var partesIguales = true
     /// Monto que debe cada persona cuando las partes no son iguales.
     @State private var montosPorPersona: [String: String] = [:]
+    /// Estado del reparto tal como estaba al abrir el formulario, para no
+    /// tocar las deudas si la edición no cambió nada del gasto compartido
+    /// (y así no perder las que ya estén marcadas como saldadas).
+    @State private var esCompartidoOriginal = false
+    @State private var partesOriginalesPorPersona: [String: Double] = [:]
 
     private let esEdicion: Bool
+    private let movimientoOriginal: Movimiento?
     /// Abre la cámara de escaneo apenas aparece el formulario (lo usa el
     /// botón de la franja del Dashboard).
     private let escanearAlAbrir: Bool
@@ -38,6 +48,7 @@ struct AddTransactionSheet: View {
     ) {
         _viewModel = State(initialValue: MovimientoFormViewModel(movimiento: movimiento, cuentaPreseleccionada: cuentaPreseleccionada))
         esEdicion = movimiento != nil
+        movimientoOriginal = movimiento
         self.escanearAlAbrir = escanearAlAbrir
     }
 
@@ -92,18 +103,29 @@ struct AddTransactionSheet: View {
                 Section("Datos") {
                     TextField("Nombre", text: $viewModel.nombre)
 
+                    // El símbolo es el selector de moneda: era una fila
+                    // aparte y ahí no hacía más que repetir lo que ya
+                    // mostraba el campo del monto.
                     HStack {
-                        Text(viewModel.moneda.simbolo)
+                        Menu {
+                            Picker("Moneda", selection: $viewModel.moneda) {
+                                ForEach(Moneda.allCases) { moneda in
+                                    Text("\(moneda.simbolo) · \(moneda.rawValue)").tag(moneda)
+                                }
+                            }
+                        } label: {
+                            HStack(spacing: 2) {
+                                Text(viewModel.moneda.simbolo)
+                                Image(systemName: "chevron.up.chevron.down")
+                                    .font(.caption2)
+                            }
                             .foregroundStyle(.secondary)
+                        }
+                        .accessibilityLabel(String(localized: "Moneda"))
+
                         TextField("0", text: $viewModel.montoTexto)
                             .keyboardType(.decimalPad)
                             .monospacedDigit()
-                    }
-
-                    Picker("Moneda", selection: $viewModel.moneda) {
-                        ForEach(Moneda.allCases) { moneda in
-                            Text("\(moneda.simbolo) · \(moneda.rawValue)").tag(moneda)
-                        }
                     }
 
                     if viewModel.esMonedaExtranjera {
@@ -159,8 +181,40 @@ struct AddTransactionSheet: View {
                     }
                 }
 
-                if !esEdicion && viewModel.tipo == .gasto {
-                    Section {
+                // Cashback y compartido en un solo bloque: los dos
+                // significan "este gasto además genera otro movimiento"
+                // —plata que vuelve, o lo que te deben— y separarlos los
+                // hacía parecer dos temas distintos.
+                if viewModel.tipo == .gasto {
+                    Section("Además") {
+                        if !esEdicion {
+                        Toggle(isOn: $hayCashback.animation()) {
+                            Label("Hubo cashback", systemImage: "arrow.counterclockwise.circle.fill")
+                        }
+                        if hayCashback {
+                            Picker("Cómo", selection: $cashback.modo.animation()) {
+                                ForEach(CashbackDelGasto.Modo.allCases) { modo in
+                                    Text(modo.nombre).tag(modo)
+                                }
+                            }
+                            .pickerStyle(.segmented)
+
+                            HStack {
+                                Text(cashback.modo == .porcentaje ? "%" : viewModel.moneda.simbolo)
+                                    .foregroundStyle(.secondary)
+                                TextField("0", text: $cashback.texto)
+                                    .keyboardType(.decimalPad)
+                                    .monospacedDigit()
+                            }
+
+                            if let devuelto = montoDeCashbackConvertido {
+                                LabeledContent("Te devuelven", value: devuelto.enMoneda)
+                                    .font(.subheadline)
+                            }
+                            nota("Queda como un movimiento de cashback aparte, con la misma fecha y la misma cuenta que el gasto.")
+                        }
+                        }
+
                         Toggle(isOn: $esCompartido.animation()) {
                             Label("Gasto compartido", systemImage: "person.2.fill")
                         }
@@ -168,8 +222,17 @@ struct AddTransactionSheet: View {
                             TextField("¿Con quiénes? (separá con comas)", text: $conQuienes)
                                 .autocorrectionDisabled()
 
-                            let nombres = DeudasService.nombres(desde: conQuienes)
+                            let nombres = personasCompartidas
                             if !nombres.isEmpty {
+                                if let reparto = repartoPorRenglones {
+                                    LabeledContent(
+                                        "Cada uno (entre \(nombres.count + 1))",
+                                        value: reparto.deCadaUno.enMoneda
+                                    )
+                                    .font(.subheadline)
+                                    LabeledContent("Tu parte", value: reparto.tuya.enMoneda)
+                                        .font(.subheadline)
+                                } else {
                                 Toggle("Partes iguales", isOn: $partesIguales.animation())
 
                                 if partesIguales {
@@ -205,14 +268,18 @@ struct AddTransactionSheet: View {
                                         }
                                     }
                                 }
+                                }
                             }
                         }
-                    } footer: {
-                        if esCompartido {
-                            Text("Pagaste vos: el gasto queda completo y Fino anota lo que te debe cada uno en \"Me deben\".")
+                        if repartoPorRenglones != nil {
+                            nota("El reparto sale del detalle del ticket: los renglones marcados como tuyos van enteros a tu parte y el resto se divide. Los descuentos se reparten en la misma proporción.")
+                        } else if esCompartido {
+                            nota("Pagaste vos: el gasto queda completo y Fino anota lo que te debe cada uno en \"Me deben\".")
                         }
                     }
                 }
+
+                seccionDetalleTicket
 
                 Section("Notas") {
                     TextField("Notas (opcional)", text: $viewModel.notas, axis: .vertical)
@@ -229,11 +296,16 @@ struct AddTransactionSheet: View {
                     Button("Guardar") {
                         if let movimiento = viewModel.guardar(en: contexto) {
                             NotificacionesService.verificarPresupuestos(en: contexto)
-                            if !esEdicion, viewModel.tipo == .gasto, let monto = viewModel.monto {
-                                if esCompartido {
-                                    crearDeudas(total: monto, para: movimiento)
+                            if viewModel.tipo == .gasto, let monto = viewModel.monto {
+                                if esEdicion {
+                                    actualizarGastoCompartido(total: monto, para: movimiento)
+                                } else {
+                                    if esCompartido {
+                                        crearDeudas(total: monto, para: movimiento)
+                                    }
+                                    crearCashback(delGastoDe: monto, como: movimiento)
+                                    RedondeoService.aplicar(aGastoDe: monto, en: contexto)
                                 }
-                                RedondeoService.aplicar(aGastoDe: monto, en: contexto)
                             }
                             Haptics.exito()
                             dismiss()
@@ -245,6 +317,7 @@ struct AddTransactionSheet: View {
             }
             .onAppear {
                 recargarCategoriasPersonalizadas()
+                cargarGastoCompartidoExistente()
                 if escanearAlAbrir && EscanerTicketView.disponible {
                     mostrandoEscaner = true
                 }
@@ -378,29 +451,226 @@ struct AddTransactionSheet: View {
         }
     }
 
-    private func crearDeudas(total: Double, para movimiento: Movimiento) {
-        let nombres = DeudasService.nombres(desde: conQuienes)
-        let partes: [(persona: String, monto: Double)]
-        if partesIguales {
+    /// Reparto vigente en el formulario, en la moneda del gasto.
+    private func partesActuales(total: Double) -> [(persona: String, monto: Double)] {
+        let nombres = personasCompartidas
+        if let reparto = repartoPorRenglones {
+            return nombres.map { ($0, reparto.deCadaUno) }
+        } else if partesIguales {
             let parte = DeudasService.parteDeCadaUno(total: total, nombres: nombres)
-            partes = nombres.map { ($0, parte) }
+            return nombres.map { ($0, parte) }
         } else {
-            partes = nombres.compactMap { nombre -> (persona: String, monto: Double)? in
+            return nombres.compactMap { nombre -> (persona: String, monto: Double)? in
                 guard let monto = Formatters.parsearMonto(montoBinding(para: nombre).wrappedValue),
                       monto > 0 else { return nil }
                 return (nombre, monto)
             }
         }
+    }
+
+    /// Explicación de una opción, debajo de sus campos.
+    ///
+    /// Antes cada opción era su propia sección y esto vivía en el `footer`.
+    /// Al juntarlas en un bloque solo quedaría un pie para las dos, así
+    /// que la nota baja al renglón y aparece únicamente con la opción
+    /// prendida.
+    private func nota(_ texto: String) -> some View {
+        Text(texto)
+            .font(.caption)
+            .foregroundStyle(.secondary)
+            .listRowSeparator(.hidden)
+    }
+
+    /// Lo que devuelve el cashback, ya en la moneda global (que es la que
+    /// se guarda y la que suman los totales).
+    private var montoDeCashbackConvertido: Double? {
+        guard hayCashback,
+              let monto = viewModel.monto,
+              let devuelto = cashback.monto(sobre: monto)
+        else { return nil }
+        return viewModel.esMonedaExtranjera ? devuelto * (viewModel.tasa ?? 1) : devuelto
+    }
+
+    /// Da de alta el movimiento de cashback junto con el gasto.
+    ///
+    /// Hereda la fecha y la cuenta del gasto a propósito: la gracia es no
+    /// tener que cargar dos veces la misma compra, y pedir una fecha
+    /// aparte devolvería justo ese trabajo. Si el reintegro cae otro día,
+    /// el movimiento queda creado y se edita como cualquier otro.
+    private func crearCashback(delGastoDe monto: Double, como gasto: Movimiento) {
+        guard hayCashback, let devuelto = cashback.monto(sobre: monto), devuelto > 0 else { return }
+
+        let movimiento = Movimiento(
+            tipo: .cashback,
+            nombre: String(localized: "Cashback \(viewModel.nombre)"),
+            categoriaRaw: CategoriaCashback.cashback.rawValue,
+            monto: viewModel.esMonedaExtranjera ? devuelto * (viewModel.tasa ?? 1) : devuelto,
+            fecha: gasto.fecha
+        )
+        movimiento.cuenta = gasto.cuenta
+        // En otra moneda se guardan las dos, igual que el gasto: el
+        // reintegro de una compra en dólares también es en dólares.
+        if viewModel.esMonedaExtranjera {
+            movimiento.monedaOriginalRaw = viewModel.moneda.rawValue
+            movimiento.montoOriginal = devuelto
+            movimiento.tasaCambio = viewModel.tasa
+        }
+        contexto.insert(movimiento)
+        try? contexto.save()
+    }
+
+    private func crearDeudas(total: Double, para movimiento: Movimiento) {
+        let partes = partesActuales(total: total)
         DeudasService.crear(
             partes: partes,
             detalle: viewModel.nombre,
             movimientoID: movimiento.id,
+            moneda: viewModel.moneda,
+            tasa: viewModel.tasa,
             en: contexto
         )
         // El gasto recuerda cuánto es de otros: las métricas del mes
         // cuentan solo tu parte.
-        movimiento.montoAjeno = partes.reduce(0) { $0 + $1.monto }
+        //
+        // Convertido a la moneda global, porque `monto` también lo está:
+        // sin esto, un gasto compartido en dólares restaba 33 (dólares) a
+        // un monto de 60.000 (pesos) y "tu parte" daba cualquier cosa.
+        let ajenoEnMonedaDelGasto = partes.reduce(0) { $0 + $1.monto }
+        movimiento.montoAjeno = viewModel.esMonedaExtranjera
+            ? ajenoEnMonedaDelGasto * (viewModel.tasa ?? 1)
+            : ajenoEnMonedaDelGasto
         try? contexto.save()
+    }
+
+    /// Al editar, precarga el toggle, los nombres y los montos desde las
+    /// deudas ya vinculadas al movimiento (si las hay), para que se vean y
+    /// se puedan cambiar en vez de arrancar siempre en blanco.
+    private func cargarGastoCompartidoExistente() {
+        guard let movimiento = movimientoOriginal, movimiento.tipo == .gasto else { return }
+        let deudas = ((try? contexto.fetch(FetchDescriptor<Deuda>())) ?? [])
+            .filter { $0.movimientoID == movimiento.id }
+        guard !deudas.isEmpty else { return }
+
+        esCompartido = true
+        esCompartidoOriginal = true
+        conQuienes = deudas.map(\.persona).joined(separator: ", ")
+
+        let montoPorPersona = Dictionary(uniqueKeysWithValues: deudas.map { ($0.persona, $0.montoOriginal ?? $0.monto) })
+        partesOriginalesPorPersona = montoPorPersona
+
+        let montos = Array(montoPorPersona.values)
+        partesIguales = montos.max().map { mayor in montos.allSatisfy { abs($0 - mayor) < 0.01 } } ?? true
+        if !partesIguales {
+            montosPorPersona = montoPorPersona.mapValues { Formatters.montoEditable($0, moneda: viewModel.moneda) }
+        }
+    }
+
+    /// Solo toca las deudas si el reparto cambió de verdad: así una
+    /// edición que no toca el gasto compartido no pisa deudas que ya
+    /// estén marcadas como saldadas.
+    private func actualizarGastoCompartido(total: Double, para movimiento: Movimiento) {
+        guard gastoCompartidoCambio(total: total) else { return }
+        DeudasService.eliminarVinculadas(a: movimiento.id, en: contexto)
+        if esCompartido {
+            crearDeudas(total: total, para: movimiento)
+        } else {
+            movimiento.montoAjeno = nil
+            try? contexto.save()
+        }
+    }
+
+    private func gastoCompartidoCambio(total: Double) -> Bool {
+        guard esCompartido == esCompartidoOriginal else { return true }
+        guard esCompartido else { return false }
+        let actuales = Dictionary(uniqueKeysWithValues: partesActuales(total: total).map { ($0.persona, $0.monto) })
+        guard actuales.count == partesOriginalesPorPersona.count else { return true }
+        return actuales.contains { persona, monto in
+            guard let original = partesOriginalesPorPersona[persona] else { return true }
+            return abs(monto - original) >= 0.01
+        }
+    }
+
+    /// Personas nombradas para dividir el gasto.
+    private var personasCompartidas: [String] {
+        DeudasService.nombres(desde: conQuienes)
+    }
+
+    /// El reparto sale de los renglones del ticket en vez de dividir el
+    /// total: hay detalle, hay con quién dividir, y alguno de los
+    /// renglones está marcado como tuyo.
+    private var repartoPorRenglones: (tuya: Double, deCadaUno: Double)? {
+        guard esCompartido, !viewModel.items.isEmpty, let monto = viewModel.monto else { return nil }
+        return viewModel.items.reparto(
+            entrePersonas: personasCompartidas.count,
+            totalPagado: monto
+        )
+    }
+
+    /// Renglones leídos del ticket. Se puede borrar cualquiera que el OCR
+    /// haya inventado; el monto del gasto no se toca, porque el total
+    /// impreso es más confiable que la suma de lo que se pudo leer.
+    @ViewBuilder
+    private var seccionDetalleTicket: some View {
+        if !viewModel.items.isEmpty {
+            Section {
+                ForEach(Array(viewModel.items.enumerated()), id: \.offset) { indice, item in
+                    HStack {
+                        // Solo cuando hay con quién dividir: si no, la
+                        // marca no cambia nada y estorba.
+                        if esCompartido, item.monto > 0 {
+                            Button {
+                                viewModel.items[indice].soloMio.toggle()
+                                Haptics.seleccion()
+                            } label: {
+                                Image(systemName: item.soloMio ? "person.fill" : "person.2.fill")
+                                    .font(.caption)
+                                    .foregroundStyle(item.soloMio ? Color.accentColor : .secondary)
+                                    .frame(width: 26)
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityLabel(item.soloMio
+                                ? String(localized: "Solo mío, tocá para compartir")
+                                : String(localized: "Compartido, tocá para marcarlo como solo mío"))
+                        }
+
+                        Text(item.nombre)
+                            .lineLimit(2)
+                        Spacer(minLength: 8)
+                        // Los descuentos van en verde: son el único
+                        // renglón que resta y así se distingue de un
+                        // producto sin tener que leer el signo.
+                        Text(item.monto.enMoneda)
+                            .monospacedDigit()
+                            .foregroundStyle(item.monto < 0 ? Color.green.legible() : .secondary)
+                    }
+                    .swipeActions(edge: .trailing) {
+                        Button(role: .destructive) {
+                            viewModel.items.remove(at: indice)
+                        } label: {
+                            Label("Quitar", systemImage: "trash")
+                        }
+                    }
+                }
+            } header: {
+                HStack {
+                    Text("Detalle del ticket")
+                    Spacer()
+                    Text("\(viewModel.items.count) ítems")
+                }
+            } footer: {
+                if esCompartido {
+                    Text("Tocá el ícono de cada renglón para marcarlo como solo tuyo. Los tuyos van enteros a tu parte y el resto se divide.")
+                } else if viewModel.itemsCuadranConElMonto {
+                    Text("Suman \(viewModel.totalDeItems.enMoneda). Deslizá para quitar un renglón.")
+                } else {
+                    Label(
+                        "Los renglones suman \(viewModel.totalDeItems.enMoneda) y el total cargado es otro. Puede que falte algún producto o que se haya colado una línea que no lo es.",
+                        systemImage: "exclamationmark.triangle.fill"
+                    )
+                    .foregroundStyle(.orange)
+                }
+            }
+        }
     }
 
     /// Corre el OCR y precarga el formulario con lo que se pudo leer.
@@ -428,6 +698,7 @@ struct AddTransactionSheet: View {
         if let fecha = datos.fecha {
             viewModel.fecha = fecha
         }
+        viewModel.items = datos.items
         Haptics.exito()
     }
 

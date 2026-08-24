@@ -25,6 +25,22 @@ final class MovimientoFormViewModel {
     /// La cotización se está trayendo de la red.
     var cargandoTasa = false
 
+    /// Detalle leído del ticket. El usuario puede borrar renglones que el
+    /// OCR haya inventado antes de guardar.
+    var items: [ItemTicket] = []
+
+    /// Suma de los renglones. Sirve para avisar cuando no cierra con el
+    /// total: ahí el detalle quedó incompleto o se coló algo que no era
+    /// un producto.
+    var totalDeItems: Double { items.total }
+
+    /// Los renglones suman —con una tolerancia de un peso por redondeos—
+    /// lo mismo que el monto cargado.
+    var itemsCuadranConElMonto: Bool {
+        guard !items.isEmpty, let monto else { return true }
+        return abs(totalDeItems - monto) < 1
+    }
+
     private let movimientoEditado: Movimiento?
 
     init(movimiento: Movimiento? = nil, cuentaPreseleccionada: Cuenta? = nil) {
@@ -43,6 +59,7 @@ final class MovimientoFormViewModel {
             cuenta = movimiento.cuenta
             moneda = movimiento.monedaOriginal ?? Formatters.monedaActual
             tasaTexto = Self.formatearTasa(movimiento.tasaCambio ?? 1)
+            items = movimiento.itemsTicket ?? []
         } else {
             tipo = .gasto
             nombre = ""
@@ -141,6 +158,7 @@ final class MovimientoFormViewModel {
             movimiento.notas = notas
             movimiento.cuotas = cuotasFinales
             movimiento.cuenta = cuenta
+            movimiento.itemsTicket = items.isEmpty ? nil : items
             aplicarMoneda(a: movimiento, montoOriginal: monto)
             guardado = movimiento
         } else {
@@ -154,6 +172,7 @@ final class MovimientoFormViewModel {
                 cuotas: cuotasFinales,
                 cuenta: cuenta
             )
+            nuevo.itemsTicket = items.isEmpty ? nil : items
             aplicarMoneda(a: nuevo, montoOriginal: monto)
             contexto.insert(nuevo)
             guardado = nuevo

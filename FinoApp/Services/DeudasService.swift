@@ -41,19 +41,35 @@ enum DeudasService {
     }
 
     /// Crea deudas con un monto distinto por persona.
+    ///
+    /// Los montos vienen en la moneda en que se cargó el gasto. Si no es
+    /// la global, se guardan las dos: `monto` convertido —para que los
+    /// totales de "Me deben" sigan sumando en una sola moneda— y el
+    /// original, que es con lo que te lo tienen que devolver.
     static func crear(
         partes: [(persona: String, monto: Double)],
         detalle: String,
         movimientoID: UUID?,
+        moneda: Moneda? = nil,
+        tasa: Double? = nil,
         en contexto: ModelContext
     ) {
+        let enOtraMoneda = moneda != nil && moneda != Formatters.monedaActual
+        let factor = enOtraMoneda ? (tasa ?? 1) : 1
+
         for (persona, monto) in partes where monto > 0 {
-            contexto.insert(Deuda(
+            let deuda = Deuda(
                 persona: persona,
                 detalle: detalle,
-                monto: monto,
+                monto: monto * factor,
                 movimientoID: movimientoID
-            ))
+            )
+            if enOtraMoneda, let moneda {
+                deuda.monedaOriginalRaw = moneda.rawValue
+                deuda.montoOriginal = monto
+                deuda.tasaCambio = tasa
+            }
+            contexto.insert(deuda)
         }
         try? contexto.save()
     }
