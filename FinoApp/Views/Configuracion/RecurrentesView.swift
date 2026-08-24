@@ -92,7 +92,9 @@ struct RecurrentesView: View {
             Spacer()
 
             VStack(alignment: .trailing, spacing: 4) {
-                Text(recurrente.monto.enMonedaCompacta)
+                // Monto completo: el compacto es para ejes de gráficos y
+                // acá dejaba "2k" donde uno quiere ver cuánto sale.
+                Text(Formatters.moneda(recurrente.monto, moneda: recurrente.moneda))
                     .font(.callout.bold())
                     .monospacedDigit()
                 Toggle("", isOn: Binding(
@@ -127,6 +129,7 @@ private struct RecurrenteFormSheet: View {
     @State private var categoriaRaw: String
     @State private var diaDelMes: Int
     @State private var cuenta: Cuenta?
+    @State private var moneda: Moneda
 
     init(existente: MovimientoRecurrente? = nil) {
         self.existente = existente
@@ -140,6 +143,7 @@ private struct RecurrenteFormSheet: View {
         _categoriaRaw = State(initialValue: existente?.categoriaRaw ?? CategoriaGasto.suscripciones.rawValue)
         _diaDelMes = State(initialValue: existente?.diaDelMes ?? 1)
         _cuenta = State(initialValue: existente?.cuenta)
+        _moneda = State(initialValue: existente?.moneda ?? Formatters.monedaActual)
     }
 
     private var categoriasDisponibles: [any CategoriaInfo] {
@@ -170,11 +174,17 @@ private struct RecurrenteFormSheet: View {
                     TextField("Nombre (ej: Netflix, Alquiler, Sueldo)", text: $nombre)
 
                     HStack {
-                        Text(Formatters.monedaActual.simbolo)
+                        Text(moneda.simbolo)
                             .foregroundStyle(.secondary)
                         TextField("0", text: $montoTexto)
                             .keyboardType(.decimalPad)
                             .monospacedDigit()
+                    }
+
+                    Picker("Moneda", selection: $moneda) {
+                        ForEach(Moneda.allCases) { moneda in
+                            Text("\(moneda.simbolo) · \(moneda.nombre)").tag(moneda)
+                        }
                     }
 
                     Picker("Día del mes", selection: $diaDelMes) {
@@ -187,6 +197,17 @@ private struct RecurrenteFormSheet: View {
                             Label(cuenta.nombre, systemImage: cuenta.icono)
                                 .tag(Cuenta?.some(cuenta))
                         }
+                    }
+                }
+
+                if moneda != Formatters.monedaActual {
+                    Section {
+                        Label(
+                            "El monto queda fijo en \(moneda.nombre). Cada mes se convierte con la cotización de ese día, así que el gasto en \(Formatters.monedaActual.rawValue) va a variar.",
+                            systemImage: "arrow.left.arrow.right"
+                        )
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
                     }
                 }
 
@@ -223,15 +244,18 @@ private struct RecurrenteFormSheet: View {
             existente.monto = monto
             existente.diaDelMes = diaDelMes
             existente.cuenta = cuenta
+            existente.moneda = moneda
         } else {
-            contexto.insert(MovimientoRecurrente(
+            let nuevo = MovimientoRecurrente(
                 nombre: nombre.trimmingCharacters(in: .whitespaces),
                 tipo: tipo,
                 categoriaRaw: categoriaRaw,
                 monto: monto,
                 diaDelMes: diaDelMes,
                 cuenta: cuenta
-            ))
+            )
+            nuevo.moneda = moneda
+            contexto.insert(nuevo)
         }
         try? contexto.save()
         Haptics.exito()
