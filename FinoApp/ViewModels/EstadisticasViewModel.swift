@@ -11,6 +11,10 @@ struct EstadisticasViewModel {
     let promedioDiarioIngresos: Double
     let categoriaTopGasto: TotalCategoria?
     let categoriaTopIngreso: TotalCategoria?
+    /// Gasto del mes repartido por medio de pago, de mayor a menor.
+    let gastosPorMedioDePago: [TotalPorMedioDePago]
+    /// Cashback del mes por tarjeta, para ver cuál rinde más.
+    let cashbackPorMedioDePago: [TotalPorMedioDePago]
 
     init(movimientos: [Movimiento], meses: Int = 6, mes: Date = .now) {
         series = CalculosService.seriesMensuales(movimientos, meses: meses)
@@ -26,7 +30,15 @@ struct EstadisticasViewModel {
         )
         categoriaTopGasto = CalculosService.categoriaTop(delMes, tipo: .gasto)
         categoriaTopIngreso = CalculosService.categoriaTop(delMes, tipo: .ingreso)
+        gastosPorMedioDePago = TotalPorMedioDePago.agrupar(delMes, tipo: .gasto)
+        cashbackPorMedioDePago = TotalPorMedioDePago.agrupar(delMes, tipo: .cashback)
     }
+
+    /// El medio con el que más gastaste este mes.
+    var medioMasUsado: TotalPorMedioDePago? { gastosPorMedioDePago.first }
+
+    /// La tarjeta que más cashback te devolvió este mes.
+    var medioQueMasDevuelve: TotalPorMedioDePago? { cashbackPorMedioDePago.first }
 
     var topCategorias: [TotalCategoria] {
         Array(gastosPorCategoria.prefix(5))

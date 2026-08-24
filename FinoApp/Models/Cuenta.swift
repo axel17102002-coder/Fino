@@ -23,6 +23,11 @@ final class Cuenta {
     /// Posición elegida por el usuario al reordenar las listas.
     var orden: Int = 0
 
+    /// Fecha de cierre del último resumen que se marcó como pagado.
+    /// `nil` = nunca se marcó ninguno. Opcional para que las bases
+    /// existentes migren sin drama.
+    var resumenPagadoAlCierre: Date?
+
     @Relationship(deleteRule: .nullify, inverse: \Movimiento.cuenta)
     var movimientos: [Movimiento]?
 
@@ -102,5 +107,38 @@ final class Cuenta {
     func inicioCicloActual(desde referencia: Date = .now) -> Date? {
         guard let cierre = proximoCierre(desde: referencia) else { return nil }
         return Calendar.current.date(byAdding: .month, value: -1, to: cierre)
+    }
+
+    /// Inicio del resumen que ya cerró y está a pagar: el ciclo anterior
+    /// al que está corriendo.
+    func inicioResumenCerrado(desde referencia: Date = .now) -> Date? {
+        guard let inicio = inicioCicloActual(desde: referencia) else { return nil }
+        return Calendar.current.date(byAdding: .month, value: -1, to: inicio)
+    }
+
+    /// El resumen que cerró todavía no se marcó como pagado.
+    ///
+    /// Se compara contra la fecha de cierre y no con un booleano para que
+    /// el mes siguiente vuelva a quedar pendiente solo: al pasar un cierre
+    /// nuevo, la fecha guardada deja de coincidir.
+    func tieneResumenSinPagar(al referencia: Date = .now) -> Bool {
+        guard esTarjetaCredito, let cierre = inicioCicloActual(desde: referencia) else { return false }
+        guard let pagado = resumenPagadoAlCierre else { return true }
+        return !Calendar.current.isDate(pagado, inSameDayAs: cierre)
+    }
+
+    /// El resumen de este ciclo se marcó como pagado a mano.
+    func resumenMarcadoPagado(al referencia: Date = .now) -> Bool {
+        resumenPagadoAlCierre != nil && !tieneResumenSinPagar(al: referencia)
+    }
+
+    /// Marca como pagado el resumen que cerró.
+    func marcarResumenPagado(al referencia: Date = .now) {
+        resumenPagadoAlCierre = inicioCicloActual(desde: referencia)
+    }
+
+    /// Deshace el "pagada" por si se tocó de más.
+    func desmarcarResumenPagado() {
+        resumenPagadoAlCierre = nil
     }
 }

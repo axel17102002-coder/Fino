@@ -3,7 +3,7 @@ import Foundation
 /// Prepara todos los datos que muestra el Dashboard.
 struct DashboardViewModel {
 
-    let movimientosDelMes: [Movimiento]
+    let movimientosDelMes: [AporteMensual]
     let totalGastos: Double
     let totalIngresos: Double
     let totalCashback: Double

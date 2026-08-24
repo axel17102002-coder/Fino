@@ -7,6 +7,8 @@ struct VencimientosCard: View {
 
     let tarjetas: [Cuenta]
 
+    @Environment(\.modelContext) private var contexto
+
     private struct Item: Identifiable {
         let id: UUID
         let nombre: String
@@ -16,7 +18,12 @@ struct VencimientosCard: View {
         let proximoEvento: Date
         let diasRestantes: Int
         let esVencimiento: Bool
-        let consumo: Double
+        let importe: Double
+        /// El resumen cerró y todavía no se marcó como pagado.
+        let aPagar: Bool
+        /// El resumen de este ciclo se marcó como pagado a mano.
+        let marcadaPagada: Bool
+        let tarjeta: Cuenta
     }
 
     private var items: [Item] {
@@ -30,12 +37,22 @@ struct VencimientosCard: View {
                 ? CalculosService.proximaFecha(dia: tarjeta.diaVencimiento) : nil
             guard cierre != nil || vencimiento != nil else { return nil }
 
+            let aPagar = CalculosService.hayResumenAPagar(de: tarjeta)
+            let marcadaPagada = tarjeta.resumenMarcadoPagado()
+
             var partes: [String] = []
-            if let cierre {
-                partes.append(String(localized: "Cierra el \(cierre.formatted(.dateTime.day().month(.abbreviated)))"))
-            }
-            if let vencimiento {
-                partes.append(String(localized: "Vence el \(vencimiento.formatted(.dateTime.day().month(.abbreviated)))"))
+            if marcadaPagada { partes.append(String(localized: "Pagada")) }
+            if aPagar, let vencimiento {
+                // Con el resumen cerrado, lo único que importa es cuándo
+                // hay que pagarlo; el cierre siguiente todavía queda lejos.
+                partes.append(String(localized: "A pagar el \(vencimiento.formatted(.dateTime.day().month(.abbreviated)))"))
+            } else {
+                if let cierre {
+                    partes.append(String(localized: "Cierra el \(cierre.formatted(.dateTime.day().month(.abbreviated)))"))
+                }
+                if let vencimiento {
+                    partes.append(String(localized: "Vence el \(vencimiento.formatted(.dateTime.day().month(.abbreviated)))"))
+                }
             }
 
             let candidatos = [cierre, vencimiento].compactMap { $0 }
@@ -51,7 +68,10 @@ struct VencimientosCard: View {
                 proximoEvento: proximo,
                 diasRestantes: dias,
                 esVencimiento: proximo == vencimiento,
-                consumo: CalculosService.consumoActual(de: tarjeta)
+                importe: CalculosService.importeAMostrar(de: tarjeta),
+                aPagar: aPagar,
+                marcadaPagada: marcadaPagada,
+                tarjeta: tarjeta
             )
         }
         .sorted { $0.proximoEvento < $1.proximoEvento }
@@ -64,7 +84,7 @@ struct VencimientosCard: View {
                     fila(item)
                 }
             }
-            .estiloTarjeta(padding: 16)
+            .estiloTarjetaVidrio(padding: 16)
         }
     }
 
@@ -87,12 +107,60 @@ struct VencimientosCard: View {
             Spacer()
 
             VStack(alignment: .trailing, spacing: 4) {
-                Text(item.consumo.enMonedaCompacta)
+                Text(item.importe.enMonedaCompacta)
                     .font(.callout.bold())
                     .monospacedDigit()
-                chip(dias: item.diasRestantes, esVencimiento: item.esVencimiento)
+
+                if item.aPagar {
+                    botonPagada(item)
+                } else {
+                    chip(dias: item.diasRestantes, esVencimiento: item.esVencimiento)
+                }
             }
         }
+        // Deshacer el "pagada" vive acá porque es una corrección, no algo
+        // de todos los días: si estuviera siempre a la vista competiría
+        // con el dato que la fila tiene que dar, que es cuánto y cuándo.
+        .contextMenu {
+            if item.marcadaPagada {
+                Button {
+                    item.tarjeta.desmarcarResumenPagado()
+                    try? contexto.save()
+                    Haptics.advertencia()
+                } label: {
+                    Label("Marcar como no pagada", systemImage: "arrow.uturn.backward")
+                }
+            } else if item.aPagar {
+                Button {
+                    marcarPagada(item)
+                } label: {
+                    Label("Marcar como pagada", systemImage: "checkmark.circle")
+                }
+            }
+        }
+    }
+
+    /// Marca el resumen cerrado como pagado. A partir de ahí la tarjeta
+    /// vuelve a mostrar el consumo del ciclo que está corriendo, hasta el
+    /// próximo cierre.
+    private func botonPagada(_ item: Item) -> some View {
+        Button {
+            marcarPagada(item)
+        } label: {
+            Label("Pagada", systemImage: "checkmark.circle.fill")
+                .font(.caption2.weight(.semibold))
+                .padding(.horizontal, 8)
+                .padding(.vertical, 3)
+                .background(Capsule().fill(Color.green.legible().opacity(0.16)))
+                .foregroundStyle(Color.green.legible())
+        }
+        .buttonStyle(.plain)
+    }
+
+    private func marcarPagada(_ item: Item) {
+        item.tarjeta.marcarResumenPagado()
+        try? contexto.save()
+        Haptics.exito()
     }
 
     private func chip(dias: Int, esVencimiento: Bool) -> some View {

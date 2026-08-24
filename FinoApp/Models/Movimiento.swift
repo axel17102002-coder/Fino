@@ -31,6 +31,11 @@ final class Movimiento {
     /// usada para convertir (se guarda para mostrarla y para auditoría).
     var tasaCambio: Double?
 
+    /// Renglones del ticket escaneado, cuando el OCR pudo separarlos.
+    /// Es informativo: los totales de la app siguen saliendo de `monto`.
+    /// Opcional para que las bases existentes migren sin drama.
+    var itemsTicket: [ItemTicket]?
+
     init(
         tipo: TipoMovimiento,
         nombre: String,
@@ -54,6 +59,7 @@ final class Movimiento {
         self.monedaOriginalRaw = nil
         self.montoOriginal = nil
         self.tasaCambio = nil
+        self.itemsTicket = nil
     }
 
     // MARK: - Tipo y categoría
@@ -109,10 +115,16 @@ final class Movimiento {
 
     var montoCuota: Double { monto / Double(max(1, cuotas)) }
 
-    /// Número de cuota que corresponde pagar en la fecha de referencia (1...cuotas).
+    /// Número de cuota que cae en esa fecha, **sin recortar**: da más que
+    /// `cuotas` cuando el plan ya terminó y menos que 1 antes de la
+    /// compra. Es lo que hay que mirar para saber si todavía se paga.
+    func numeroDeCuota(al referencia: Date = .now) -> Int {
+        (Calendar.current.dateComponents([.month], from: fecha, to: referencia).month ?? 0) + 1
+    }
+
+    /// Número de cuota para mostrar, acotado a 1...cuotas ("Cuota 3/12").
     func cuotaActual(al referencia: Date = .now) -> Int {
-        let meses = Calendar.current.dateComponents([.month], from: fecha, to: referencia).month ?? 0
-        return min(max(meses + 1, 1), cuotas)
+        min(max(numeroDeCuota(al: referencia), 1), cuotas)
     }
 
     func cuotasRestantes(al referencia: Date = .now) -> Int {
