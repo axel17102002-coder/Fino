@@ -35,6 +35,13 @@ final class Movimiento {
     /// Es informativo: los totales de la app siguen saliendo de `monto`.
     /// Opcional para que las bases existentes migren sin drama.
     var itemsTicket: [ItemTicket]?
+    /// Los renglones tal como los leyó el OCR, si el gasto se cargó
+    /// escaneando.
+    ///
+    /// No se usa para calcular nada: está para poder copiarlos cuando un
+    /// ticket se lee mal. Sin esto, un caso que falla solo se puede
+    /// reproducir si uno todavía tiene la foto.
+    var textoTicket: String?
 
     init(
         tipo: TipoMovimiento,

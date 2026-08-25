@@ -118,6 +118,8 @@ struct MovimientoBackup: Codable {
     /// Renglones del ticket escaneado. Opcional: los backups hechos
     /// antes de que existiera el detalle se siguen leyendo igual.
     var itemsTicket: [ItemTicket]?
+    /// Desde la versión 2.4.
+    var textoTicket: String?
 }
 
 struct PresupuestoBackup: Codable {
@@ -174,7 +176,8 @@ enum BackupService {
                     monedaOriginalRaw: $0.monedaOriginalRaw,
                     montoOriginal: $0.montoOriginal,
                     tasaCambio: $0.tasaCambio,
-                    itemsTicket: $0.itemsTicket
+                    itemsTicket: $0.itemsTicket,
+                    textoTicket: $0.textoTicket
                 )
             },
             presupuestos: presupuestos.map {
@@ -299,6 +302,7 @@ enum BackupService {
             movimiento.montoOriginal = dto.montoOriginal
             movimiento.tasaCambio = dto.tasaCambio
             movimiento.itemsTicket = dto.itemsTicket
+            movimiento.textoTicket = dto.textoTicket
             contexto.insert(movimiento)
         }
 

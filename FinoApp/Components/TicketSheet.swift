@@ -13,6 +13,7 @@ struct TicketSheet: View {
 
     @Environment(\.dismiss) private var cerrar
     @State private var editando = false
+    @State private var copiado = false
 
     private var items: [ItemTicket] { movimiento.itemsTicket ?? [] }
     private var productos: [ItemTicket] { items.filter { $0.monto > 0 } }
@@ -35,6 +36,23 @@ struct TicketSheet: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Editar") { editando = true }
                         .fontWeight(.semibold)
+                }
+                // Copiar lo que leyó el OCR, para cuando el ticket se
+                // interpreta mal: pegándolo en un mensaje, ese caso se
+                // puede reproducir y arreglar sin necesidad de la foto.
+                if let texto = movimiento.textoTicket, !texto.isEmpty {
+                    ToolbarItem(placement: .secondaryAction) {
+                        Button {
+                            UIPasteboard.general.string = texto
+                            copiado = true
+                            Haptics.exito()
+                        } label: {
+                            Label(
+                                copiado ? "Texto copiado" : "Copiar el texto leído",
+                                systemImage: copiado ? "checkmark" : "doc.on.doc"
+                            )
+                        }
+                    }
                 }
             }
             .sheet(isPresented: $editando) {

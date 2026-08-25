@@ -15,6 +15,14 @@ enum TicketScannerService {
         /// Cada producto del ticket con su precio. Vacío si no se pudo
         /// separar el detalle (no todos los tickets lo permiten).
         var items: [ItemTicket] = []
+        /// Los renglones tal como salieron del OCR, antes de
+        /// interpretarlos.
+        ///
+        /// Se guardan para poder copiarlos desde la pantalla del ticket:
+        /// sin esto, un ticket que se lee mal solo se puede arreglar si
+        /// uno tiene la foto a mano, y con esto se convierte en un caso de
+        /// prueba.
+        var lineasCrudas: [String] = []
 
         var estaVacio: Bool { monto == nil && nombre == nil && fecha == nil }
     }
@@ -44,14 +52,70 @@ enum TicketScannerService {
         }.value
     }
 
+    /// Un fragmento leído por Vision, con dónde está en la imagen.
+    ///
+    /// Las coordenadas son las de Vision: normalizadas de 0 a 1 y con el
+    /// origen abajo a la izquierda, así que más `y` es más arriba.
+    struct FragmentoOCR {
+        let texto: String
+        let caja: CGRect
+    }
+
     private static func reconocerTexto(en cgImage: CGImage) -> [String] {
+        renglones(de: fragmentos(en: cgImage))
+    }
+
+    private static func fragmentos(en cgImage: CGImage) -> [FragmentoOCR] {
         let pedido = VNRecognizeTextRequest()
         pedido.recognitionLevel = .accurate
         pedido.recognitionLanguages = ["es-ES", "en-US"]
         pedido.usesLanguageCorrection = false
         let handler = VNImageRequestHandler(cgImage: cgImage)
         try? handler.perform([pedido])
-        return (pedido.results ?? []).compactMap { $0.topCandidates(1).first?.string }
+        return (pedido.results ?? []).compactMap { observacion in
+            guard let texto = observacion.topCandidates(1).first?.string else { return nil }
+            return FragmentoOCR(texto: texto, caja: observacion.boundingBox)
+        }
+    }
+
+    /// Arma los renglones juntando los fragmentos que están a la misma
+    /// altura, de arriba hacia abajo y de izquierda a derecha.
+    ///
+    /// Vision devuelve el nombre del producto y su precio como fragmentos
+    /// separados cuando están en columnas distintas, y el orden en que los
+    /// entrega no es confiable: con flash cambia. Antes se usaba ese orden
+    /// tal cual, y de ahí salían los precios apareados con el producto
+    /// equivocado. Mirando dónde está cada fragmento, un precio se aparea
+    /// con su producto por estar a la misma altura y el orden deja de
+    /// importar.
+    static func renglones(de fragmentos: [FragmentoOCR]) -> [String] {
+        var pendientes = fragmentos.sorted { $0.caja.midY > $1.caja.midY }
+        var resultado: [String] = []
+
+        while !pendientes.isEmpty {
+            let primero = pendientes.removeFirst()
+            var grupo = [primero]
+            pendientes.removeAll { candidato in
+                guard comparteRenglon(primero.caja, candidato.caja) else { return false }
+                grupo.append(candidato)
+                return true
+            }
+            let ordenado = grupo.sorted { $0.caja.minX < $1.caja.minX }
+            resultado.append(ordenado.map(\.texto).joined(separator: " "))
+        }
+        return resultado
+    }
+
+    /// Dos fragmentos están en el mismo renglón si se solapan en vertical
+    /// más de la mitad del más bajo.
+    ///
+    /// Se compara el solapamiento y no la distancia entre centros porque
+    /// en un mismo renglón conviven tamaños distintos —el precio suele ir
+    /// más grande que la descripción— y una tolerancia fija los separaba.
+    private static func comparteRenglon(_ a: CGRect, _ b: CGRect) -> Bool {
+        let solape = min(a.maxY, b.maxY) - max(a.minY, b.minY)
+        guard solape > 0 else { return false }
+        return solape > min(a.height, b.height) * 0.5
     }
 
     /// Redibuja la imagen con orientación normal y como máximo 2600 px
@@ -104,6 +168,12 @@ enum TicketScannerService {
     // MARK: - Parser (puro, testeable)
 
     static func parsear(lineas: [String]) -> DatosTicket {
+        var datos = parsearContenido(lineas: lineas)
+        datos.lineasCrudas = lineas
+        return datos
+    }
+
+    private static func parsearContenido(lineas: [String]) -> DatosTicket {
         DatosTicket(
             monto: detectarTotal(en: lineas),
             nombre: detectarComercio(en: lineas),

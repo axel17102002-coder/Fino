@@ -28,6 +28,8 @@ final class MovimientoFormViewModel {
     /// Detalle leído del ticket. El usuario puede borrar renglones que el
     /// OCR haya inventado antes de guardar.
     var items: [ItemTicket] = []
+    /// Renglones crudos del OCR, para guardarlos con el movimiento.
+    var textoTicket: String?
 
     /// Suma de los renglones. Sirve para avisar cuando no cierra con el
     /// total: ahí el detalle quedó incompleto o se coló algo que no era
@@ -159,6 +161,7 @@ final class MovimientoFormViewModel {
             movimiento.cuotas = cuotasFinales
             movimiento.cuenta = cuenta
             movimiento.itemsTicket = items.isEmpty ? nil : items
+            if let textoTicket { movimiento.textoTicket = textoTicket }
             aplicarMoneda(a: movimiento, montoOriginal: monto)
             guardado = movimiento
         } else {
@@ -173,6 +176,7 @@ final class MovimientoFormViewModel {
                 cuenta: cuenta
             )
             nuevo.itemsTicket = items.isEmpty ? nil : items
+            nuevo.textoTicket = textoTicket
             aplicarMoneda(a: nuevo, montoOriginal: monto)
             contexto.insert(nuevo)
             guardado = nuevo

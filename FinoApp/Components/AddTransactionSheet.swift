@@ -699,6 +699,12 @@ struct AddTransactionSheet: View {
             viewModel.fecha = fecha
         }
         viewModel.items = datos.items
+        // El texto crudo viaja con el movimiento para poder revisarlo
+        // después: es lo que convierte un ticket mal leído en un caso de
+        // prueba.
+        viewModel.textoTicket = datos.lineasCrudas.isEmpty
+            ? nil
+            : datos.lineasCrudas.joined(separator: "\n")
         Haptics.exito()
     }
 
