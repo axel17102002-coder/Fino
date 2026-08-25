@@ -75,11 +75,20 @@ enum CotizacionesService {
     // MARK: - Acciones
 
     private static func precioAccion(_ ticker: String) async -> Double? {
-        guard let url = URL(string: "https://query1.finance.yahoo.com/v8/finance/chart/\(ticker)?interval=1d&range=1d") else {
-            return nil
-        }
-        guard let data = await traer(url) else { return nil }
+        guard let url = urlDeAccion(ticker), let data = await traer(url) else { return nil }
         return precioDeRespuestaYahoo(data)
+    }
+
+    /// URL de consulta de un papel.
+    ///
+    /// El ticker va escapado porque los índices llevan `^` —el S&P 500 es
+    /// `^GSPC`— y ese carácter invalida la URL: sin escapar, `URL(string:)`
+    /// devuelve nil y la consulta no llegaba a salir.
+    static func urlDeAccion(_ ticker: String) -> URL? {
+        let escapado = ticker.addingPercentEncoding(
+            withAllowedCharacters: .alphanumerics
+        ) ?? ticker
+        return URL(string: "https://query1.finance.yahoo.com/v8/finance/chart/\(escapado)?interval=1d&range=1d")
     }
 
     /// Saca el precio de la respuesta de Yahoo. Separado para poder

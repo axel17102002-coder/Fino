@@ -195,6 +195,18 @@ struct CotizacionesTests {
         #expect(CotizacionesService.precioDeRespuestaYahoo(datos(json)) == nil)
     }
 
+    @Test func losIndicesLlevanElSimboloEscapado() {
+        // El S&P 500 es "^GSPC" y el acento circunflejo invalida la URL:
+        // sin escapar, la consulta no llegaba a salir.
+        let url = CotizacionesService.urlDeAccion("^GSPC")
+        #expect(url?.absoluteString.contains("%5EGSPC") == true)
+    }
+
+    @Test func unTickerComunNoSeDeforma() {
+        let url = CotizacionesService.urlDeAccion("AAPL")
+        #expect(url?.absoluteString.contains("/chart/AAPL?") == true)
+    }
+
     @Test func unaRespuestaRotaNoRompe() {
         #expect(CotizacionesService.precioDeRespuestaYahoo(Data()) == nil)
         #expect(CotizacionesService.precioDeRespuestaYahoo(datos("{}")) == nil)
