@@ -14,6 +14,13 @@ struct InversionesView: View {
     @State private var mostrandoAlta = false
     @State private var enEdicion: Inversion?
     @State private var tasasADolar: [Moneda: Double] = [:]
+    @State private var actualizando = false
+    @State private var resultado: String?
+
+    /// Las que tienen precio que se puede consultar.
+    private var conTicker: [Inversion] {
+        inversiones.filter(\.tipo.usaTicker)
+    }
 
     private var cartera: Cartera {
         Cartera(inversiones, tasasADolar: tasasADolar)
@@ -39,6 +46,20 @@ struct InversionesView: View {
         .navigationTitle("Inversiones")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
+            if !conTicker.isEmpty {
+                Button {
+                    Task { await actualizarPrecios() }
+                } label: {
+                    if actualizando {
+                        ProgressView()
+                    } else {
+                        Image(systemName: "arrow.clockwise")
+                    }
+                }
+                .disabled(actualizando)
+                .accessibilityLabel("Actualizar cotizaciones")
+            }
+
             Button {
                 mostrandoAlta = true
                 Haptics.seleccion()
@@ -82,7 +103,9 @@ struct InversionesView: View {
                 }
                 .textCase(nil)
             } footer: {
-                if cartera.faltaCotizacion {
+                if let resultado {
+                    Text(resultado)
+                } else if cartera.faltaCotizacion {
                     Text("Sin cotización del dólar no se pueden convertir las tenencias en pesos, así que no entran en el total.")
                 }
             }
@@ -124,7 +147,29 @@ struct InversionesView: View {
         if inversion.moneda != .usd {
             partes.append(Formatters.moneda(inversion.valor, moneda: inversion.moneda))
         }
+        if let actualizado = inversion.precioActualizado {
+            partes.append(actualizado.formatted(.relative(presentation: .numeric)))
+        }
         return partes.joined(separator: " · ")
+    }
+
+    /// Trae las cotizaciones y cuenta cuántas se pudieron actualizar.
+    ///
+    /// Dice cuántas fallaron en vez de fallar en silencio: si el ticker
+    /// está mal escrito, la tenencia se queda con el precio viejo y sin
+    /// aviso uno cree que se actualizó.
+    private func actualizarPrecios() async {
+        actualizando = true
+        resultado = nil
+        let total = conTicker.count
+        let logradas = await CotizacionesService.actualizar(conTicker)
+        try? contexto.save()
+        tasasADolar = await Cartera.tasas(para: inversiones)
+        actualizando = false
+        resultado = logradas == total
+            ? String(localized: "Cotizaciones actualizadas.")
+            : String(localized: "Se actualizaron \(logradas) de \(total): revisá los tickers de las que faltan.")
+        Haptics.exito()
     }
 
     private func eliminar(_ inversion: Inversion) {

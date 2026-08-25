@@ -33,6 +33,8 @@ struct InversionBackup: Codable {
     let tasaAnual: Double?
     let vencimiento: Date?
     let orden: Int
+    /// Desde la versión 2.4.
+    let precioActualizado: Date?
 }
 
 struct RecurrenteBackup: Codable {
@@ -221,7 +223,7 @@ enum BackupService {
                     donde: $0.donde, monedaRaw: $0.monedaRaw,
                     cantidad: $0.cantidad, precio: $0.precio, monto: $0.monto,
                     tasaAnual: $0.tasaAnual, vencimiento: $0.vencimiento,
-                    orden: $0.orden
+                    orden: $0.orden, precioActualizado: $0.precioActualizado
                 )
             }
         )
@@ -353,6 +355,7 @@ enum BackupService {
                 orden: dto.orden
             )
             inversion.id = dto.id
+            inversion.precioActualizado = dto.precioActualizado
             contexto.insert(inversion)
         }
 

@@ -350,6 +350,17 @@
         }
       }
     },
+    "Actualizar cotizaciones": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Update prices"
+          }
+        }
+      }
+    },
     "Acumulado": {},
     "Además": {},
     "Agregar": {
@@ -996,6 +1007,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Continue"
+          }
+        }
+      }
+    },
+    "Cotizaciones actualizadas.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prices updated."
           }
         }
       }
@@ -1964,6 +1986,7 @@
         }
       }
     },
+    "Grupo": {},
     "Guarda un gasto al instante, sin abrir la app ni confirmar. Usalo en una automatización de Atajos con el disparador \"Transacción\" para registrar solos los pagos con Apple Pay.": {},
     "Guardar": {
       "localizations": {
@@ -3139,6 +3162,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Health"
+          }
+        }
+      }
+    },
+    "Se actualizaron %lld de %lld: revisá los tickers de las que faltan.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Updated %lld of %lld: check the tickers of the ones that failed."
           }
         }
       }

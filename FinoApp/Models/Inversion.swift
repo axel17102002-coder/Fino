@@ -96,6 +96,11 @@ final class Inversion {
     /// cantidad ni cotización.
     var monto: Double?
 
+    /// Cuándo se trajo el precio de la red. `nil` en las que se cargan a
+    /// mano, para poder decir "actualizado hace 2 h" solo cuando es
+    /// cierto.
+    var precioActualizado: Date?
+
     /// Informativos: no entran en ninguna cuenta, sirven para avisar que
     /// un plazo fijo está por vencer.
     var tasaAnual: Double?

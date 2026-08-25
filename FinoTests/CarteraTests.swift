@@ -157,12 +157,53 @@ struct BackupDeInversionesTests {
             id: UUID(), nombre: "AAPL", tipoRaw: TipoInversion.accion.rawValue,
             donde: "IBKR", monedaRaw: Moneda.usd.rawValue,
             cantidad: 10, precio: 220, monto: nil,
-            tasaAnual: nil, vencimiento: nil, orden: 0
+            tasaAnual: nil, vencimiento: nil, orden: 0, precioActualizado: nil
         )
         let data = try JSONEncoder().encode(original)
         let vuelta = try JSONDecoder().decode(InversionBackup.self, from: data)
         #expect(vuelta.nombre == "AAPL")
         #expect(vuelta.cantidad == 10)
         #expect(vuelta.precio == 220)
+    }
+}
+
+/// Lectura de las fuentes de precios.
+struct CotizacionesTests {
+
+    private func datos(_ json: String) -> Data { Data(json.utf8) }
+
+    @Test func leeElPrecioDeYahoo() {
+        let json = """
+        {"chart":{"result":[{"meta":{"currency":"USD","symbol":"AAPL","regularMarketPrice":310.34}}]}}
+        """
+        #expect(CotizacionesService.precioDeRespuestaYahoo(datos(json)) == 310.34)
+    }
+
+    @Test func rechazaLosPapelesQueNoCotizanEnDolares() {
+        // Guardar un precio en euros como si fueran dólares daría un total
+        // inflado sin que nada lo delate.
+        let json = """
+        {"chart":{"result":[{"meta":{"currency":"EUR","symbol":"SAP.DE","regularMarketPrice":240.0}}]}}
+        """
+        #expect(CotizacionesService.precioDeRespuestaYahoo(datos(json)) == nil)
+    }
+
+    @Test func unTickerQueNoExisteNoDevuelvePrecio() {
+        let json = """
+        {"chart":{"result":null,"error":{"code":"Not Found"}}}
+        """
+        #expect(CotizacionesService.precioDeRespuestaYahoo(datos(json)) == nil)
+    }
+
+    @Test func unaRespuestaRotaNoRompe() {
+        #expect(CotizacionesService.precioDeRespuestaYahoo(Data()) == nil)
+        #expect(CotizacionesService.precioDeRespuestaYahoo(datos("{}")) == nil)
+    }
+
+    @Test func unPrecioEnCeroSeDescarta() {
+        let json = """
+        {"chart":{"result":[{"meta":{"currency":"USD","regularMarketPrice":0}}]}}
+        """
+        #expect(CotizacionesService.precioDeRespuestaYahoo(datos(json)) == nil)
     }
 }
