@@ -166,7 +166,11 @@ struct InversionesCard<Pie: View>: View {
                 Text(Formatters.moneda(dolares, moneda: .usd))
                     .font(.subheadline.bold())
                     .monospacedDigit()
-                Text("\(Int((proporcion * 100).rounded()))%")
+                // Cuántas tenés debajo del total, junto al peso que
+                // representa: son las dos preguntas que uno se hace
+                // mirando el número grande.
+                Text(inversion.cantidadTexto.map { "\($0) · \(Int((proporcion * 100).rounded()))%" }
+                    ?? "\(Int((proporcion * 100).rounded()))%")
                     .font(.caption2)
                     .monospacedDigit()
                     .foregroundStyle(.secondary)
@@ -179,8 +183,8 @@ struct InversionesCard<Pie: View>: View {
     private func subtitulo(de inversion: Inversion) -> String {
         var partes: [String] = []
         if !inversion.donde.isEmpty { partes.append(inversion.donde) }
-        if let nominal = inversion.cantidadYPrecio {
-            partes.append(nominal)
+        if let unitario = inversion.precioUnitarioTexto {
+            partes.append(unitario)
         } else if inversion.moneda != .usd {
             partes.append(Formatters.moneda(inversion.valor, moneda: inversion.moneda))
         }

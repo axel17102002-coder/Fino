@@ -147,16 +147,22 @@ final class Inversion {
         return monto ?? 0
     }
 
-    /// "10 × US$ 310,34": cuántas tenés y a cuánto está cada una.
+    /// Cuántas tenés, sin decimales cuando es un número entero: "10" y
+    /// no "10,0". Una fracción de bitcoin sí los conserva.
     ///
-    /// Solo en las que se siguen por ticker: en un plazo fijo no hay
-    /// cantidad ni precio unitario que mostrar.
-    var cantidadYPrecio: String? {
-        guard tipo.usaTicker, let cantidad, let precio, cantidad > 0 else { return nil }
-        let nominal = cantidad.truncatingRemainder(dividingBy: 1) == 0
+    /// Solo en las que se siguen por ticker: un plazo fijo no tiene
+    /// cantidad que mostrar.
+    var cantidadTexto: String? {
+        guard tipo.usaTicker, let cantidad, cantidad > 0 else { return nil }
+        return cantidad.truncatingRemainder(dividingBy: 1) == 0
             ? String(Int(cantidad))
             : String(format: "%g", cantidad)
-        return "\(nominal) × \(Formatters.moneda(precio, moneda: moneda))"
+    }
+
+    /// A cuánto está cada una, para poner al lado del ticker.
+    var precioUnitarioTexto: String? {
+        guard tipo.usaTicker, let precio, precio > 0 else { return nil }
+        return Formatters.moneda(precio, moneda: moneda)
     }
 
     /// Días que faltan para el vencimiento, si lo tiene y no pasó.

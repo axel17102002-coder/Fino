@@ -211,32 +211,35 @@ struct CotizacionesTests {
 /// Cómo se muestra la cantidad nominal.
 struct CantidadNominalTests {
 
-    @Test func muestraCuantasTenesYAComo() {
-        let accion = Inversion(nombre: "AAPL", tipo: .accion, moneda: .usd,
-                               cantidad: 10, precio: 310.34)
-        #expect(accion.cantidadYPrecio?.hasPrefix("10 × ") == true)
-    }
-
     @Test func sinDecimalesCuandoLaCantidadEsEntera() {
         let accion = Inversion(nombre: "NVDA", tipo: .accion, moneda: .usd,
                                cantidad: 12, precio: 208.48)
-        #expect(accion.cantidadYPrecio?.hasPrefix("12 ×") == true)
+        #expect(accion.cantidadTexto == "12")
     }
 
     @Test func conDecimalesCuandoLosTiene() {
         // Una fracción de bitcoin no se puede redondear a cero.
         let cripto = Inversion(nombre: "BTC", tipo: .cripto, moneda: .usd,
                                cantidad: 0.03, precio: 80_504)
-        #expect(cripto.cantidadYPrecio?.hasPrefix("0.03 ×") == true)
+        #expect(cripto.cantidadTexto == "0.03")
     }
 
-    @Test func elPlazoFijoNoTieneCantidadQueMostrar() {
+    @Test func elPrecioUnitarioVaAlLadoDelTicker() {
+        let accion = Inversion(nombre: "AAPL", tipo: .accion, moneda: .usd,
+                               cantidad: 10, precio: 310.34)
+        #expect(accion.precioUnitarioTexto?.contains("310") == true)
+    }
+
+    @Test func elPlazoFijoNoTieneNiCantidadNiPrecioUnitario() {
         let pf = Inversion(nombre: "Galicia", tipo: .plazoFijo, moneda: .ars, monto: 2_400_000)
-        #expect(pf.cantidadYPrecio == nil)
+        #expect(pf.cantidadTexto == nil)
+        #expect(pf.precioUnitarioTexto == nil)
     }
 
-    @Test func sinPrecioTodaviaNoMuestraNada() {
+    @Test func sinPrecioTodaviaMuestraLaCantidadIgual() {
+        // Recién cargada y sin cotizar: cuántas tenés ya se sabe.
         let accion = Inversion(nombre: "AAPL", tipo: .accion, moneda: .usd, cantidad: 10)
-        #expect(accion.cantidadYPrecio == nil)
+        #expect(accion.cantidadTexto == "10")
+        #expect(accion.precioUnitarioTexto == nil)
     }
 }

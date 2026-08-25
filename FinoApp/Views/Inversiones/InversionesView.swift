@@ -133,9 +133,17 @@ struct InversionesView: View {
 
             Spacer(minLength: 8)
 
-            Text(Formatters.moneda(dolares, moneda: .usd))
-                .font(.callout.bold())
-                .monospacedDigit()
+            VStack(alignment: .trailing, spacing: 1) {
+                Text(Formatters.moneda(dolares, moneda: .usd))
+                    .font(.callout.bold())
+                    .monospacedDigit()
+                if let cantidad = inversion.cantidadTexto {
+                    Text(cantidad)
+                        .font(.caption2)
+                        .monospacedDigit()
+                        .foregroundStyle(.secondary)
+                }
+            }
         }
         .padding(.vertical, 2)
     }
@@ -144,7 +152,7 @@ struct InversionesView: View {
     /// es en la suya.
     private func detalle(de inversion: Inversion) -> String {
         var partes = [inversion.tipo.nombre]
-        if let nominal = inversion.cantidadYPrecio { partes.append(nominal) }
+        if let unitario = inversion.precioUnitarioTexto { partes.append(unitario) }
         if !inversion.donde.isEmpty { partes.append(inversion.donde) }
         if inversion.moneda != .usd {
             partes.append(Formatters.moneda(inversion.valor, moneda: inversion.moneda))
