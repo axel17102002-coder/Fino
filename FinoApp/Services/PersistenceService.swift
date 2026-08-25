@@ -20,7 +20,20 @@ final class PersistenceService {
             Deuda.self,
             Inversion.self
         ])
-        let configuracion = ModelConfiguration(schema: esquema)
+        // El App Group va explícito y no por omisión. `ModelConfiguration`
+        // usa `groupContainer: .automatic`, que significa "si la app
+        // declara un App Group en sus entitlements, poné la base ahí": la
+        // ubicación de los datos terminaba dependiendo de un archivo de
+        // configuración y no del código. Si ese entitlement se sacara o
+        // renombrara, la app abriría una base vacía y el `catch` de abajo
+        // borraría lo que hubiera quedado.
+        //
+        // Nombrarlo no cambia dónde vive la base hoy: resuelve al mismo
+        // contenedor que venía eligiendo sola.
+        let configuracion = ModelConfiguration(
+            schema: esquema,
+            groupContainer: .identifier(WidgetDataService.grupo)
+        )
         do {
             container = try ModelContainer(for: esquema, configurations: [configuracion])
         } catch {

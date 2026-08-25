@@ -255,3 +255,104 @@ struct CantidadNominalTests {
         #expect(accion.precioUnitarioTexto == nil)
     }
 }
+
+/// El backup completo, ida y vuelta.
+///
+/// Los tests que había cubrían una tenencia suelta y que un backup viejo
+/// se pudiera leer. Faltaba el camino entero: armar un backup con todo lo
+/// que agregamos, codificarlo, decodificarlo y comprobar que nada se
+/// perdió en el viaje.
+struct BackupCompletoTests {
+
+    private func codificar(_ backup: BackupFino) throws -> Data {
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        return try encoder.encode(backup)
+    }
+
+    private func decodificar(_ data: Data) throws -> BackupFino {
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        return try decoder.decode(BackupFino.self, from: data)
+    }
+
+    /// Un backup con una tenencia de cada forma de carga y los ajustes de
+    /// categorías, que es lo último que agregamos.
+    private var backupDePrueba: BackupFino {
+        BackupFino(
+            fecha: .now,
+            cuentas: [],
+            movimientos: [],
+            presupuestos: [],
+            objetivos: [],
+            categoriasPersonalizadas: [],
+            preferencias: PreferenciasBackup(
+                nombre: "Axel",
+                monedaRaw: Moneda.ars.rawValue,
+                temaRaw: nil,
+                diaInicioMes: 1,
+                ordenCategorias: ["gasto": ["comida", "transporte"]],
+                ajustesFabrica: [
+                    // Un tipo de inversión renombrado: el caso que entró
+                    // solo, por compartir el mecanismo de las categorías.
+                    "inversion-accion": CustomCategoryStore.AjusteCategoria(
+                        nombre: "Equity", icono: nil, colorHex: "#112233"
+                    )
+                ],
+                categoriasOcultas: ["mascotas"]
+            ),
+            deudas: nil,
+            recurrentes: nil,
+            inversiones: [
+                InversionBackup(
+                    id: UUID(), nombre: "AAPL", tipoRaw: TipoInversion.accion.rawValue,
+                    donde: "IBKR", monedaRaw: Moneda.usd.rawValue,
+                    cantidad: 10, precio: 310.34, monto: nil,
+                    tasaAnual: nil, vencimiento: nil, orden: 0,
+                    precioActualizado: Date(timeIntervalSince1970: 1_780_000_000)
+                ),
+                InversionBackup(
+                    id: UUID(), nombre: "Plazo fijo Galicia", tipoRaw: TipoInversion.plazoFijo.rawValue,
+                    donde: "Galicia", monedaRaw: Moneda.ars.rawValue,
+                    cantidad: nil, precio: nil, monto: 2_400_000,
+                    tasaAnual: 42, vencimiento: Date(timeIntervalSince1970: 1_790_000_000),
+                    orden: 1, precioActualizado: nil
+                ),
+            ]
+        )
+    }
+
+    @Test func lasTenenciasSobrevivenElViajeCompleto() throws {
+        let vuelta = try decodificar(try codificar(backupDePrueba))
+        let inversiones = try #require(vuelta.inversiones)
+        #expect(inversiones.count == 2)
+
+        let accion = try #require(inversiones.first { $0.nombre == "AAPL" })
+        #expect(accion.cantidad == 10)
+        #expect(accion.precio == 310.34)
+        #expect(accion.monto == nil)
+        #expect(accion.precioActualizado != nil)
+
+        let plazo = try #require(inversiones.first { $0.tipoRaw == TipoInversion.plazoFijo.rawValue })
+        #expect(plazo.monto == 2_400_000)
+        #expect(plazo.monedaRaw == Moneda.ars.rawValue)
+        #expect(plazo.tasaAnual == 42)
+        #expect(plazo.vencimiento != nil)
+        // Las dos formas de carga no se pisan entre sí.
+        #expect(plazo.cantidad == nil)
+    }
+
+    @Test func losAjustesDeCategoriasSobrevivenIncluidosLosDeInversion() throws {
+        let vuelta = try decodificar(try codificar(backupDePrueba))
+        let ajustes = try #require(vuelta.preferencias?.ajustesFabrica)
+        let renombrado = try #require(ajustes["inversion-accion"])
+        #expect(renombrado.nombre == "Equity")
+        #expect(renombrado.colorHex == "#112233")
+    }
+
+    @Test func elOrdenYLasOcultasTambienViajan() throws {
+        let vuelta = try decodificar(try codificar(backupDePrueba))
+        #expect(vuelta.preferencias?.ordenCategorias?["gasto"] == ["comida", "transporte"])
+        #expect(vuelta.preferencias?.categoriasOcultas == ["mascotas"])
+    }
+}

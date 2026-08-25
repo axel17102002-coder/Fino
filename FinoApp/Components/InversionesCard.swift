@@ -2,8 +2,8 @@ import SwiftUI
 
 /// Qué tenés invertido, cuánto vale y dónde está.
 ///
-/// Todo en dólares aunque haya tenencias en pesos: sumar dos monedas no
-/// da un número. El donut reparte por tenencia y al lado va el reparto
+/// Todo en dólares aunque haya tenencias en otras monedas: sumarlas sin
+/// convertir no da un número. El donut reparte por tenencia y al lado va el reparto
 /// por clase, que responden dos preguntas distintas —cuánto hay en cada
 /// cosa y cuánto en cada tipo de cosa— sin necesitar dos tarjetas.
 struct InversionesCard<Pie: View>: View {
@@ -87,7 +87,7 @@ struct InversionesCard<Pie: View>: View {
                     // El total está incompleto y hay que decirlo: mostrar
                     // un número al que le falta una parte, sin avisar, es
                     // peor que no mostrarlo.
-                    Text("Sin cotización del dólar: faltan las tenencias en pesos.")
+                    Text("Falta la cotización de alguna moneda: esas tenencias no entran en el total.")
                         .font(.caption2)
                         .foregroundStyle(.orange)
                 }

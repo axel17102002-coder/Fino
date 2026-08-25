@@ -106,7 +106,7 @@ struct InversionesView: View {
                 if let resultado {
                     Text(resultado)
                 } else if cartera.faltaCotizacion {
-                    Text("Sin cotización del dólar no se pueden convertir las tenencias en pesos, así que no entran en el total.")
+                    Text("Sin cotización no se pueden convertir las tenencias en otras monedas, así que no entran en el total.")
                 }
             }
         }

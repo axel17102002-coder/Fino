@@ -3,9 +3,10 @@ import SwiftUI
 
 /// Las inversiones vistas como un todo, ya llevadas a una sola moneda.
 ///
-/// Todo se muestra en dólares aunque haya tenencias en pesos —un plazo
-/// fijo, una cuenta remunerada—: sumar dos monedas no da un número, y el
-/// dólar es la unidad en la que están la mayoría.
+/// Todo se muestra en dólares aunque haya tenencias en pesos o en euros
+/// —un plazo fijo, una cuenta remunerada, una divisa—: sumar monedas
+/// distintas no da un número, y el dólar es la unidad en la que están la
+/// mayoría.
 struct Cartera {
 
     /// Cuántos dólares vale una unidad de cada moneda. El dólar no está:
@@ -35,8 +36,9 @@ struct Cartera {
         return inversion.valor * tasa
     }
 
-    /// Hay tenencias en pesos que no se pueden convertir. La card lo dice
-    /// en vez de mostrar un total al que le falta una parte sin avisar.
+    /// Hay tenencias que no se pueden convertir por falta de cotización.
+    /// La card lo dice en vez de mostrar un total al que le falta una
+    /// parte sin avisar.
     var faltaCotizacion: Bool {
         tenencias.contains { enDolares($0) == nil }
     }
