@@ -140,9 +140,11 @@ struct InversionesView: View {
         .padding(.vertical, 2)
     }
 
-    /// Tipo, dónde está y —en las de pesos— cuánto es en su moneda.
+    /// Tipo, cuántas tenés, dónde está y —en las de otra moneda— cuánto
+    /// es en la suya.
     private func detalle(de inversion: Inversion) -> String {
         var partes = [inversion.tipo.nombre]
+        if let nominal = inversion.cantidadYPrecio { partes.append(nominal) }
         if !inversion.donde.isEmpty { partes.append(inversion.donde) }
         if inversion.moneda != .usd {
             partes.append(Formatters.moneda(inversion.valor, moneda: inversion.moneda))
@@ -161,14 +163,13 @@ struct InversionesView: View {
     private func actualizarPrecios() async {
         actualizando = true
         resultado = nil
-        let total = conTicker.count
-        let logradas = await CotizacionesService.actualizar(conTicker)
+        let fallidas = await CotizacionesService.actualizar(conTicker)
         try? contexto.save()
         tasasADolar = await Cartera.tasas(para: inversiones)
         actualizando = false
-        resultado = logradas == total
+        resultado = fallidas.isEmpty
             ? String(localized: "Cotizaciones actualizadas.")
-            : String(localized: "Se actualizaron \(logradas) de \(total): revisá los tickers de las que faltan.")
+            : String(localized: "No se pudo consultar \(fallidas.joined(separator: ", ")). Revisá que el ticker sea el del mercado de Estados Unidos.")
         Haptics.exito()
     }
 

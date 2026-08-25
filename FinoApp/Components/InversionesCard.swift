@@ -179,13 +179,10 @@ struct InversionesCard<Pie: View>: View {
     private func subtitulo(de inversion: Inversion) -> String {
         var partes: [String] = []
         if !inversion.donde.isEmpty { partes.append(inversion.donde) }
-        if inversion.moneda != .usd {
+        if let nominal = inversion.cantidadYPrecio {
+            partes.append(nominal)
+        } else if inversion.moneda != .usd {
             partes.append(Formatters.moneda(inversion.valor, moneda: inversion.moneda))
-        } else if let cantidad = inversion.cantidad, inversion.tipo.usaTicker {
-            // Sin decimales cuando es entero: "10 AAPL" y no "10,0".
-            partes.append(cantidad.truncatingRemainder(dividingBy: 1) == 0
-                ? String(Int(cantidad))
-                : String(format: "%g", cantidad))
         }
         return partes.joined(separator: " · ")
     }

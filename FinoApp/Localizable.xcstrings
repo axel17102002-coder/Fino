@@ -2509,6 +2509,17 @@
         }
       }
     },
+    "No se pudo consultar %@. Revisá que el ticker sea el del mercado de Estados Unidos.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn't look up %@. Check that the ticker is the US market one."
+          }
+        }
+      }
+    },
     "No se pudo restaurar": {
       "localizations": {
         "en": {
@@ -3162,17 +3173,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Health"
-          }
-        }
-      }
-    },
-    "Se actualizaron %lld de %lld: revisá los tickers de las que faltan.": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Updated %lld of %lld: check the tickers of the ones that failed."
           }
         }
       }

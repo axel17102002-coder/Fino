@@ -207,3 +207,36 @@ struct CotizacionesTests {
         #expect(CotizacionesService.precioDeRespuestaYahoo(datos(json)) == nil)
     }
 }
+
+/// Cómo se muestra la cantidad nominal.
+struct CantidadNominalTests {
+
+    @Test func muestraCuantasTenesYAComo() {
+        let accion = Inversion(nombre: "AAPL", tipo: .accion, moneda: .usd,
+                               cantidad: 10, precio: 310.34)
+        #expect(accion.cantidadYPrecio?.hasPrefix("10 × ") == true)
+    }
+
+    @Test func sinDecimalesCuandoLaCantidadEsEntera() {
+        let accion = Inversion(nombre: "NVDA", tipo: .accion, moneda: .usd,
+                               cantidad: 12, precio: 208.48)
+        #expect(accion.cantidadYPrecio?.hasPrefix("12 ×") == true)
+    }
+
+    @Test func conDecimalesCuandoLosTiene() {
+        // Una fracción de bitcoin no se puede redondear a cero.
+        let cripto = Inversion(nombre: "BTC", tipo: .cripto, moneda: .usd,
+                               cantidad: 0.03, precio: 80_504)
+        #expect(cripto.cantidadYPrecio?.hasPrefix("0.03 ×") == true)
+    }
+
+    @Test func elPlazoFijoNoTieneCantidadQueMostrar() {
+        let pf = Inversion(nombre: "Galicia", tipo: .plazoFijo, moneda: .ars, monto: 2_400_000)
+        #expect(pf.cantidadYPrecio == nil)
+    }
+
+    @Test func sinPrecioTodaviaNoMuestraNada() {
+        let accion = Inversion(nombre: "AAPL", tipo: .accion, moneda: .usd, cantidad: 10)
+        #expect(accion.cantidadYPrecio == nil)
+    }
+}

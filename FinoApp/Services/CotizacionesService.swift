@@ -32,23 +32,26 @@ enum CotizacionesService {
         }
     }
 
-    /// Actualiza el precio de las tenencias que se siguen por ticker.
-    /// Devuelve cuántas se pudieron actualizar.
+    /// Actualiza el precio de las tenencias que se siguen por ticker y
+    /// devuelve los nombres de las que no se pudieron consultar.
+    ///
+    /// Devuelve cuáles fallaron y no cuántas: con un número, un ticker mal
+    /// escrito obliga a adivinar cuál de todas es. Con el nombre, se ve.
     ///
     /// Las que se cargan con capital —plazo fijo, cuenta remunerada,
     /// divisa— no se tocan: no tienen cotización que buscar.
     @discardableResult
-    static func actualizar(_ tenencias: [Inversion]) async -> Int {
-        var actualizadas = 0
+    static func actualizar(_ tenencias: [Inversion]) async -> [String] {
+        var fallidas: [String] = []
         for tenencia in tenencias where tenencia.tipo.usaTicker {
             guard let precio = await precio(de: tenencia.nombre, tipo: tenencia.tipo) else {
+                fallidas.append(tenencia.nombre)
                 continue
             }
             tenencia.precio = precio
             tenencia.precioActualizado = .now
-            actualizadas += 1
         }
-        return actualizadas
+        return fallidas
     }
 
     // MARK: - Cripto

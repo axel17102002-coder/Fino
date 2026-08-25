@@ -147,6 +147,18 @@ final class Inversion {
         return monto ?? 0
     }
 
+    /// "10 × US$ 310,34": cuántas tenés y a cuánto está cada una.
+    ///
+    /// Solo en las que se siguen por ticker: en un plazo fijo no hay
+    /// cantidad ni precio unitario que mostrar.
+    var cantidadYPrecio: String? {
+        guard tipo.usaTicker, let cantidad, let precio, cantidad > 0 else { return nil }
+        let nominal = cantidad.truncatingRemainder(dividingBy: 1) == 0
+            ? String(Int(cantidad))
+            : String(format: "%g", cantidad)
+        return "\(nominal) × \(Formatters.moneda(precio, moneda: moneda))"
+    }
+
     /// Días que faltan para el vencimiento, si lo tiene y no pasó.
     var diasParaVencer: Int? {
         guard let vencimiento else { return nil }
