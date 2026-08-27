@@ -97,6 +97,20 @@ final class Movimiento {
     /// `montoConSigno` pero con el consumo propio: para el balance del mes.
     var montoPropioConSigno: Double { tipo == .gasto ? -montoPropio : montoPropio }
 
+    /// Lo que sale de tu bolsillo por este movimiento en un mes: la cuota
+    /// si está financiado, y el monto entero si no.
+    ///
+    /// Una compra de 120.000 en 12 cuotas no te saca 120.000 el día que
+    /// la hacés: te saca 10.000 por mes. Es la misma idea que usa el
+    /// resumen del mes, aplicada al total de un día.
+    var montoPropioMensual: Double {
+        esEnCuotas && cuotas > 0 ? montoPropio / Double(cuotas) : montoPropio
+    }
+
+    var montoPropioMensualConSigno: Double {
+        tipo == .gasto ? -montoPropioMensual : montoPropioMensual
+    }
+
     var esCompartido: Bool { (montoAjeno ?? 0) > 0 }
 
     // MARK: - Moneda

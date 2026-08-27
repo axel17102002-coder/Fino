@@ -622,3 +622,36 @@ struct ResumenesDeTarjetaTests {
         #expect(CalculosService.resumenesDeTarjeta(tarjeta).isEmpty)
     }
 }
+
+/// Lo que se muestra como gasto de un día.
+struct GastoDelDiaTests {
+
+    private func gasto(_ monto: Double, cuotas: Int = 1, ajeno: Double? = nil) -> Movimiento {
+        let m = Movimiento(
+            tipo: .gasto, nombre: "Compra",
+            categoriaRaw: CategoriaGasto.otros.rawValue,
+            monto: monto, fecha: .now
+        )
+        m.cuotas = cuotas
+        m.montoAjeno = ajeno
+        return m
+    }
+
+    @Test func loFinanciadoCuentaLaCuotaYNoElTotal() {
+        // 120.000 en 12 no te sacan 120.000 ese día: te sacan 10.000.
+        #expect(gasto(120_000, cuotas: 12).montoPropioMensual == 10_000)
+    }
+
+    @Test func unPagoUnicoCuentaEntero() {
+        #expect(gasto(8_400).montoPropioMensual == 8_400)
+    }
+
+    @Test func loCompartidoEnCuotasCuentaTuParteDeLaCuota() {
+        // 60.000 en 6 cuotas, mitad de otro: tu cuota es 5.000.
+        #expect(gasto(60_000, cuotas: 6, ajeno: 30_000).montoPropioMensual == 5_000)
+    }
+
+    @Test func elSignoSigueSiendoNegativoEnLosGastos() {
+        #expect(gasto(120_000, cuotas: 12).montoPropioMensualConSigno == -10_000)
+    }
+}

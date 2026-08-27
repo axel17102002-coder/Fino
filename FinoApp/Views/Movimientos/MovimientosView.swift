@@ -20,18 +20,7 @@ struct MovimientosView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                BarraSuperior("Movimientos") {
-                    Button {
-                        mostrandoFiltros = true
-                    } label: {
-                        Image(systemName: viewModel.hayFiltrosActivos
-                            ? "line.3.horizontal.decrease.circle.fill"
-                            : "line.3.horizontal.decrease.circle")
-                            .font(.title3)
-                            .foregroundStyle(.white)
-                    }
-                    .accessibilityLabel("Filtros")
-                }
+                BarraSuperior("Movimientos")
 
                 Group {
                     if movimientos.isEmpty {
@@ -77,15 +66,36 @@ struct MovimientosView: View {
     private var lista: some View {
         List {
             Section {
-                SearchBar(texto: $viewModel.busqueda, placeholder: String(localized: "Buscar por nombre, categoría o cuenta"))
-                    .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
-                    .listRowBackground(Color.clear)
-                    .listRowSeparator(.hidden)
-            }
+                // El filtro al lado del buscador: los dos son la misma
+                // tarea —achicar la lista— y tenerlos juntos ahorra ir
+                // hasta la barra de arriba para algo que se usa mirando
+                // los resultados.
+                HStack(spacing: 10) {
+                    SearchBar(texto: $viewModel.busqueda, placeholder: String(localized: "Buscar por nombre, categoría o cuenta"))
 
-            Section {
+                    Button {
+                        mostrandoFiltros = true
+                        Haptics.seleccion()
+                    } label: {
+                        Image(systemName: viewModel.hayFiltrosActivos
+                            ? "line.3.horizontal.decrease.circle.fill"
+                            : "line.3.horizontal.decrease.circle")
+                            .font(.title2)
+                            .foregroundStyle(Color.crema)
+                            .frame(width: 38, height: 38)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Filtros")
+                }
+                .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 8, trailing: 16))
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
+
+                // En la misma sección que el buscador: como secciones
+                // separadas, el espacio que insetGrouped mete entre una y
+                // otra dejaba un hueco muerto de casi dos centímetros.
                 resumenDeLaLista
-                    .listRowInsets(EdgeInsets(top: 2, leading: 16, bottom: 6, trailing: 16))
+                    .listRowInsets(EdgeInsets(top: 0, leading: 16, bottom: 4, trailing: 16))
                     .listRowBackground(Color.clear)
                     .listRowSeparator(.hidden)
             }
@@ -114,6 +124,9 @@ struct MovimientosView: View {
         }
         .listStyle(.insetGrouped)
         .scrollContentBackground(.hidden)
+        // Arranca pegado al título: el buscador y el filtro son lo
+        // primero que se usa y no necesitan aire arriba.
+        .contentMargins(.top, 4, for: .scrollContent)
         // Deja pasar el último renglón por encima de la barra inferior.
         .contentMargins(.bottom, 84, for: .scrollContent)
         .scrollDismissesKeyboard(.immediately)
@@ -243,12 +256,17 @@ private struct DiaDeMovimientos: Identifiable {
     /// es para ver cuánto gastaste, y un sueldo daba vuelta el número y
     /// tapaba el gasto del día.
     ///
+    /// Lo financiado suma su cuota y no el total: una compra de 120.000
+    /// en 12 cuotas no te saca 120.000 ese día, te saca 10.000 por mes.
+    /// Con el total, un día con una compra en cuotas mostraba un número
+    /// que no se parecía a lo que realmente gastaste.
+    ///
     /// `nil` cuando el día solo tuvo ingresos: ahí no hay gasto que
     /// mostrar y un "$ 0" confundiría más de lo que aporta.
     var gastoDelDia: Double? {
         let deSalida = movimientos.filter { $0.tipo != .ingreso }
         guard !deSalida.isEmpty else { return nil }
-        return deSalida.reduce(0) { $0 + $1.montoPropioConSigno }
+        return deSalida.reduce(0) { $0 + $1.montoPropioMensualConSigno }
     }
 
     /// "Hoy" y "Ayer" en vez de la fecha, que es como uno los nombra. Los
